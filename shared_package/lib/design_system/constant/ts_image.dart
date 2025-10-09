@@ -1,0 +1,9 @@
+const String logots = "assets/images/ts logoblue.png";
+const String icHome = "assets/images/ic_home.png";
+const String icFav = "assets/images/ic_heart.png";
+const String icPerson = "assets/images/ic_person.png";
+const String imgHarvard = "assets/images/img_harvert.jpg";
+const String imgRupp = "assets/images/img_rupp.jpg";
+const String iclogo = "assets/images/ic_logo.png";
+const String icKhmer = "assets/images/ic_kh.svg";
+const String icUk = "assets/images/ic_uk.svg";
