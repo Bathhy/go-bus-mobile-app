@@ -60,14 +60,15 @@ class XTextLarge extends StatelessWidget {
   final FontWeight? fontWeight;
   final TextOverflow? textOverFlow;
   final int? maxLines;
-  const XTextLarge(
-      {super.key,
-      required this.colortext,
-      this.textOverFlow = TextOverflow.ellipsis,
-      required this.label,
-      this.decoration,
-      this.maxLines,
-      this.fontWeight});
+  const XTextLarge({
+    super.key,
+    this.colortext = goBusPrimary,
+    this.textOverFlow = TextOverflow.ellipsis,
+    required this.label,
+    this.decoration,
+    this.maxLines,
+    this.fontWeight,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -76,11 +77,12 @@ class XTextLarge extends StatelessWidget {
       overflow: textOverFlow,
       maxLines: maxLines,
       style: TextStyle(
-          color: colortext,
-          fontSize: TsFontSize.large,
-          fontWeight: fontWeight,
-        
-          decoration: decoration),
+        color: colortext,
+        fontSize: TsFontSize.large,
+        fontWeight: fontWeight,
+
+        decoration: decoration,
+      ),
     );
   }
 }
@@ -155,11 +157,7 @@ class TsTextExtraSmall extends StatelessWidget {
   final String label;
   final Color colortext = eventPrimaryColor;
   final TextDecoration? decoration;
-  const TsTextExtraSmall({
-    super.key,
-    required this.label,
-    this.decoration,
-  });
+  const TsTextExtraSmall({super.key, required this.label, this.decoration});
 
   @override
   Widget build(BuildContext context) {

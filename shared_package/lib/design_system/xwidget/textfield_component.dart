@@ -48,20 +48,19 @@ class XTextfield extends StatelessWidget {
       children: [
         titletextfield.isNotEmpty
             ? Text(
-                titletextfield,
-                style: const TextStyle(color: eventPrimaryColor),
-              )
+              titletextfield,
+              style: const TextStyle(color: eventPrimaryColor),
+            )
             : const SizedBox.shrink(),
-        SizedBox(
-          height: TsPadding.medium,
-        ),
+        SizedBox(height: XPadding.medium),
         Container(
           decoration: BoxDecoration(
             color: bgcolor,
             border: Border.all(color: black),
-            borderRadius: radiuschoice == 1
-                ? BorderRadius.circular(20)
-                : BorderRadius.circular(10),
+            borderRadius:
+                radiuschoice == 1
+                    ? BorderRadius.circular(20)
+                    : BorderRadius.circular(10),
           ),
           child: TextFormField(
             onChanged: onChanged,
@@ -74,33 +73,33 @@ class XTextfield extends StatelessWidget {
             decoration: InputDecoration(
               hintText: label,
               contentPadding: EdgeInsets.symmetric(
-                  vertical: TsPadding.extralarge,
-                  horizontal: TsPadding.extralarge + 5),
-              border: border ??
+                vertical: XPadding.extralarge,
+                horizontal: XPadding.extralarge + 5,
+              ),
+              border:
+                  border ??
                   OutlineInputBorder(
                     borderSide: const BorderSide(
                       color: Colors.red, // Border color
                       width: 20, // Border thickness
                     ),
-                    borderRadius: radiuschoice == 1
-                        ? BorderRadius.circular(20)
-                        : BorderRadius.circular(10),
+                    borderRadius:
+                        radiuschoice == 1
+                            ? BorderRadius.circular(20)
+                            : BorderRadius.circular(10),
                   ),
-              suffixIcon: enablePrefixIcon && icondata != null
-                  ? IconButton(
-                      onPressed: onpress,
-                      icon: Icon(
-                        icondata,
-                        color: colorIcon,
-                        size: iconsize,
-                      ),
-                    )
-                  : null,
+              suffixIcon:
+                  enablePrefixIcon && icondata != null
+                      ? IconButton(
+                        onPressed: onpress,
+                        icon: Icon(icondata, color: colorIcon, size: iconsize),
+                      )
+                      : null,
               prefixIcon: prefixicon != null ? Icon(prefixicon) : null,
             ),
           ),
         ),
-      ], 
+      ],
     );
   }
 }

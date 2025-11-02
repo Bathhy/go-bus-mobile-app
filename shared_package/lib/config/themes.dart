@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 const Color eventPrimaryColor = Color(0xFFF76B10);
@@ -11,3 +10,7 @@ const Color bottomsheetcolor = Color.fromARGB(248, 199, 196, 196);
 Color shimmerColor = Colors.grey.shade300;
 Color shimerBgColor = Colors.grey.shade200;
 const Color appBgColor = Color(0xFFFBFBFB);
+
+const Color goBusPrimary = Color(0xFF4169E1);
+const Color success = Color(0xFF2ECC71);
+const Color errorPrimary = Color(0xFFFE5858);
