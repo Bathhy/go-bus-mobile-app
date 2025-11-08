@@ -9,6 +9,7 @@ class XButton extends StatelessWidget {
   final GestureTapCallback? onTap;
   final int optionbutton;
   final double? width;
+  final double? height;
   final bool loadingState;
   final Color bgColor;
   final Color textColor;
@@ -24,6 +25,7 @@ class XButton extends StatelessWidget {
     this.width = double.infinity,
     this.loadingState = false,
     this.isDisabled = false,
+    this.height,
   });
 
   @override
@@ -36,36 +38,45 @@ class XButton extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: TsFontSize.medium),
         width: width,
+        height: height,
         decoration: BoxDecoration(
-          borderRadius: optionbutton == 1
-              ? BorderRadius.circular(10)
-              : BorderRadius.circular(20),
+          borderRadius:
+              optionbutton == 1
+                  ? BorderRadius.circular(10)
+                  : BorderRadius.circular(20),
           color: effectiveBgColor,
-          boxShadow: isDisabled
-              ? []
-              : [
-                  BoxShadow(
-                    color: const Color.fromARGB(255, 33, 32, 32).withOpacity(0.5),
-                    spreadRadius: 0.5,
-                    blurRadius: 3,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+          boxShadow:
+              isDisabled
+                  ? []
+                  : [
+                    BoxShadow(
+                      color: const Color.fromARGB(
+                        255,
+                        33,
+                        32,
+                        32,
+                      ).withOpacity(0.5),
+                      spreadRadius: 0.5,
+                      blurRadius: 3,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
         ),
         child: Center(
-          child: loadingState
-              ? CircularProgressIndicator(
-                  backgroundColor: white,
-                  color: shimmerColor,
-                )
-              : Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: TsFontSize.large,
-                    color: effectiveTextColor,
-                    fontWeight: FontWeight.bold,
+          child:
+              loadingState
+                  ? CircularProgressIndicator(
+                    backgroundColor: white,
+                    color: shimmerColor,
+                  )
+                  : Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: TsFontSize.large,
+                      color: effectiveTextColor,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
         ),
       ),
     );

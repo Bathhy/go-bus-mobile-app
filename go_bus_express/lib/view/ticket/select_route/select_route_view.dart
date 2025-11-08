@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 import 'package:shared_package/design_system/xwidget/x_app_bar.dart';
@@ -216,7 +218,9 @@ class SelectRouteView extends StatelessWidget {
                 ),
               ),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Get.toNamed(AppRoutes.selectSeat);
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: success,
                   foregroundColor: Colors.white,
