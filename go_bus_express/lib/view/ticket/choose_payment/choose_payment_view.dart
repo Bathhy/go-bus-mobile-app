@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:go_bus_express/resources/app_images.dart';
+import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 import 'package:shared_package/design_system/xwidget/ButtonComponent.dart';
@@ -154,6 +157,7 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
             label: 'Pay \$13:00',
             optionbutton: 1,
             bgColor: agreedToTerms ? Colors.green : Colors.grey,
+            onTap: () => Get.toNamed(AppRoutes.makePayment),
           ),
         ),
       ),

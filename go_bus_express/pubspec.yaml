@@ -53,6 +53,8 @@ dependencies:
   #image package
   # flutter_svg: ^2.0.17
   cached_network_image: ^3.4.1
+  khqr_sdk: ^2.0.0
+  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:
