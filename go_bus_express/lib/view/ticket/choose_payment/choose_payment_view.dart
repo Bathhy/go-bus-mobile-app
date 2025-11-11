@@ -177,7 +177,7 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
         ),
         XTextMedium(label: ':', colortext: Colors.grey.shade700),
         SizedBox(width: XPadding.medium),
-        Expanded(
+        Expanded( 
           child: XTextMedium(
             label: value,
             colortext: black,
