@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_package/design_system/xwidget/user_profile_card.dart';
+import 'package:go_bus_express/view/edit_profile_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -33,13 +34,22 @@ class ProfilePage extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
                       _buildMenuItem(
+                        context: context,
                         icon: Icons.person_outline,
                         iconColor: Colors.orange,
                         title: 'Edit Profile',
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const EditProfilePage(),
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 12),
                       _buildMenuItem(
+                        context: context,
                         icon: Icons.language,
                         iconColor: Colors.purple,
                         title: 'Languages',
@@ -47,6 +57,7 @@ class ProfilePage extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       _buildMenuItem(
+                        context: context,
                         icon: Icons.history,
                         iconColor: Colors.blue,
                         title: 'Booking History',
@@ -66,6 +77,7 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildMenuItem({
+    required BuildContext context,
     required IconData icon,
     required Color iconColor,
     required String title,

@@ -15,7 +15,6 @@ class _MainNavigationState extends State<MainNavigation> {
   final List<Widget> _pages = [
     const HomePageContent(),
     const Center(child: Text('Ticket Page')),
-    const Center(child: Text('Tracking Page')),
     const ProfilePage(),
   ];
 
@@ -57,10 +56,6 @@ class _MainNavigationState extends State<MainNavigation> {
             BottomNavigationBarItem(
               icon: Icon(Icons.confirmation_number),
               label: 'Ticket',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.local_shipping),
-              label: 'Tracking',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),
