@@ -1,51 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:shared_package/design_system/xwidget/user_profile_card.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  Widget build(BuildContext context) {
+    return const HomePageContent();
+  }
 }
 
-class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+class HomePageContent extends StatelessWidget {
+  const HomePageContent({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildAppBar(),
-                    const SizedBox(height: 16),
-                    _buildUserProfileCard(),
-                    const SizedBox(height: 16),
-                    _buildBookingCard(),
-                    const SizedBox(height: 16),
-                    _buildFastBookingSection(),
-                    const SizedBox(height: 16),
-                    _buildPromotionsSection(),
-                    const SizedBox(height: 16),
-                    _buildNeedHelpSection(),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-              ),
-            ),
-            _buildBottomNavigationBar(),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildAppBar(),
+              const SizedBox(height: 16),
+              _buildUserProfileCard(),
+              const SizedBox(height: 16),
+              _buildBookingCard(),
+              const SizedBox(height: 16),
+              _buildFastBookingSection(),
+              const SizedBox(height: 16),
+              _buildPromotionsSection(),
+              const SizedBox(height: 16),
+              _buildNeedHelpSection(),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
@@ -58,7 +48,7 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Image.asset(
-            'assets/images/logo.png',
+            'assets/images/go_bus_logo.png',
             height: 40,
             errorBuilder: (context, error, stackTrace) {
               return Container(
@@ -395,49 +385,6 @@ class _HomePageState extends State<HomePage> {
         shape: BoxShape.circle,
       ),
       child: Icon(icon, color: Colors.white, size: 16),
-    );
-  }
-
-  Widget _buildBottomNavigationBar() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.blue[700],
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.blue[700],
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white70,
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.confirmation_number),
-            label: 'Ticket',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.local_shipping),
-            label: 'Tracking',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
     );
   }
 }
