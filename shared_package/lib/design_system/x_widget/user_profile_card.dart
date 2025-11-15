@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 
 class UserProfileCard extends StatelessWidget {
@@ -21,12 +22,11 @@ class UserProfileCard extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: XPadding.extralarge),
       child: GestureDetector(
         onTap: onTap,
-        child: Container( 
+        child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.blue[600]!, Colors.blue[700]!],
-            ),
+            // gradient: LinearGradient(colors: [goBusPrimary, goBusPrimary]),
+            color: goBusPrimary,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
