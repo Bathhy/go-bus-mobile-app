@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:go_bus_express/view/dashboard/dashboard_view.dart';
 import 'package:go_bus_express/view/ticket/choose_payment/choose_payment_view.dart';
 import 'package:go_bus_express/view/ticket/khqr_payment/khqr_payment_view.dart';
 import 'package:go_bus_express/view/ticket/select_route/select_route_view.dart';
@@ -9,6 +10,7 @@ class AppRoutes {
   static const String selectRoute = "/selectRoute";
   static const String choosePayment = "/choosePayment";
   static const String makePayment = "/makePayment";
+  static const String mainNavigation = "/mainNavigation";
 
   // static void goToDetailCategoryRoute(
   //         int? categoryId, String? uniName, String? uniDescription) =>
@@ -23,5 +25,6 @@ class AppRoutes {
     GetPage(name: selectRoute, page: () => const SelectRouteView()),
     GetPage(name: selectSeat, page: () => const SelectSeatView()),
     GetPage(name: makePayment, page: () => const KHQRPaymentView()),
+    GetPage(name: mainNavigation, page: () => const MainNavigation()),
   ];
 }

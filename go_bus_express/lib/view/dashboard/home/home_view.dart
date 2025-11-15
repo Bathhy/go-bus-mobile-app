@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:shared_package/design_system/xwidget/user_profile_card.dart';
 
 class HomePage extends StatelessWidget {
@@ -25,7 +27,7 @@ class HomePageContent extends StatelessWidget {
               _buildAppBar(),
               const SizedBox(height: 16),
               _buildUserProfileCard(),
-              const SizedBox(height: 16),
+              const SizedBox(height: 16), 
               _buildBookingCard(),
               const SizedBox(height: 16),
               _buildFastBookingSection(),
@@ -52,7 +54,10 @@ class HomePageContent extends StatelessWidget {
             height: 40,
             errorBuilder: (context, error, stackTrace) {
               return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.blue[700],
                   borderRadius: BorderRadius.circular(8),
@@ -85,10 +90,7 @@ class HomePageContent extends StatelessWidget {
   Widget _buildSocialIcon(IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
       child: Icon(icon, color: Colors.white, size: 20),
     );
   }
@@ -126,14 +128,14 @@ class HomePageContent extends StatelessWidget {
                   child: _buildDatePicker('Departure Date', '2029-08-29'),
                 ),
                 const SizedBox(width: 16),
-                Expanded(
-                  child: _buildDatePicker('Return Date', '2029-08-28'),
-                ),
+                Expanded(child: _buildDatePicker('Return Date', '2029-08-28')),
               ],
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Get.toNamed(AppRoutes.selectRoute);
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.blue[700],
@@ -170,10 +172,7 @@ class HomePageContent extends StatelessWidget {
               const SizedBox(width: 12),
               Text(
                 text,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
+                style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
             ],
           ),
@@ -189,10 +188,7 @@ class HomePageContent extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 12,
-          ),
+          style: const TextStyle(color: Colors.white70, fontSize: 12),
         ),
         const SizedBox(height: 8),
         Row(
@@ -201,10 +197,7 @@ class HomePageContent extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               date,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-              ),
+              style: const TextStyle(color: Colors.white, fontSize: 14),
             ),
           ],
         ),
@@ -285,7 +278,9 @@ class HomePageContent extends StatelessWidget {
                     color: Colors.grey[300],
                     borderRadius: BorderRadius.circular(12),
                     image: const DecorationImage(
-                      image: NetworkImage('https://via.placeholder.com/160x140'),
+                      image: NetworkImage(
+                        'https://via.placeholder.com/160x140',
+                      ),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -351,10 +346,7 @@ class HomePageContent extends StatelessWidget {
                       SizedBox(height: 4),
                       Text(
                         'We are always here to help - 090 9001131',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                        ),
+                        style: TextStyle(color: Colors.white70, fontSize: 12),
                       ),
                     ],
                   ),
@@ -380,10 +372,7 @@ class HomePageContent extends StatelessWidget {
   Widget _buildSmallSocialIcon(IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
       child: Icon(icon, color: Colors.white, size: 16),
     );
   }
