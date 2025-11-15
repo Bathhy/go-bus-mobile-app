@@ -23,6 +23,7 @@ class _SelectSeatViewState extends State<SelectSeatView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: white,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: XAppBar(

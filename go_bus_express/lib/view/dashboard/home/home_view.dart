@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:shared_package/design_system/xwidget/user_profile_card.dart';
 
 class HomePage extends StatelessWidget {
@@ -18,6 +20,7 @@ class HomePageContent extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       body: SafeArea(
+<<<<<<< HEAD:go_bus_express/lib/view/home_page.dart
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -48,6 +51,26 @@ class HomePageContent extends StatelessWidget {
               ),
             ),
           ],
+=======
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildAppBar(),
+              const SizedBox(height: 16),
+              _buildUserProfileCard(),
+              const SizedBox(height: 16), 
+              _buildBookingCard(),
+              const SizedBox(height: 16),
+              _buildFastBookingSection(),
+              const SizedBox(height: 16),
+              _buildPromotionsSection(),
+              const SizedBox(height: 16),
+              _buildNeedHelpSection(),
+              const SizedBox(height: 20),
+            ],
+          ),
+>>>>>>> 5223102 (work on profile UI):go_bus_express/lib/view/dashboard/home/home_view.dart
         ),
       ),
     );
@@ -62,10 +85,22 @@ class HomePageContent extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+<<<<<<< HEAD:go_bus_express/lib/view/home_page.dart
           Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
+=======
+          Image.asset(
+            'assets/images/go_bus_logo.png',
+            height: 40,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+>>>>>>> 5223102 (work on profile UI):go_bus_express/lib/view/dashboard/home/home_view.dart
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [Colors.blue[600]!, Colors.blue[700]!],
@@ -144,7 +179,79 @@ class HomePageContent extends StatelessWidget {
     );
   }
 
+<<<<<<< HEAD:go_bus_express/lib/view/home_page.dart
   Widget _buildBookingCard() {
+=======
+  Widget _buildSocialIcon(IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      child: Icon(icon, color: Colors.white, size: 20),
+    );
+  }
+
+  Widget _buildUserProfileCard() {
+    return UserProfileCard(
+      name: 'សុប្រ័យ ស៊ុន',
+      email: 'goldammy24k@gmail.com',
+      onTap: () {
+        // Handle profile tap
+      },
+    );
+  }
+
+  Widget _buildBookingCard() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.blue[600]!, Colors.blue[700]!],
+          ),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          children: [
+            _buildDirectionRow('Choose Direction', Icons.flag_outlined),
+            const SizedBox(height: 12),
+            _buildDirectionRow('Cambodia', Icons.add_circle_outline),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildDatePicker('Departure Date', '2029-08-29'),
+                ),
+                const SizedBox(width: 16),
+                Expanded(child: _buildDatePicker('Return Date', '2029-08-28')),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Get.toNamed(AppRoutes.selectRoute);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.blue[700],
+                minimumSize: const Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+              ),
+              child: const Text(
+                'Search',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDirectionRow(String text, IconData icon) {
+>>>>>>> 5223102 (work on profile UI):go_bus_express/lib/view/dashboard/home/home_view.dart
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -195,6 +302,7 @@ class HomePageContent extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
+<<<<<<< HEAD:go_bus_express/lib/view/home_page.dart
               Expanded(
                 child: _buildSimpleField(
                   icon: Icons.calendar_today,
@@ -202,6 +310,11 @@ class HomePageContent extends StatelessWidget {
                   value: '28 Aug',
                   iconColor: const Color(0xFF10B981),
                 ),
+=======
+              Text(
+                text,
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+>>>>>>> 5223102 (work on profile UI):go_bus_express/lib/view/dashboard/home/home_view.dart
               ),
             ],
           ),
@@ -240,6 +353,7 @@ class HomePageContent extends StatelessWidget {
     );
   }
 
+<<<<<<< HEAD:go_bus_express/lib/view/home_page.dart
   Widget _buildSimpleField({
     required IconData icon,
     required String label,
@@ -258,9 +372,19 @@ class HomePageContent extends StatelessWidget {
             color: const Color(0xFFE5E7EB),
             width: 1.5,
           ),
+=======
+  Widget _buildDatePicker(String label, String date) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white70, fontSize: 12),
+>>>>>>> 5223102 (work on profile UI):go_bus_express/lib/view/dashboard/home/home_view.dart
         ),
         child: Row(
           children: [
+<<<<<<< HEAD:go_bus_express/lib/view/home_page.dart
             Icon(icon, color: iconColor, size: 22),
             const SizedBox(width: 14),
             Expanded(
@@ -369,6 +493,13 @@ class HomePageContent extends StatelessWidget {
                 color: Colors.white,
                 size: 20,
               ),
+=======
+            const Icon(Icons.calendar_today, color: Colors.white, size: 16),
+            const SizedBox(width: 8),
+            Text(
+              date,
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+>>>>>>> 5223102 (work on profile UI):go_bus_express/lib/view/dashboard/home/home_view.dart
             ),
           ],
         ),
@@ -376,6 +507,7 @@ class HomePageContent extends StatelessWidget {
     );
   }
 
+<<<<<<< HEAD:go_bus_express/lib/view/home_page.dart
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
@@ -383,6 +515,47 @@ class HomePageContent extends StatelessWidget {
         fontSize: 20,
         fontWeight: FontWeight.bold,
         color: Color(0xFF1F2937),
+=======
+  Widget _buildPromotionsSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'New & Promotions',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 140,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: 3,
+              itemBuilder: (context, index) {
+                return Container(
+                  width: 160,
+                  margin: const EdgeInsets.only(right: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(12),
+                    image: const DecorationImage(
+                      image: NetworkImage(
+                        'https://via.placeholder.com/160x140',
+                      ),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+>>>>>>> 5223102 (work on profile UI):go_bus_express/lib/view/dashboard/home/home_view.dart
       ),
     );
   }
@@ -456,6 +629,7 @@ class HomePageContent extends StatelessWidget {
                           ),
                         ),
                       ),
+<<<<<<< HEAD:go_bus_express/lib/view/home_page.dart
                       Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
@@ -467,6 +641,12 @@ class HomePageContent extends StatelessWidget {
                           color: Colors.white,
                           size: 18,
                         ),
+=======
+                      SizedBox(height: 4),
+                      Text(
+                        'We are always here to help - 090 9001131',
+                        style: TextStyle(color: Colors.white70, fontSize: 12),
+>>>>>>> 5223102 (work on profile UI):go_bus_express/lib/view/dashboard/home/home_view.dart
                       ),
                     ],
                   ),
@@ -566,4 +746,15 @@ class HomePageContent extends StatelessWidget {
       ),
     );
   }
+<<<<<<< HEAD:go_bus_express/lib/view/home_page.dart
+=======
+
+  Widget _buildSmallSocialIcon(IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      child: Icon(icon, color: Colors.white, size: 16),
+    );
+  }
+>>>>>>> 5223102 (work on profile UI):go_bus_express/lib/view/dashboard/home/home_view.dart
 }

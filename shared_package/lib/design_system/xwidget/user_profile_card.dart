@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_package/design_system/constant/ts_padding.dart';
 
 class UserProfileCard extends StatelessWidget {
   final String name;
@@ -17,10 +18,10 @@ class UserProfileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      padding: EdgeInsets.symmetric(horizontal: XPadding.extralarge),
       child: GestureDetector(
         onTap: onTap,
-        child: Container(
+        child: Container( 
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -33,10 +34,16 @@ class UserProfileCard extends StatelessWidget {
               CircleAvatar(
                 radius: 30,
                 backgroundColor: Colors.pink[300],
-                backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl!) : null,
-                child: avatarUrl == null
-                    ? const Icon(Icons.person, size: 35, color: Colors.white)
-                    : null,
+                backgroundImage:
+                    avatarUrl != null ? NetworkImage(avatarUrl!) : null,
+                child:
+                    avatarUrl == null
+                        ? const Icon(
+                          Icons.person,
+                          size: 35,
+                          color: Colors.white,
+                        )
+                        : null,
               ),
               const SizedBox(width: 16),
               Expanded(

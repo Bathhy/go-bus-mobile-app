@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:go_bus_express/view/home_page.dart';
-import 'package:go_bus_express/view/profile_page.dart';
+import 'package:go_bus_express/view/dashboard/home/home_view.dart';
+import 'package:go_bus_express/view/dashboard/profile/profile_view.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});

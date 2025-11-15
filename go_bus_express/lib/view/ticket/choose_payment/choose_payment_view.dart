@@ -156,7 +156,7 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
             height: 52,
             label: 'Pay \$13:00',
             optionbutton: 1,
-            bgColor: agreedToTerms ? Colors.green : Colors.grey,
+            bgColor: goBusPrimary,
             onTap: () => Get.toNamed(AppRoutes.makePayment),
           ),
         ),
@@ -177,7 +177,7 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
         ),
         XTextMedium(label: ':', colortext: Colors.grey.shade700),
         SizedBox(width: XPadding.medium),
-        Expanded( 
+        Expanded(
           child: XTextMedium(
             label: value,
             colortext: black,
@@ -194,54 +194,42 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
     String subtitle,
     Color logoColor,
   ) {
-    final isSelected = selectedPayment == id;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedPayment = id;
-        });
-      },
-      child: Container(
-        padding: EdgeInsets.all(XPadding.large),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? Colors.blue : Colors.grey.shade300,
-            width: isSelected ? 2 : 1,
+    return Container(
+       padding: EdgeInsets.all(XPadding.large),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: Offset(0, 2),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 4,
-              offset: Offset(0, 2),
+        ],
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset(AppImages.imgBakong, width: 40, height: 40),
+          ),
+          SizedBox(width: XPadding.large),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                XTextMedium(
+                  label: title,
+                  colortext: black,
+                  fontWeight: FontWeight.bold,
+                ),
+                SizedBox(height: 4),
+                XTextSmall(label: subtitle, colortext: Colors.grey.shade600),
+              ],
             ),
-          ],
-        ),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset(AppImages.imgBakong, width: 40, height: 40),
-            ),
-            SizedBox(width: XPadding.large),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  XTextMedium(
-                    label: title,
-                    colortext: black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  SizedBox(height: 4),
-                  XTextSmall(label: subtitle, colortext: Colors.grey.shade600),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
