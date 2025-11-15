@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:go_bus_express/resources/app_images.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
-import 'package:shared_package/design_system/xwidget/ButtonComponent.dart';
-import 'package:shared_package/design_system/xwidget/TextComponent.dart';
-import 'package:shared_package/design_system/xwidget/x_app_bar.dart';
+import 'package:shared_package/design_system/x_widget/ButtonComponent.dart';
+import 'package:shared_package/design_system/x_widget/TextComponent.dart';
+import 'package:shared_package/design_system/x_widget/x_app_bar.dart';
 
 class ChoosePaymentView extends StatefulWidget {
   const ChoosePaymentView({super.key});
@@ -195,7 +194,7 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
     Color logoColor,
   ) {
     return Container(
-       padding: EdgeInsets.all(XPadding.large),
+      padding: EdgeInsets.all(XPadding.large),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
-import 'package:shared_package/design_system/xwidget/user_profile_card.dart';
+import 'package:shared_package/design_system/x_widget/user_profile_card.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});

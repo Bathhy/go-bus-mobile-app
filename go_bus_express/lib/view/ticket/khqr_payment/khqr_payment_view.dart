@@ -4,7 +4,7 @@ import 'package:go_bus_express/resources/app_images.dart';
 import 'package:khqr_sdk/khqr_sdk.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
-import 'package:shared_package/design_system/xwidget/x_app_bar.dart';
+import 'package:shared_package/design_system/x_widget/x_app_bar.dart';
 
 class KHQRPaymentView extends StatefulWidget {
   const KHQRPaymentView({super.key});
