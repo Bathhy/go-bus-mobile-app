@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_package/design_system/xwidget/user_profile_card.dart';
-import 'package:go_bus_express/view/edit_profile_page.dart';
+import 'package:shared_package/design_system/x_widget/user_profile_card.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -36,12 +35,12 @@ class ProfilePage extends StatelessWidget {
                   iconColor: Colors.orange[400]!,
                   title: 'Edit Profile',
                   onTap: () {
-                    Navigator.push(
+                    /*Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => const EditProfilePage(),
                       ),
-                    );
+                    );*/
                   },
                 ),
                 const SizedBox(height: 12),

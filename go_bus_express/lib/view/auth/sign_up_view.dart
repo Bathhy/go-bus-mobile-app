@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
-import 'package:shared_package/design_system/xwidget/ButtonComponent.dart';
-import 'package:shared_package/design_system/xwidget/TextComponent.dart';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});

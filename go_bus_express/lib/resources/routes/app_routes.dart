@@ -21,7 +21,7 @@ class AppRoutes {
   // static void goToDetailCategoryRoute(
   //         int? categoryId, String? uniName, String? uniDescription) =>
   //     Get.toNamed(arguments: {
-  //       "categoryId": categoryId,
+  //       "categoryId": categoryId,m
   //       "uniname": uniName,
   //       "unidescription": uniDescription
   //     }, detailtopmajorroute);
