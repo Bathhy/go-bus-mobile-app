@@ -18,7 +18,7 @@ class HomePageContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: Colors.grey[100],
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -27,7 +27,7 @@ class HomePageContent extends StatelessWidget {
               _buildAppBar(),
               const SizedBox(height: 16),
               _buildUserProfileCard(),
-              const SizedBox(height: 16),
+              const SizedBox(height: 16), 
               _buildBookingCard(),
               const SizedBox(height: 16),
               _buildFastBookingSection(),
@@ -43,15 +43,9 @@ class HomePageContent extends StatelessWidget {
     );
   }
 
-  // ------------------------
-  // APP BAR
-  // ------------------------
   Widget _buildAppBar() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-      ),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -65,24 +59,27 @@ class HomePageContent extends StatelessWidget {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.blue[600]!, Colors.blue[700]!],
-                  ),
-                  borderRadius: BorderRadius.circular(14),
+                  color: Colors.blue[700],
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
-                  Icons.directions_bus_rounded,
-                  color: Colors.white,
-                  size: 24,
+                child: const Text(
+                  'GoBus',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               );
             },
           ),
           Row(
             children: [
-              _iconButton(Icons.notifications_none_rounded),
-              const SizedBox(width: 10),
-              _iconButton(Icons.phone_outlined, color: Colors.blue),
+              _buildSocialIcon(Icons.messenger, Colors.purple),
+              const SizedBox(width: 12),
+              _buildSocialIcon(Icons.telegram, Colors.blue),
+              const SizedBox(width: 12),
+              _buildSocialIcon(Icons.phone, Colors.green),
             ],
           ),
         ],
@@ -90,49 +87,46 @@ class HomePageContent extends StatelessWidget {
     );
   }
 
-  Widget _iconButton(IconData icon, {Color color = const Color(0xFF6B7280)}) {
+  Widget _buildSocialIcon(IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF3F4F6),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Icon(icon, color: color, size: 22),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      child: Icon(icon, color: Colors.white, size: 20),
     );
   }
 
-  // ------------------------
-  // PROFILE
-  // ------------------------
   Widget _buildUserProfileCard() {
     return UserProfileCard(
       name: 'សុប្រ័យ ស៊ុន',
       email: 'goldammy24k@gmail.com',
-      onTap: () {},
+      onTap: () {
+        // Handle profile tap
+      },
     );
   }
 
-  // ------------------------
-  // BOOKING CARD
-  // ------------------------
   Widget _buildBookingCard() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          gradient: LinearGradient(colors: [Colors.blue[600]!, Colors.blue[700]!]),
+          gradient: LinearGradient(
+            colors: [Colors.blue[600]!, Colors.blue[700]!],
+          ),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
           children: [
-            _buildBookingRow('Choose Direction', Icons.flag_outlined),
+            _buildDirectionRow('Choose Direction', Icons.flag_outlined),
             const SizedBox(height: 12),
-            _buildBookingRow('Cambodia', Icons.add_circle_outline),
+            _buildDirectionRow('Cambodia', Icons.add_circle_outline),
             const SizedBox(height: 20),
             Row(
               children: [
-                Expanded(child: _buildDatePicker('Departure Date', '2029-08-29')),
+                Expanded(
+                  child: _buildDatePicker('Departure Date', '2029-08-29'),
+                ),
                 const SizedBox(width: 16),
                 Expanded(child: _buildDatePicker('Return Date', '2029-08-28')),
               ],
@@ -161,13 +155,30 @@ class HomePageContent extends StatelessWidget {
     );
   }
 
-  Widget _buildBookingRow(String text, IconData icon) {
-    return Row(
-      children: [
-        Icon(icon, color: Colors.white, size: 26),
-        const SizedBox(width: 12),
-        Text(text, style: const TextStyle(color: Colors.white, fontSize: 16)),
-      ],
+  Widget _buildDirectionRow(String text, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Colors.white.withOpacity(0.3)),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: Colors.white, size: 20),
+              const SizedBox(width: 12),
+              Text(
+                text,
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ],
+          ),
+          const Icon(Icons.chevron_right, color: Colors.white),
+        ],
+      ),
     );
   }
 
@@ -175,66 +186,70 @@ class HomePageContent extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-        const SizedBox(height: 6),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white70, fontSize: 12),
+        ),
+        const SizedBox(height: 8),
         Row(
           children: [
             const Icon(Icons.calendar_today, color: Colors.white, size: 16),
             const SizedBox(width: 8),
-            Text(date, style: const TextStyle(color: Colors.white, fontSize: 14)),
+            Text(
+              date,
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+            ),
           ],
         ),
       ],
     );
   }
 
-  // ------------------------
-  // FAST BOOKING CARD
-  // ------------------------
   Widget _buildFastBookingSection() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)],
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Fast Booking',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
           ),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.blue[600]!, Colors.blue[700]!],
               ),
-              child: const Icon(Icons.bolt, color: Colors.white, size: 28),
+              borderRadius: BorderRadius.circular(24),
             ),
-            const SizedBox(width: 16),
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Fast Booking',
-                      style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 4),
-                  Text('Book your favorite route instantly',
-                      style: TextStyle(color: Colors.white, fontSize: 13)),
-                ],
-              ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.flash_on, color: Colors.white),
+                SizedBox(width: 8),
+                Text(
+                  'Fast Booking',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
-            const Icon(Icons.arrow_forward, color: Colors.white),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  // ------------------------
-  // PROMOTIONS
-  // ------------------------
   Widget _buildPromotionsSection() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -243,7 +258,11 @@ class HomePageContent extends StatelessWidget {
         children: [
           const Text(
             'New & Promotions',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
           ),
           const SizedBox(height: 12),
           SizedBox(
@@ -259,7 +278,9 @@ class HomePageContent extends StatelessWidget {
                     color: Colors.grey[300],
                     borderRadius: BorderRadius.circular(12),
                     image: const DecorationImage(
-                      image: NetworkImage("https://via.placeholder.com/160x140"),
+                      image: NetworkImage(
+                        'https://via.placeholder.com/160x140',
+                      ),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -272,55 +293,87 @@ class HomePageContent extends StatelessWidget {
     );
   }
 
-  // ------------------------
-  // SUPPORT SECTION
-  // ------------------------
   Widget _buildNeedHelpSection() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Need Help?',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
             ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: const Color(0xFF2563EB).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.blue[600]!, Colors.blue[700]!],
               ),
-              child: const Icon(Icons.headset_mic, color: Color(0xFF2563EB), size: 28),
+              borderRadius: BorderRadius.circular(16),
             ),
-            const SizedBox(width: 16),
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('24/7 Customer Support',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 4),
-                  Text('090 9001131',
-                      style: TextStyle(fontSize: 14, color: Color(0xFF6B7280))),
-                ],
-              ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.headset_mic,
+                    color: Colors.white,
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Need Help?',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'We are always here to help - 090 9001131',
+                        style: TextStyle(color: Colors.white70, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Row(
+                  children: [
+                    _buildSmallSocialIcon(Icons.messenger, Colors.purple),
+                    const SizedBox(width: 8),
+                    _buildSmallSocialIcon(Icons.telegram, Colors.blue),
+                    const SizedBox(width: 8),
+                    _buildSmallSocialIcon(Icons.phone, Colors.green),
+                  ],
+                ),
+              ],
             ),
-            IconButton(
-              icon: const Icon(Icons.phone, color: Color(0xFF10B981)),
-              onPressed: () {},
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildSmallSocialIcon(IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+      child: Icon(icon, color: Colors.white, size: 16),
     );
   }
 }
