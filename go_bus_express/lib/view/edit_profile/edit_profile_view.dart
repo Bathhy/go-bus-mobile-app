@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class EditProfilePage extends StatefulWidget {
-  const EditProfilePage({super.key});
+class EditProfileView extends StatefulWidget {
+  const EditProfileView({super.key});
 
   @override
-  State<EditProfilePage> createState() => _EditProfilePageState();
+  State<EditProfileView> createState() => _EditProfileViewState();
 }
 
-class _EditProfilePageState extends State<EditProfilePage> {
+class _EditProfileViewState extends State<EditProfileView> {
   final TextEditingController _nameController = TextEditingController(
     text: 'សុប្រ័យ ស៊ុន',
   );

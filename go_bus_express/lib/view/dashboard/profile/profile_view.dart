@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:go_bus_express/resources/app_images.dart';
+import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
-import 'package:go_bus_express/view/edit_profile/edit_profile_view.dart';
 import 'package:shared_package/design_system/x_widget/AppImage.dart';
 import 'package:shared_package/design_system/x_widget/ButtonComponent.dart';
 import 'package:shared_package/design_system/x_widget/TextComponent.dart';
@@ -53,12 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       iconColor: Colors.orange,
                       title: 'Edit Profile',
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const EditProfilePage(),
-                          ),
-                        );
+                        Get.toNamed(AppRoutes.editProfile);
                       },
                     ),
                     const SizedBox(height: 12),
@@ -199,7 +195,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       source: Icons.history,
                       iconColor: Colors.blue,
                       title: 'Booking History',
-                      onTap: () {},
+                      onTap: () {
+                        Get.toNamed(AppRoutes.bookingHistory) ;
+                      },
                     ),
                     const SizedBox(height: 24),
                     _buildLogoutButton(context),
