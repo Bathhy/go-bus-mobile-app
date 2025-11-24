@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 
@@ -12,7 +13,8 @@ class SignInView extends StatefulWidget {
 class _SignInViewState extends State<SignInView> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  bool rememberMe = false;
+
+  bool showPassword = false;
 
   @override
   void dispose() {
@@ -25,14 +27,13 @@ class _SignInViewState extends State<SignInView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: white,
+
       appBar: AppBar(
         backgroundColor: white,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: black),
-          onPressed: () => Navigator.pop(context),
-        ),
+        automaticallyImplyLeading: false,
       ),
+
       body: SingleChildScrollView(
         padding: EdgeInsets.all(XPadding.extralarge),
         child: Column(
@@ -56,7 +57,7 @@ class _SignInViewState extends State<SignInView> {
             ),
             SizedBox(height: XPadding.extralarge * 2),
 
-            // Email field
+            // EMAIL FIELD
             Container(
               decoration: BoxDecoration(
                 color: Colors.grey.shade100,
@@ -74,7 +75,7 @@ class _SignInViewState extends State<SignInView> {
             ),
             SizedBox(height: XPadding.large),
 
-            // Password field
+            // PASSWORD FIELD (UPDATED)
             Container(
               decoration: BoxDecoration(
                 color: Colors.grey.shade100,
@@ -82,34 +83,35 @@ class _SignInViewState extends State<SignInView> {
               ),
               child: TextField(
                 controller: passwordController,
-                obscureText: true,
+                obscureText: !showPassword,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(8),
+                ],
                 decoration: InputDecoration(
                   hintText: 'Password',
                   prefixIcon: Icon(Icons.lock_outline, color: Colors.grey),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      showPassword ? Icons.visibility : Icons.visibility_off,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        showPassword = !showPassword;
+                      });
+                    },
+                  ),
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.all(XPadding.large),
                 ),
               ),
             ),
-            SizedBox(height: XPadding.medium),
 
-            // Forgot password
-            Align(
-              alignment: Alignment.centerRight,
-              child: GestureDetector(
-                onTap: () {},
-                child: Text(
-                  'Forgot password?',
-                  style: TextStyle(
-                    color: goBusPrimary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
             SizedBox(height: XPadding.extralarge),
 
-            // Sign in button
+            // SIGN IN BUTTON
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -133,7 +135,7 @@ class _SignInViewState extends State<SignInView> {
             ),
             SizedBox(height: XPadding.extralarge),
 
-            // Divider
+            // DIVIDER
             Row(
               children: [
                 Expanded(child: Divider(color: Colors.grey.shade300)),
@@ -149,32 +151,35 @@ class _SignInViewState extends State<SignInView> {
             ),
             SizedBox(height: XPadding.extralarge),
 
-            // Social login buttons
+            // GOOGLE ONLY
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildSocialButton(
-                  icon: Icons.facebook,
-                  color: Color(0xFF1877F2),
+                GestureDetector(
                   onTap: () {},
-                ),
-                SizedBox(width: XPadding.large),
-                _buildSocialButton(
-                  icon: Icons.g_mobiledata,
-                  color: Color(0xFFDB4437),
-                  onTap: () {},
-                ),
-                SizedBox(width: XPadding.large),
-                _buildSocialButton(
-                  icon: Icons.apple,
-                  color: black,
-                  onTap: () {},
+                  child: Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Image.asset(
+                        'assets/images/google.png',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
+
             SizedBox(height: XPadding.extralarge),
 
-            // Sign up link
+            // SIGN UP LINK
             Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -198,26 +203,6 @@ class _SignInViewState extends State<SignInView> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildSocialButton({
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 60,
-        height: 60,
-        decoration: BoxDecoration(
-          color: white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade300),
-        ),
-        child: Icon(icon, color: color, size: 32),
       ),
     );
   }
