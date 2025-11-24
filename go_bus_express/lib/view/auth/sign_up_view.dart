@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 
@@ -13,7 +14,8 @@ class _SignUpViewState extends State<SignUpView> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  bool rememberMe = false;
+
+  bool showPassword = false;
 
   @override
   void dispose() {
@@ -94,7 +96,7 @@ class _SignUpViewState extends State<SignUpView> {
             ),
             SizedBox(height: XPadding.large),
 
-            // Password field
+            // Password (numbers only + exactly 8 digits)
             Container(
               decoration: BoxDecoration(
                 color: Colors.grey.shade100,
@@ -102,42 +104,47 @@ class _SignUpViewState extends State<SignUpView> {
               ),
               child: TextField(
                 controller: passwordController,
-                obscureText: true,
+                obscureText: !showPassword,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(8),
+                ],
                 decoration: InputDecoration(
                   hintText: 'Password',
                   prefixIcon: Icon(Icons.lock_outline, color: Colors.grey),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      showPassword ? Icons.visibility : Icons.visibility_off,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        showPassword = !showPassword;
+                      });
+                    },
+                  ),
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.all(XPadding.large),
                 ),
               ),
             ),
-            SizedBox(height: XPadding.medium),
-
-            // Remember me checkbox
-            Row(
-              children: [
-                Checkbox(
-                  value: rememberMe,
-                  onChanged: (value) {
-                    setState(() {
-                      rememberMe = value ?? false;
-                    });
-                  },
-                  activeColor: goBusPrimary,
-                ),
-                Text(
-                  'Remember me',
-                  style: TextStyle(color: Colors.grey.shade700),
-                ),
-              ],
-            ),
             SizedBox(height: XPadding.large),
 
-            // Sign up button
+            // Sign Up BUTTON
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  if (passwordController.text.length != 8) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Password must be exactly 8 digits."),
+                      ),
+                    );
+                    return;
+                  }
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: goBusPrimary,
                   padding: EdgeInsets.symmetric(vertical: XPadding.large),
@@ -155,6 +162,7 @@ class _SignUpViewState extends State<SignUpView> {
                 ),
               ),
             ),
+
             SizedBox(height: XPadding.extralarge),
 
             // Divider
@@ -171,64 +179,30 @@ class _SignUpViewState extends State<SignUpView> {
                 Expanded(child: Divider(color: Colors.grey.shade300)),
               ],
             ),
+
             SizedBox(height: XPadding.extralarge),
 
-            // Social login buttons
+            // GOOGLE BUTTON (PNG image)
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildSocialButton(
-                  icon: Icons.facebook,
-                  color: Color(0xFF1877F2),
-                  onTap: () {},
-                ),
-                SizedBox(width: XPadding.large),
-                _buildSocialButton(
-                  icon: Icons.g_mobiledata,
-                  color: Color(0xFFDB4437),
-                  onTap: () {},
-                ),
-                SizedBox(width: XPadding.large),
-                _buildSocialButton(
-                  icon: Icons.apple,
-                  color: black,
+                _buildGoogleButton(
+                  imagePath: "assets/images/google.png",
                   onTap: () {},
                 ),
               ],
             ),
-            SizedBox(height: XPadding.extralarge),
 
-            // Sign in link
-            Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Don't have an account? ",
-                    style: TextStyle(color: Colors.grey.shade600),
-                  ),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Text(
-                      'Sign In',
-                      style: TextStyle(
-                        color: goBusPrimary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            SizedBox(height: XPadding.extralarge),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSocialButton({
-    required IconData icon,
-    required Color color,
+  // GOOGLE BUTTON USING PNG IMAGE
+  Widget _buildGoogleButton({
+    required String imagePath,
     required VoidCallback onTap,
   }) {
     return GestureDetector(
@@ -241,7 +215,13 @@ class _SignUpViewState extends State<SignUpView> {
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: Colors.grey.shade300),
         ),
-        child: Icon(icon, color: color, size: 32),
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Image.asset(
+            imagePath,
+            fit: BoxFit.contain,
+          ),
+        ),
       ),
     );
   }
