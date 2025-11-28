@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 
+import 'sign_up_view.dart'; // correct path
+
 class SignInView extends StatefulWidget {
   const SignInView({super.key});
 
@@ -27,13 +29,11 @@ class _SignInViewState extends State<SignInView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: white,
-
       appBar: AppBar(
         backgroundColor: white,
         elevation: 0,
         automaticallyImplyLeading: false,
       ),
-
       body: SingleChildScrollView(
         padding: EdgeInsets.all(XPadding.extralarge),
         child: Column(
@@ -57,7 +57,7 @@ class _SignInViewState extends State<SignInView> {
             ),
             SizedBox(height: XPadding.extralarge * 2),
 
-            // EMAIL FIELD
+            // EMAIL
             Container(
               decoration: BoxDecoration(
                 color: Colors.grey.shade100,
@@ -75,7 +75,7 @@ class _SignInViewState extends State<SignInView> {
             ),
             SizedBox(height: XPadding.large),
 
-            // PASSWORD FIELD (UPDATED)
+            // PASSWORD
             Container(
               decoration: BoxDecoration(
                 color: Colors.grey.shade100,
@@ -98,9 +98,7 @@ class _SignInViewState extends State<SignInView> {
                       color: Colors.grey,
                     ),
                     onPressed: () {
-                      setState(() {
-                        showPassword = !showPassword;
-                      });
+                      setState(() => showPassword = !showPassword);
                     },
                   ),
                   border: InputBorder.none,
@@ -133,6 +131,7 @@ class _SignInViewState extends State<SignInView> {
                 ),
               ),
             ),
+
             SizedBox(height: XPadding.extralarge),
 
             // DIVIDER
@@ -151,55 +150,57 @@ class _SignInViewState extends State<SignInView> {
             ),
             SizedBox(height: XPadding.extralarge),
 
-            // GOOGLE ONLY
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                GestureDetector(
-                  onTap: () {},
-                  child: Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Image.asset(
-                        'assets/images/google.png',
-                        fit: BoxFit.contain,
-                      ),
+            // GOOGLE
+            Center(
+              child: GestureDetector(
+                onTap: () {},
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Image.asset(
+                      'assets/images/google.png',
+                      fit: BoxFit.contain,
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
 
             SizedBox(height: XPadding.extralarge),
 
             // SIGN UP LINK
-            Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Don't have an account? ",
-                    style: TextStyle(color: Colors.grey.shade600),
-                  ),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Text(
-                      'Sign Up',
-                      style: TextStyle(
-                        color: goBusPrimary,
-                        fontWeight: FontWeight.w600,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Don't have an account? ",
+                  style: TextStyle(color: Colors.grey.shade600),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const SignUpView(),
                       ),
+                    );
+                  },
+                  child: Text(
+                    'Sign Up',
+                    style: TextStyle(
+                      color: goBusPrimary,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ),
