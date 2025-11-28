@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 
+import 'sign_in_view.dart'; // correct path
+
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
 
@@ -60,7 +62,7 @@ class _SignUpViewState extends State<SignUpView> {
             ),
             SizedBox(height: XPadding.extralarge * 2),
 
-            // Username field
+            // USERNAME
             Container(
               decoration: BoxDecoration(
                 color: Colors.grey.shade100,
@@ -78,7 +80,7 @@ class _SignUpViewState extends State<SignUpView> {
             ),
             SizedBox(height: XPadding.large),
 
-            // Email field
+            // EMAIL
             Container(
               decoration: BoxDecoration(
                 color: Colors.grey.shade100,
@@ -96,7 +98,7 @@ class _SignUpViewState extends State<SignUpView> {
             ),
             SizedBox(height: XPadding.large),
 
-            // Password (numbers only + exactly 8 digits)
+            // PASSWORD
             Container(
               decoration: BoxDecoration(
                 color: Colors.grey.shade100,
@@ -119,9 +121,7 @@ class _SignUpViewState extends State<SignUpView> {
                       color: Colors.grey,
                     ),
                     onPressed: () {
-                      setState(() {
-                        showPassword = !showPassword;
-                      });
+                      setState(() => showPassword = !showPassword);
                     },
                   ),
                   border: InputBorder.none,
@@ -131,16 +131,14 @@ class _SignUpViewState extends State<SignUpView> {
             ),
             SizedBox(height: XPadding.large),
 
-            // Sign Up BUTTON
+            // SIGN UP BUTTON
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
                   if (passwordController.text.length != 8) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("Password must be exactly 8 digits."),
-                      ),
+                      SnackBar(content: Text("Password must be exactly 8 digits.")),
                     );
                     return;
                   }
@@ -165,7 +163,7 @@ class _SignUpViewState extends State<SignUpView> {
 
             SizedBox(height: XPadding.extralarge),
 
-            // Divider
+            // DIVIDER
             Row(
               children: [
                 Expanded(child: Divider(color: Colors.grey.shade300)),
@@ -182,45 +180,29 @@ class _SignUpViewState extends State<SignUpView> {
 
             SizedBox(height: XPadding.extralarge),
 
-            // GOOGLE BUTTON (PNG image)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildGoogleButton(
-                  imagePath: "assets/images/google.png",
-                  onTap: () {},
+            // GOOGLE BUTTON
+            Center(
+              child: GestureDetector(
+                onTap: () {},
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Image.asset(
+                      "assets/images/google.png",
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
-              ],
+              ),
             ),
-
-            SizedBox(height: XPadding.extralarge),
           ],
-        ),
-      ),
-    );
-  }
-
-  // GOOGLE BUTTON USING PNG IMAGE
-  Widget _buildGoogleButton({
-    required String imagePath,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 60,
-        height: 60,
-        decoration: BoxDecoration(
-          color: white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade300),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Image.asset(
-            imagePath,
-            fit: BoxFit.contain,
-          ),
         ),
       ),
     );
