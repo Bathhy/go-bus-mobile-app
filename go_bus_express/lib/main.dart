@@ -29,10 +29,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
 <<<<<<< HEAD
+<<<<<<< HEAD
       initialRoute: AppRoutes.animation,
 =======
       initialRoute: AppRoutes.signIn,
 >>>>>>> 4d7444b (update sign in and sign up pages)
+=======
+      initialRoute: AppRoutes.animation,
+>>>>>>> 706acd1 (done)
       getPages: AppRoutes.routes,
       debugShowCheckedModeBanner: false,
     );
