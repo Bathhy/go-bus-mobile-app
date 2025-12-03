@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:go_bus_express/core/di/injection.dart';
+import 'package:go_bus_express/core/storage/base_share_preference.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:go_bus_express/view/dashboard/dashboard_view.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize SharedPreferences
+  await BaseSharePreference.init();
+
+  // Setup GetIt dependency injection
+  await setupDependencyInjection();
+
   runApp(const MyApp());
 }
 
