@@ -3,14 +3,14 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/storage/base_share_preference.dart';
-import 'package:go_bus_express/core/storage/storage_service.dart';
+import 'package:go_bus_express/core/storage/local_repository.dart';
 import 'package:go_bus_express/models/auth/auth_model.dart';
 import 'package:go_bus_express/models/body/auth_body.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/network/x_result.dart';
 
-import '../../repository/auth_repository.dart';
-import '../../resources/routes/app_routes.dart';
+import '../../../repository/auth_repository.dart';
+import '../../../resources/routes/app_routes.dart';
 import 'AuthState.dart';
 
 class AuthController extends GetxController {
@@ -70,6 +70,7 @@ class AuthController extends GetxController {
           {
             _localRepository.saveToken(result.data.token ?? "");
             Get.offAllNamed(AppRoutes.mainNavigation);
+            log("Login success >>>>>>>> ${result.data.token}");
           }
 
         case Error<AuthModel>():

@@ -38,7 +38,7 @@ class AppRoutes {
     GetPage(name: signIn, page: () => const SignInView()),
     GetPage(name: signUp, page: () => const SignUpView()),
     GetPage(name: bookingHistory, page: () => const BookingHistoryView()),
-    GetPage(name: animation, page: () => AnimationView()),
+    GetPage(name: animation, page: () => SplashView()),
     GetPage(name: editProfile, page: () => const EditProfileView()),
   ];
 }

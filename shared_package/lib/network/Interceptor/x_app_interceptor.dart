@@ -14,8 +14,7 @@ class XInterceptor extends Interceptor {
     options.headers['Accept-Language'] = 'en';
     options.headers['x-push-token'] = '';
     // options.headers['Authorization'] = 'Bearer $token';
-    options.headers['Authorization'] =
-        '288851|EkXVQ7cvPKfeL0Nl3WRfDV5eUF8ZER4SXGONtXvSd438107e';
+    options.headers['Authorization'] ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJsZW9vbmFyZEBnbWFpbC5jb20iLCJpYXQiOjE3NjQ3ODc2MzcsImV4cCI6MTc2NDc5MTIzN30.Tv4Q2o2tDNVF1ghw-wa8mCfulh7DRqCOdoyodczdRcU';
 
     final method = options.method.toUpperCase();
     debug('$method  ${options.uri}');

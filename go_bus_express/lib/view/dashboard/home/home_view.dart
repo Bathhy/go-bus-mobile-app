@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_bus_express/models/profile/profile_model.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
+import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
 import 'package:shared_package/design_system/x_widget/user_profile_card.dart';
+
+import '../../../core/di/app_di.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -17,6 +21,7 @@ class HomePageContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final HomeController homeController = getIt<HomeController>();
     return Scaffold(
       backgroundColor: Colors.grey[100],
       body: SafeArea(
@@ -26,8 +31,13 @@ class HomePageContent extends StatelessWidget {
             children: [
               _buildAppBar(),
               const SizedBox(height: 16),
-              _buildUserProfileCard(),
-              const SizedBox(height: 16), 
+              if (homeController.state.profileModel != null)
+                Obx(
+                  () => _buildUserProfileCard(
+                    homeController.state.profileModel!,
+                  ),
+                ),
+              const SizedBox(height: 16),
               _buildBookingCard(),
               const SizedBox(height: 16),
               _buildFastBookingSection(),
@@ -95,10 +105,10 @@ class HomePageContent extends StatelessWidget {
     );
   }
 
-  Widget _buildUserProfileCard() {
+  Widget _buildUserProfileCard(ProfileModel profile) {
     return UserProfileCard(
-      name: 'សុប្រ័យ ស៊ុន',
-      email: 'goldammy24k@gmail.com',
+      name: profile.fullName ?? "NA",
+      email: profile.email ?? "NA",
       onTap: () {
         // Handle profile tap
       },

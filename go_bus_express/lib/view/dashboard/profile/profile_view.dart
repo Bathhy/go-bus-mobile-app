@@ -9,7 +9,7 @@ import 'package:shared_package/design_system/x_widget/ButtonComponent.dart';
 import 'package:shared_package/design_system/x_widget/TextComponent.dart';
 import 'package:shared_package/design_system/x_widget/user_profile_card.dart';
 
-import '../../../utils/enums/ImageType.dart';
+import '../../../utils/enums/image_type_enum.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});

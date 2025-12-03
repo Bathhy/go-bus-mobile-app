@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:go_bus_express/core/di/injection.dart';
-import 'package:go_bus_express/view_models/controller/AuthController.dart';
+import 'package:go_bus_express/core/di/app_di.dart';
+import 'package:go_bus_express/view_models/controller/auth/AuthController.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 
