@@ -1,6 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum PreferencesKey { token, fcm, language, theme, locale, isLogin }
+enum PreferencesKey { token, fcm, language, theme, locale, isLogin, profile }
 
 mixin class BaseSharePreference {
   static SharedPreferences? _prefs;

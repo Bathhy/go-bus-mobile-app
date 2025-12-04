@@ -2,7 +2,7 @@ class NetworkConstant {
   static String baseurl = "http://$local_back_ip:8000/api";
   static String baseurlMobile = "http://$local_ip:8000/api";
   static String productionUrl =
-      "http://192.168.8.103:3000";
+      "http://192.168.15.247:3000";
   static String register = "/register";
   static String login = "/login";
   static String logout = "/logout";

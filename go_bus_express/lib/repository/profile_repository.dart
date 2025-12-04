@@ -3,7 +3,7 @@ import 'package:go_bus_express/models/profile/profile_model.dart';
 import 'package:shared_package/network/x_result.dart';
 
 abstract class ProfileRepository {
-  Future<XResult<ProfileModel>> fetchProfile();
+  Future<XResult<ProfileModel?>> fetchProfile();
 }
 
 class ProfileRepositoryImpl implements ProfileRepository {
@@ -12,9 +12,10 @@ class ProfileRepositoryImpl implements ProfileRepository {
   ProfileRepositoryImpl(this.api);
 
   @override
-  Future<XResult<ProfileModel>> fetchProfile() {
+  Future<XResult<ProfileModel?>> fetchProfile() {
     return xResultHandler(() async {
-      return await api.fetchProfile();
+      final response = await api.fetchProfile();
+      return response.profile;
     });
   }
 }

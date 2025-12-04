@@ -18,12 +18,12 @@ class _GoBusApi implements GoBusApi {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<ProfileModel> fetchProfile() async {
+  Future<ProfileResponse> fetchProfile() async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<ProfileModel>(
+    final _options = _setStreamType<ProfileResponse>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -34,9 +34,9 @@ class _GoBusApi implements GoBusApi {
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late ProfileModel _value;
+    late ProfileResponse _value;
     try {
-      _value = ProfileModel.fromJson(_result.data!);
+      _value = ProfileResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

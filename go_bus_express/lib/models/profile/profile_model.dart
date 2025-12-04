@@ -7,16 +7,12 @@ class ProfileModel {
   final int? id;
   final String? fullName;
   final String? email;
-  final String? phone;
-  final String? googleId;
   final String? image;
 
   const ProfileModel({
     this.id,
     this.fullName,
     this.email,
-    this.phone,
-    this.googleId,
     this.image,
   });
 
@@ -31,8 +27,6 @@ class ProfileModel {
     id: id ?? this.id,
     fullName: fullName ?? this.fullName,
     email: email ?? this.email,
-    phone: phone ?? this.phone,
-    googleId: googleId ?? this.googleId,
     image: image ?? this.image,
   );
 

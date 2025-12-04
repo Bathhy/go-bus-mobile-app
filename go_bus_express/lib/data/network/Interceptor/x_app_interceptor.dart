@@ -1,20 +1,29 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import '../../../core/storage/local_repository.dart';
 
 /// Dio App Interceptor
 class XInterceptor extends Interceptor {
+  final LocalRepository _localRepository;
+
+  XInterceptor(this._localRepository);
+
   @override
   Future onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
+    final token = _localRepository.getToken();
+
     options.headers['Content-Type'] = 'application/json';
     options.headers['X-Requested-With'] = 'XMLHttpRequest ';
     options.headers['accepts-version'] = '1.0.0';
     options.headers['Accept-Language'] = 'en';
     options.headers['x-push-token'] = '';
-    // options.headers['Authorization'] = 'Bearer $token';
-    options.headers['Authorization'] ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJsZW9vbmFyZEBnbWFpbC5jb20iLCJpYXQiOjE3NjQ3ODc2MzcsImV4cCI6MTc2NDc5MTIzN30.Tv4Q2o2tDNVF1ghw-wa8mCfulh7DRqCOdoyodczdRcU';
+
+    if (token != null && token.isNotEmpty) {
+      options.headers['Authorization'] = 'Bearer $token';
+    }
 
     final method = options.method.toUpperCase();
     debug('$method  ${options.uri}');

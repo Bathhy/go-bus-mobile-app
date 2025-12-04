@@ -9,8 +9,10 @@ import 'package:go_bus_express/repository/auth_repository.dart';
 import 'package:go_bus_express/repository/profile_repository.dart';
 import 'package:go_bus_express/view_models/controller/auth/AuthController.dart';
 import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
+import 'package:go_bus_express/view_models/controller/profile/profile_controller.dart';
 import 'package:go_bus_express/view_models/controller/splash/SplashController.dart';
-import 'package:shared_package/network/dio_service.dart';
+
+import '../../data/network/dio_service.dart';
 
 final getIt = GetIt.instance;
 
@@ -18,7 +20,8 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<LocalRepository>(() => LocalRepository());
 
   // NetWork
-  final dio = DioService().dio;
+  final dioService = DioService(getIt<LocalRepository>());
+  final dio = dioService.dio;
   dio.interceptors.add(AuthInterceptor());
   getIt.registerLazySingleton(() => dio);
   getIt.registerLazySingleton<AuthApi>(() => AuthApi(getIt<Dio>()));
@@ -43,8 +46,16 @@ Future<void> setupDependencyInjection() async {
     Get.put(controller);
     return controller;
   });
-  getIt.registerLazySingleton<HomeController>(() {
-    final controller = HomeController(getIt<ProfileRepository>());
+  getIt.registerFactory<HomeController>(() {
+    final controller = HomeController(
+      getIt<ProfileRepository>(),
+      getIt<LocalRepository>(),
+    );
+    Get.put(controller);
+    return controller;
+  });
+  getIt.registerFactory<ProfileController>(() {
+    final controller = ProfileController(getIt());
     Get.put(controller);
     return controller;
   });

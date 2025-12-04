@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/resources/app_images.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
+import 'package:go_bus_express/view_models/controller/profile/profile_controller.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 import 'package:shared_package/design_system/x_widget/AppImage.dart';
@@ -9,6 +10,7 @@ import 'package:shared_package/design_system/x_widget/ButtonComponent.dart';
 import 'package:shared_package/design_system/x_widget/TextComponent.dart';
 import 'package:shared_package/design_system/x_widget/user_profile_card.dart';
 
+import '../../../core/di/app_di.dart';
 import '../../../utils/enums/image_type_enum.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -21,6 +23,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
+    final ProfileController controller = getIt<ProfileController>();
     var selectedLanguage = 'km';
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -42,10 +45,16 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const UserProfileCard(
-                      name: 'សុប្រ័យ ស៊ុន',
-                      email: 'goldammy24k@gmail.com',
-                    ),
+                    Obx(() {
+                      if (controller.state.profileModel != null) {
+                        return UserProfileCard(
+                          name: controller.state.profileModel!.fullName ?? "",
+                          email: controller.state.profileModel!.email ?? "",
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    }),
+
                     const SizedBox(height: 24),
                     _buildMenuItem(
                       context: context,
@@ -68,123 +77,110 @@ class _ProfilePageState extends State<ProfilePage> {
                         showModalBottomSheet(
                           context: context,
                           backgroundColor: Colors.transparent,
-                          builder:
-                              (context) => Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(20),
-                                    topRight: Radius.circular(20),
+                          builder: (context) => Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                topRight: Radius.circular(20),
+                              ),
+                            ),
+                            padding: EdgeInsets.all(XPadding.extralarge),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                XTextLarge(
+                                  label: 'Choose Your Language',
+                                  colortext: black,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                SizedBox(height: XPadding.extralarge),
+
+                                // Khmer option
+                                GestureDetector(
+                                  onTap: () {},
+                                  child: Container(
+                                    padding: EdgeInsets.all(XPadding.large),
+                                    decoration: BoxDecoration(
+                                      color: selectedLanguage == 'ខ្មែរ'
+                                          ? goBusPrimary
+                                          : Colors.grey.shade100,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        AppSvgImage(
+                                          width: 25,
+                                          height: 25,
+                                          path: AppImages.imgKhLang,
+                                          defaultColor: true,
+                                        ),
+                                        SizedBox(width: XPadding.large),
+                                        XTextMedium(
+                                          label: 'ខ្មែរ',
+                                          colortext: selectedLanguage == 'ខ្មែរ'
+                                              ? white
+                                              : black,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                                padding: EdgeInsets.all(XPadding.extralarge),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    XTextLarge(
-                                      label: 'Choose Your Language',
-                                      colortext: black,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                    SizedBox(height: XPadding.extralarge),
+                                SizedBox(height: XPadding.medium),
 
-                                    // Khmer option
-                                    GestureDetector(
-                                      onTap: () {},
-                                      child: Container(
-                                        padding: EdgeInsets.all(XPadding.large),
-                                        decoration: BoxDecoration(
-                                          color:
-                                              selectedLanguage == 'ខ្មែរ'
-                                                  ? goBusPrimary
-                                                  : Colors.grey.shade100,
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            /*  Image.asset(
-                                              AppImages.imgKhLang,
-                                              height: 25,
-                                              width: 25,
-                                            ),*/
-                                            AppSvgImage(
-                                              width: 25,
-                                              height: 25,
-                                              path: AppImages.imgKhLang,
-                                              defaultColor: true,
-                                            ),
-                                            SizedBox(width: XPadding.large),
-                                            XTextMedium(
-                                              label: 'ខ្មែរ',
-                                              colortext:
-                                                  selectedLanguage == 'ខ្មែរ'
-                                                      ? white
-                                                      : black,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                                // English option
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      selectedLanguage = 'English';
+                                    });
+                                    Navigator.pop(context);
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.all(XPadding.large),
+                                    decoration: BoxDecoration(
+                                      color: selectedLanguage == 'English'
+                                          ? goBusPrimary
+                                          : Colors.grey.shade100,
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
-                                    SizedBox(height: XPadding.medium),
-
-                                    // English option
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          selectedLanguage = 'English';
-                                        });
-                                        Navigator.pop(context);
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.all(XPadding.large),
-                                        decoration: BoxDecoration(
-                                          color:
+                                    child: Row(
+                                      children: [
+                                        AppSvgImage(
+                                          path: AppImages.imgEngLang,
+                                          height: 25,
+                                          width: 25,
+                                          defaultColor: true,
+                                        ),
+                                        SizedBox(width: XPadding.large),
+                                        XTextMedium(
+                                          label: 'English',
+                                          colortext:
                                               selectedLanguage == 'English'
-                                                  ? goBusPrimary
-                                                  : Colors.grey.shade100,
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
+                                              ? white
+                                              : black,
+                                          fontWeight: FontWeight.w600,
                                         ),
-                                        child: Row(
-                                          children: [
-                                            AppSvgImage(
-                                              path: AppImages.imgEngLang,
-                                              height: 25,
-                                              width: 25,
-                                              defaultColor: true,
-                                            ),
-                                            SizedBox(width: XPadding.large),
-                                            XTextMedium(
-                                              label: 'English',
-                                              colortext:
-                                                  selectedLanguage == 'English'
-                                                      ? white
-                                                      : black,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                                      ],
                                     ),
-                                    SizedBox(height: XPadding.extralarge),
-
-                                    // Cancel button
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: XButton(
-                                        label: 'CANCEL',
-                                        optionbutton: 1,
-                                        bgColor: goBusPrimary,
-                                        onTap: () => Navigator.pop(context),
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                              ),
+                                SizedBox(height: XPadding.extralarge),
+
+                                // Cancel button
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: XButton(
+                                    label: 'CANCEL',
+                                    optionbutton: 1,
+                                    bgColor: goBusPrimary,
+                                    onTap: () => Navigator.pop(context),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         );
                       },
                     ),
@@ -196,7 +192,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       iconColor: Colors.blue,
                       title: 'Booking History',
                       onTap: () {
-                        Get.toNamed(AppRoutes.bookingHistory) ;
+                        Get.toNamed(AppRoutes.bookingHistory);
                       },
                     ),
                     const SizedBox(height: 24),

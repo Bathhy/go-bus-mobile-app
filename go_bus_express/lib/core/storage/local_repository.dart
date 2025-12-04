@@ -28,6 +28,20 @@ class LocalRepository with BaseSharePreference {
   String? getLanguage() {
     return readString(PreferencesKey.language);
   }
+
+  // Profile
+  Future<void> saveProfile(String profileJson) async {
+    await storeValue(PreferencesKey.profile, profileJson);
+  }
+
+  String? getProfile() {
+    return readString(PreferencesKey.profile);
+  }
+
+  Future<void> removeProfile() async {
+    await removeValue(PreferencesKey.profile);
+  }
+
   // Logout
   Future<void> logout() async {
     await logoutBox();

@@ -31,12 +31,14 @@ class HomePageContent extends StatelessWidget {
             children: [
               _buildAppBar(),
               const SizedBox(height: 16),
-              if (homeController.state.profileModel != null)
-                Obx(
-                  () => _buildUserProfileCard(
+              Obx(() {
+                if (homeController.state.profileModel != null) {
+                  return _buildUserProfileCard(
                     homeController.state.profileModel!,
-                  ),
-                ),
+                  );
+                }
+                return const SizedBox.shrink();
+              }),
               const SizedBox(height: 16),
               _buildBookingCard(),
               const SizedBox(height: 16),

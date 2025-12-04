@@ -11,27 +11,14 @@ import 'package:shared_package/network/x_result.dart';
 
 import '../../../repository/auth_repository.dart';
 import '../../../resources/routes/app_routes.dart';
+import '../base/base_controller.dart';
 import 'AuthState.dart';
 
-class AuthController extends GetxController {
-  // Param
+class AuthController extends BaseController<AuthState> {
   final AuthRepository _repository;
   final LocalRepository _localRepository;
 
-  AuthController(this._repository, this._localRepository);
-
-  // ---------- STATE ----------
-  final Rx<AuthState> _state = AuthState().obs;
-
-  AuthState get state => _state.value;
-
-  void emit(AuthState newState) {
-    _state.value = newState;
-  }
-
-  void updateState(AuthState Function(AuthState state) reducer) {
-    emit(reducer(_state.value));
-  }
+  AuthController(this._repository, this._localRepository) : super(AuthState());
 
   Future<void> login(String email, String password) async {
     // Validate inputs
