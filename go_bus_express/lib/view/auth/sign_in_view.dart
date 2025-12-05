@@ -5,6 +5,8 @@ import 'package:go_bus_express/view_models/controller/auth/AuthController.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 
+import 'sign_up_view.dart'; // correct path
+
 class SignInView extends StatefulWidget {
   const SignInView({super.key});
 
