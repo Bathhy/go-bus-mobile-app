@@ -24,7 +24,7 @@ class DetailRouteModel {
     this.buses,
   });
 
-  Welcome copyWith({
+  DetailRouteModel copyWith({
     int? id,
     String? origin,
     String? destination,
@@ -32,23 +32,23 @@ class DetailRouteModel {
     int? durationMinutes,
     Location? location,
     List<Bus>? buses,
-  }) =>
-      Welcome(
-        id: id ?? this.id,
-        origin: origin ?? this.origin,
-        destination: destination ?? this.destination,
-        distanceKm: distanceKm ?? this.distanceKm,
-        durationMinutes: durationMinutes ?? this.durationMinutes,
-        location: location ?? this.location,
-        buses: buses ?? this.buses,
-      );
+  }) => DetailRouteModel(
+    id: id ?? this.id,
+    origin: origin ?? this.origin,
+    destination: destination ?? this.destination,
+    distanceKm: distanceKm ?? this.distanceKm,
+    durationMinutes: durationMinutes ?? this.durationMinutes,
+    location: location ?? this.location,
+    buses: buses ?? this.buses,
+  );
 
-  factory AllRouteModel.fromJson(Map<String, dynamic> json) =>
-      _$AllRouteModelFromJson(json);
+  factory DetailRouteModel.fromJson(Map<String, dynamic> json) =>
+      _$DetailRouteModelFromJson(json);
 
-  Map<String, dynamic> toJson() => _$AllRouteModelToJson(this);
+  Map<String, dynamic> toJson() => _$DetailRouteModelToJson(this);
 }
 
+@JsonSerializable()
 class Bus {
   final int? id;
   final int? routeId;
@@ -73,17 +73,17 @@ class Bus {
     String? busType,
     int? totalSeats,
     int? layoutId,
-  }) =>
-      Bus(
-        id: id ?? this.id,
-        routeId: routeId ?? this.routeId,
-        busNumber: busNumber ?? this.busNumber,
-        busType: busType ?? this.busType,
-        totalSeats: totalSeats ?? this.totalSeats,
-        layoutId: layoutId ?? this.layoutId,
-      );
-  factory Bus.fromJson(Map<String, dynamic> json) =>
-      _$AllRouteModelFromJson(json);
+  }) => Bus(
+    id: id ?? this.id,
+    routeId: routeId ?? this.routeId,
+    busNumber: busNumber ?? this.busNumber,
+    busType: busType ?? this.busType,
+    totalSeats: totalSeats ?? this.totalSeats,
+    layoutId: layoutId ?? this.layoutId,
+  );
 
-  Map<String, dynamic> toJson() => _$AllRouteModelToJson(this);
+  factory Bus.fromJson(Map<String, dynamic> json) =>
+      _$BusFromJson(json);
+
+  Map<String, dynamic> toJson() => _$BusToJson(this);
 }

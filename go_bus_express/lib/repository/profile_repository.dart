@@ -15,7 +15,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
   Future<XResult<ProfileModel?>> fetchProfile() {
     return xResultHandler(() async {
       final response = await api.fetchProfile();
-      return response.profile;
+      return response.data;
     });
   }
 }

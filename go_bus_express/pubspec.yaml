@@ -48,12 +48,8 @@ dependencies:
   shared_package:
     path: ../shared_package
 
-<<<<<<< HEAD
   logger: ^2.6.0
-  
-=======
->>>>>>> 706acd1 (done)
-  # UI package
+
   intl: ^0.20.1
   carousel_slider: ^5.0.0
 
@@ -63,10 +59,7 @@ dependencies:
   khqr_sdk: ^2.0.0
   qr_flutter: ^4.1.0
   lottie: ^3.1.2
-<<<<<<< HEAD
   retrofit: ^4.9.1
-=======
->>>>>>> 706acd1 (done)
 
 dev_dependencies:
   flutter_test:
