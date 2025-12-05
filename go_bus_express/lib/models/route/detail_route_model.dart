@@ -14,7 +14,7 @@ class DetailRouteModel {
   final Location? location;
   final List<Bus>? buses;
 
-  DetailRouteModel({
+  const DetailRouteModel({
     this.id,
     this.origin,
     this.destination,
@@ -57,7 +57,7 @@ class Bus {
   final int? totalSeats;
   final int? layoutId;
 
-  Bus({
+  const Bus({
     this.id,
     this.routeId,
     this.busNumber,
@@ -82,8 +82,7 @@ class Bus {
     layoutId: layoutId ?? this.layoutId,
   );
 
-  factory Bus.fromJson(Map<String, dynamic> json) =>
-      _$BusFromJson(json);
+  factory Bus.fromJson(Map<String, dynamic> json) => _$BusFromJson(json);
 
   Map<String, dynamic> toJson() => _$BusToJson(this);
 }
