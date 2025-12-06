@@ -44,7 +44,7 @@ class _SelectSeatViewState extends State<SelectSeatView> {
                 children: [
                   SizedBox(height: XPadding.extralarge),
                   XTextLarge(
-                    label: 'Select Seat',
+                    label: 'Select Seat'.tr,
                     colortext: black,
                     fontWeight: FontWeight.w600,
                   ),
@@ -124,7 +124,7 @@ class _SelectSeatViewState extends State<SelectSeatView> {
           ),
           child: XButton(
             height: 52,
-            label: 'Confirm',
+            label: 'Confirm'.tr,
             optionbutton: 1,
             bgColor: goBusPrimary,
             onTap: () => Get.toNamed(AppRoutes.choosePayment),

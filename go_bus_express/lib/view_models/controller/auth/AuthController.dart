@@ -65,7 +65,7 @@ class AuthController extends BaseController<AuthState> {
           log("Login error: ${result.error}");
           Get.snackbar(
             'Error',
-            result.error.toString(),
+            result.error.displayMessage,
             backgroundColor: Colors.red,
             colorText: white,
             snackPosition: SnackPosition.TOP,

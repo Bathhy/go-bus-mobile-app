@@ -106,11 +106,11 @@ class SelectRouteView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
-            children: const [
+            children: [
               Icon(Icons.access_time, size: 16, color: Colors.grey),
               SizedBox(width: 4),
               Text(
-                'Select Time',
+                'Select Time'.tr,
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
               ),
             ],
@@ -266,8 +266,8 @@ class SelectRouteView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text(
-                  'Book Now',
+                child:  Text(
+                  'Book Now'.tr,
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
               ),
