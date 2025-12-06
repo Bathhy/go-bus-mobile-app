@@ -28,12 +28,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-<<<<<<< HEAD
       initialRoute: AppRoutes.animation,
-=======
-      initialRoute: AppRoutes.signIn,
->>>>>>> 4d7444b (update sign in and sign up pages)
-      getPages: AppRoutes.routes,
       debugShowCheckedModeBanner: false,
     );
   }
