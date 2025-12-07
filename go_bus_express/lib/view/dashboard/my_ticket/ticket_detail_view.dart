@@ -17,6 +17,9 @@ class _TicketDetailViewState extends State<TicketDetailView> {
           _buildHeader(),
           Expanded(
             child: SingleChildScrollView(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).padding.bottom + 16,
+              ),
               child: Column(
                 children: [
                   _buildTicketCard(),

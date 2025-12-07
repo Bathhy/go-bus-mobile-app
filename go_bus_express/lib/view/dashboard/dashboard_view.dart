@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:go_bus_express/view/dashboard/home/home_view.dart';
 import 'package:go_bus_express/view/dashboard/profile/profile_view.dart';
 
+import 'my_ticket/my_ticket_view.dart';
+
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
 
@@ -26,7 +28,7 @@ class _MainNavigationState extends State<MainNavigation> {
         index: _selectedIndex,
         children: const [
           HomePageContent(),
-          Center(child: Text('Ticket Page')),
+          MyTicketView(),
           ProfilePage(),
         ],
       ),

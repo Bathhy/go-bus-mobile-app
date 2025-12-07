@@ -221,101 +221,106 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
         padding: EdgeInsets.all(XPadding.extralarge),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            XTextLarge(
-              label: 'Choose Your Language'.tr,
-              colortext: black,
-              fontWeight: FontWeight.w600,
-            ),
-            SizedBox(height: XPadding.extralarge),
-
-            // Khmer option
-            Obx(() {
-              final currentLanguage = controller.state.currentLanguage;
-              return GestureDetector(
-                onTap: () async {
-                  await controller.changeLanguage('km');
-                  Get.back();
-                },
-                child: Container(
-                  padding: EdgeInsets.all(XPadding.large),
-                  decoration: BoxDecoration(
-                    color: currentLanguage == 'km'
-                        ? goBusPrimary
-                        : Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      AppSvgImage(
-                        width: 25,
-                        height: 25,
-                        path: AppImages.imgKhLang,
-                        defaultColor: true,
-                      ),
-                      SizedBox(width: XPadding.large),
-                      XTextMedium(
-                        label: 'ខ្មែរ',
-                        colortext: currentLanguage == 'km' ? white : black,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }),
-            SizedBox(height: XPadding.extralarge),
-
-            // English option
-            Obx(() {
-              final currentLanguage = controller.state.currentLanguage;
-              return GestureDetector(
-                onTap: () async {
-                  await controller.changeLanguage('en');
-                  Get.back();
-                },
-                child: Container(
-                  padding: EdgeInsets.all(XPadding.large),
-                  decoration: BoxDecoration(
-                    color: currentLanguage == 'en'
-                        ? goBusPrimary
-                        : Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      AppSvgImage(
-                        path: AppImages.imgEngLang,
-                        height: 25,
-                        width: 25,
-                        defaultColor: true,
-                      ),
-                      SizedBox(width: XPadding.large),
-                      XTextMedium(
-                        label: 'English',
-                        colortext: currentLanguage == 'en' ? white : black,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }),
-            SizedBox(height: XPadding.extralarge),
-
-            // Cancel button
-            SizedBox(
-              width: double.infinity,
-              child: XButton(
-                label: 'Cancel'.tr,
-                optionbutton: 2,
-                bgColor: goBusPrimary,
-                onTap: () => Get.back(),
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).padding.bottom,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              XTextLarge(
+                label: 'Choose Your Language'.tr,
+                colortext: black,
+                fontWeight: FontWeight.w600,
               ),
-            ),
-          ],
+              SizedBox(height: XPadding.extralarge),
+
+              // Khmer option
+              Obx(() {
+                final currentLanguage = controller.state.currentLanguage;
+                return GestureDetector(
+                  onTap: () async {
+                    await controller.changeLanguage('km');
+                    Get.back();
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(XPadding.large),
+                    decoration: BoxDecoration(
+                      color: currentLanguage == 'km'
+                          ? goBusPrimary
+                          : Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        AppSvgImage(
+                          width: 25,
+                          height: 25,
+                          path: AppImages.imgKhLang,
+                          defaultColor: true,
+                        ),
+                        SizedBox(width: XPadding.large),
+                        XTextMedium(
+                          label: 'ខ្មែរ',
+                          colortext: currentLanguage == 'km' ? white : black,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+              SizedBox(height: XPadding.extralarge),
+
+              // English option
+              Obx(() {
+                final currentLanguage = controller.state.currentLanguage;
+                return GestureDetector(
+                  onTap: () async {
+                    await controller.changeLanguage('en');
+                    Get.back();
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(XPadding.large),
+                    decoration: BoxDecoration(
+                      color: currentLanguage == 'en'
+                          ? goBusPrimary
+                          : Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        AppSvgImage(
+                          path: AppImages.imgEngLang,
+                          height: 25,
+                          width: 25,
+                          defaultColor: true,
+                        ),
+                        SizedBox(width: XPadding.large),
+                        XTextMedium(
+                          label: 'English',
+                          colortext: currentLanguage == 'en' ? white : black,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+              SizedBox(height: XPadding.extralarge),
+
+              // Cancel button
+              SizedBox(
+                width: double.infinity,
+                child: XButton(
+                  label: 'Cancel'.tr,
+                  optionbutton: 2,
+                  bgColor: goBusPrimary,
+                  onTap: () => Get.back(),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
