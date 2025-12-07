@@ -33,6 +33,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       initialRoute: AppRoutes.animation,
+      // initialRoute: AppRoutes.ticket,
       translations: AppLocalization(),
       locale: AppLocalization.getInitialLocale(),
       fallbackLocale: const Locale('en'),
