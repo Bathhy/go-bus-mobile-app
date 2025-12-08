@@ -29,6 +29,10 @@ class LocalRepository with BaseSharePreference {
     return readString(PreferencesKey.language);
   }
 
+  Future<void> removeLanguage() async {
+    await removeValue(PreferencesKey.language);
+  }
+
   // Profile
   Future<void> saveProfile(String profileJson) async {
     await storeValue(PreferencesKey.profile, profileJson);

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_bus_express/core/di/app_di.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
+import 'package:go_bus_express/view_models/controller/route/select_route/select_route_controller.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 import 'package:shared_package/design_system/x_widget/x_app_bar.dart';
@@ -11,46 +13,77 @@ class SelectRouteView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final SelectRouteController controller = getIt<SelectRouteController>();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
-        child: XAppBar(
-          title: 'Phnom Penh → Siem Reap',
-          subTitle: "2025-10-08",
-          onBackPressed: () => Navigator.of(context).pop(),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.calendar_month, color: Colors.white),
-              onPressed: () {
-                _showDatePicker(context);
-              },
-            ),
-          ],
+        child: Obx(
+          () => XAppBar(
+            title:
+                '${controller.state.model?.origin ?? 'Origin'} → ${controller.state.model?.destination ?? 'Destination'}',
+            subTitle: "2025-10-08",
+            onBackPressed: () => Navigator.of(context).pop(),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.calendar_month, color: Colors.white),
+                onPressed: () {
+                  _showDatePicker(context);
+                },
+              ),
+            ],
+          ),
         ),
       ),
-      body: Column(
-        children: [
-          _buildTripInfo(),
-          Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.all(16),
-              itemCount: 10,
-              separatorBuilder: (context, index) => const SizedBox(height: 12),
-              itemBuilder:
-                  (context, index) => _buildBusCard(
-                    departureTime: '17:30',
-                    arrivalTime: '23:30',
-                    duration: '6:00 h',
-                    price: '\$13:00',
-                    availableSeats: '4/15 Seats',
-                    departureLocation: 'Boarding: Phnom Penh, France St. 47,',
-                    arrivalLocation: 'Boarding: Siem Reap, Phuemy St. 80',
+      body: Obx(
+        () => controller.state.isLoading
+            ? Center(child: CircularProgressIndicator(color: goBusPrimary))
+            : Column(
+                children: [
+                  _buildTripInfo(controller),
+                  Expanded(
+                    child:
+                        controller.state.model?.buses == null ||
+                            controller.state.model!.buses!.isEmpty
+                        ? Center(
+                            child: Text(
+                              'No buses available',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          )
+                        : ListView.separated(
+                            padding: const EdgeInsets.all(16),
+                            itemCount:
+                                controller.state.model?.buses?.length ?? 0,
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 12),
+                            itemBuilder: (context, index) {
+                              final bus = controller.state.model!.buses![index];
+                              final model = controller.state.model!;
+                              return _buildBusCard(
+                                departureTime: '17:30',
+                                arrivalTime: '23:30',
+                                duration:
+                                    '${model.durationMinutes ?? 0 ~/ 60}:${(model.durationMinutes ?? 0) % 60} h',
+                                price: '\$13.00',
+                                availableSeats:
+                                    '4/${bus.totalSeats ?? 0} Seats',
+                                departureLocation:
+                                    'Boarding: ${model.origin ?? 'N/A'}',
+                                arrivalLocation:
+                                    'Boarding: ${model.destination ?? 'N/A'}',
+                                busType: bus.busType ?? 'Bus',
+                              );
+                            },
+                          ),
                   ),
-            ),
-          ),
-          SizedBox(height: 40),
-        ],
+                  SizedBox(height: 40),
+                ],
+              ),
       ),
     );
   }
@@ -65,24 +98,25 @@ class SelectRouteView extends StatelessWidget {
     );
   }
 
-  Widget _buildTripInfo() {
+  Widget _buildTripInfo(SelectRouteController controller) {
+    final busCount = controller.state.model?.buses?.length ?? 0;
     return Container(
       padding: const EdgeInsets.all(16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
-            children: const [
+            children: [
               Icon(Icons.access_time, size: 16, color: Colors.grey),
               SizedBox(width: 4),
               Text(
-                'Select Time',
+                'Select Time'.tr,
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
               ),
             ],
           ),
-          const Text(
-            '10 Available Trips',
+          Text(
+            '$busCount Available Trips',
             style: TextStyle(fontSize: 14, color: Colors.grey),
           ),
         ],
@@ -98,6 +132,7 @@ class SelectRouteView extends StatelessWidget {
     required String availableSeats,
     required String departureLocation,
     required String arrivalLocation,
+    String busType = 'Bus',
   }) {
     return Container(
       width: double.infinity,
@@ -121,8 +156,8 @@ class SelectRouteView extends StatelessWidget {
             children: [
               Image.asset('assets/images/image 18.png', width: 24, height: 24),
               const SizedBox(width: 12),
-              const Text(
-                'Minivan 15 seats',
+              Text(
+                busType,
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
@@ -195,10 +230,9 @@ class SelectRouteView extends StatelessWidget {
                 20,
                 (index) => Expanded(
                   child: Container(
-                    color:
-                        index % 2 == 0
-                            ? Colors.transparent
-                            : Colors.grey.shade300,
+                    color: index % 2 == 0
+                        ? Colors.transparent
+                        : Colors.grey.shade300,
                     height: 1,
                   ),
                 ),
@@ -232,8 +266,8 @@ class SelectRouteView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child: const Text(
-                  'Book Now',
+                child:  Text(
+                  'Book Now'.tr,
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -281,47 +315,3 @@ class SelectRouteView extends StatelessWidget {
     );
   }
 }
-
-// class XAppBar extends StatelessWidget {
-//   const XAppBar({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return PreferredSize(
-//       preferredSize: const Size.fromHeight(kToolbarHeight),
-//       child: AppBar(
-//         backgroundColor: goBusPrimary,
-//         leading: IconButton(
-//           icon: const Icon(Icons.arrow_back, color: Colors.white),
-//           onPressed: () => Navigator.of(context).pop(),
-//         ),
-//         title: Column(
-//           crossAxisAlignment: CrossAxisAlignment.center,
-//           children: const [
-//             Text(
-//               'Phnom Penh → Siem Reap',
-//               style: TextStyle(
-//                 color: Colors.white,
-//                 fontSize: 18,
-//                 fontWeight: FontWeight.bold,
-//               ),
-//             ),
-//             SizedBox(height: 4),
-//             Text(
-//               '2025-10-08',
-//               style: TextStyle(color: Colors.white70, fontSize: 14),
-//             ),
-//           ],
-//         ),
-//         actions: [
-//           IconButton(
-//             icon: const Icon(Icons.calendar_month, color: Colors.white),
-//             onPressed: () {
-//               _showDatePicker(context);
-//             },
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }

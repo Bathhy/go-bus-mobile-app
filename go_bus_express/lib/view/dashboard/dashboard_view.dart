@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:go_bus_express/view/dashboard/home/home_view.dart';
 import 'package:go_bus_express/view/dashboard/profile/profile_view.dart';
+
+import 'my_ticket/my_ticket_view.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -25,7 +28,7 @@ class _MainNavigationState extends State<MainNavigation> {
         index: _selectedIndex,
         children: const [
           HomePageContent(),
-          Center(child: Text('Ticket Page')),
+          MyTicketView(),
           ProfilePage(),
         ],
       ),
@@ -49,18 +52,15 @@ class _MainNavigationState extends State<MainNavigation> {
           unselectedItemColor: Colors.white70,
           selectedFontSize: 12,
           unselectedFontSize: 12,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
+          items: [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'.tr),
             BottomNavigationBarItem(
               icon: Icon(Icons.confirmation_number),
-              label: 'Ticket',
+              label: 'Ticket'.tr,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person),
-              label: 'Profile',
+              label: 'Profile'.tr,
             ),
           ],
         ),

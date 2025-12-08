@@ -49,8 +49,7 @@ dependencies:
     path: ../shared_package
 
   logger: ^2.6.0
-  
-  # UI package
+
   intl: ^0.20.1
   carousel_slider: ^5.0.0
 
