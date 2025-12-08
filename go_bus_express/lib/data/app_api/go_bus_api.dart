@@ -1,0 +1,15 @@
+import 'package:dio/dio.dart';
+import 'package:go_bus_express/models/profile/profile_model.dart';
+import 'package:go_bus_express/models/profile/profile_response.dart';
+import 'package:retrofit/http.dart';
+import 'package:go_bus_express/core/network/parse_error_logger.dart';
+
+part 'go_bus_api.g.dart';
+
+@RestApi()
+abstract class GoBusApi {
+  factory GoBusApi(Dio dio, {String baseUrl}) = _GoBusApi;
+
+  @GET('/profile/getProfile')
+  Future<ProfileResponse> fetchProfile();
+}

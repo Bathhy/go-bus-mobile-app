@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
-import 'package:shared_package/design_system/xwidget/x_app_bar.dart';
-import 'package:shared_package/design_system/xwidget/x_location_title.dart';
+import 'package:shared_package/design_system/x_widget/x_app_bar.dart';
+import 'package:shared_package/design_system/x_widget/x_location_title.dart';
 
 class SelectRouteView extends StatelessWidget {
   const SelectRouteView({super.key});

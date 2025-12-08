@@ -4,10 +4,10 @@ import 'package:go_bus_express/resources/app_images.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
-import 'package:shared_package/design_system/xwidget/AppImage.dart';
-import 'package:shared_package/design_system/xwidget/ButtonComponent.dart';
-import 'package:shared_package/design_system/xwidget/TextComponent.dart';
-import 'package:shared_package/design_system/xwidget/x_app_bar.dart';
+import 'package:shared_package/design_system/x_widget/AppImage.dart';
+import 'package:shared_package/design_system/x_widget/ButtonComponent.dart';
+import 'package:shared_package/design_system/x_widget/TextComponent.dart';
+import 'package:shared_package/design_system/x_widget/x_app_bar.dart';
 
 class SelectSeatView extends StatefulWidget {
   const SelectSeatView({super.key});
@@ -23,6 +23,7 @@ class _SelectSeatViewState extends State<SelectSeatView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: white,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: XAppBar(
