@@ -27,4 +27,9 @@ abstract class GoBusApi {
     @Query("scheduleId") int scheduleId,
     @Query("busId") int busId,
   );
+  @GET('/route/{id}')
+  Future<BaseResponse<DetailRouteModel>> fetchRouteDetail(@Path('id') int id);
+
+  @GET('/route')
+  Future<BaseResponse<List<DetailRouteModel>>> fetchRoutes();
 }

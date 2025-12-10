@@ -45,4 +45,12 @@ class RouteRepositoryImpl implements RouteRepository {
       return result.data;
     });
   }
+
+  @override
+  Future<XResult<List<DetailRouteModel>>> fetchRoutes() async {
+    return xResultHandler(() async {
+      final result = await api.fetchRoutes();
+      return result.data ?? [];
+    });
+  }
 }
