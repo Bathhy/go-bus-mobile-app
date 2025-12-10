@@ -55,6 +55,7 @@ Future<void> setupDependencyInjection() async {
     final controller = HomeController(
       getIt<ProfileRepository>(),
       getIt<LocalRepository>(),
+      getIt<RouteRepository>(),
     );
     Get.put(controller);
     return controller;

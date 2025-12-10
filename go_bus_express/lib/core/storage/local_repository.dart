@@ -46,6 +46,19 @@ class LocalRepository with BaseSharePreference {
     await removeValue(PreferencesKey.profile);
   }
 
+  // Routes
+  Future<void> saveRoutes(String routesJson) async {
+    await storeValue(PreferencesKey.routes, routesJson);
+  }
+
+  String? getRoutes() {
+    return readString(PreferencesKey.routes);
+  }
+
+  Future<void> removeRoutes() async {
+    await removeValue(PreferencesKey.routes);
+  }
+
   // Logout
   Future<void> logout() async {
     await logoutBox();
