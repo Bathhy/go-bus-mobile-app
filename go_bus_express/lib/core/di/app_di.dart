@@ -7,9 +7,11 @@ import 'package:go_bus_express/data/app_api/go_bus_api.dart';
 import 'package:go_bus_express/data/auth/auth_api.dart';
 import 'package:go_bus_express/repository/auth_repository.dart';
 import 'package:go_bus_express/repository/profile_repository.dart';
+import 'package:go_bus_express/repository/route_repository.dart';
 import 'package:go_bus_express/view_models/controller/auth/AuthController.dart';
 import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
 import 'package:go_bus_express/view_models/controller/profile/profile_controller.dart';
+import 'package:go_bus_express/view_models/controller/route/select_route/select_route_controller.dart';
 import 'package:go_bus_express/view_models/controller/splash/SplashController.dart';
 
 import '../../data/network/dio_service.dart';
@@ -34,6 +36,9 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<ProfileRepository>(
     () => ProfileRepositoryImpl(getIt<GoBusApi>()),
   );
+  getIt.registerLazySingleton<RouteRepository>(
+    () => RouteRepositoryImpl(getIt<GoBusApi>()),
+  );
 
   // Controller
   getIt.registerFactory<SplashController>(() {
@@ -50,12 +55,19 @@ Future<void> setupDependencyInjection() async {
     final controller = HomeController(
       getIt<ProfileRepository>(),
       getIt<LocalRepository>(),
+      getIt<RouteRepository>(),
     );
     Get.put(controller);
     return controller;
   });
   getIt.registerFactory<ProfileController>(() {
-    final controller = ProfileController(getIt());
+    final controller = ProfileController(getIt<LocalRepository>());
+    Get.put(controller);
+    controller.onInit();
+    return controller;
+  });
+  getIt.registerFactory<SelectRouteController>(() {
+    final controller = SelectRouteController(getIt());
     Get.put(controller);
     return controller;
   });

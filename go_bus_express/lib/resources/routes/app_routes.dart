@@ -3,6 +3,7 @@ import 'package:go_bus_express/view/auth/sign_in_view.dart';
 import 'package:go_bus_express/view/auth/sign_up_view.dart';
 import 'package:go_bus_express/view/booking/booking_history_view.dart';
 import 'package:go_bus_express/view/dashboard/dashboard_view.dart';
+import 'package:go_bus_express/view/dashboard/my_ticket/my_ticket_view.dart';
 import 'package:go_bus_express/view/splash/splash_view.dart';
 import 'package:go_bus_express/view/edit_profile/edit_profile_view.dart';
 import 'package:go_bus_express/view/ticket/choose_payment/choose_payment_view.dart';
@@ -21,6 +22,8 @@ class AppRoutes {
   static const String bookingHistory = "/bookingHistory";
   static const String animation = '/animation';
   static const String editProfile = "/editProfile";
+  static const String ticket = "/ticket";
+
   // static void goToDetailCategoryRoute(
   //         int? categoryId, String? uniName, String? uniDescription) =>
   //     Get.toNamed(arguments: {
@@ -40,5 +43,7 @@ class AppRoutes {
     GetPage(name: bookingHistory, page: () => const BookingHistoryView()),
     GetPage(name: animation, page: () => SplashView()),
     GetPage(name: editProfile, page: () => const EditProfileView()),
+    GetPage(name: animation, page: () => SplashView()),
+    GetPage(name: ticket, page: () => const MyTicketView()),
   ];
 }

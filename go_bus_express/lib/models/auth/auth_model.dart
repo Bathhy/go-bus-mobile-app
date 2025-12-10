@@ -6,7 +6,7 @@ part 'auth_model.g.dart';
 class AuthModel {
   final String? token;
 
-  AuthModel(this.token);
+  AuthModel({this.token});
 
   factory AuthModel.fromJson(Map<String, dynamic> json) =>
       _$AuthModelFromJson(json);

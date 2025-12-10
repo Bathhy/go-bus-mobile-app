@@ -53,19 +53,19 @@ class AuthController extends BaseController<AuthState> {
       final result = await _repository.login(body: body);
 
       switch (result) {
-        case Success<AuthModel>():
+        case Success<AuthModel?>():
           {
-            _localRepository.saveToken(result.data.token ?? "");
+            _localRepository.saveToken(result.data?.token ?? "");
             Get.offAllNamed(AppRoutes.mainNavigation);
-            log("Login success >>>>>>>> ${result.data.token}");
+            log("Login success >>>>>>>> ${result.data?.token}");
           }
 
-        case Error<AuthModel>():
+        case Error<AuthModel?>():
           // Error - show message
           log("Login error: ${result.error}");
           Get.snackbar(
             'Error',
-            result.error.toString(),
+            result.error.displayMessage,
             backgroundColor: Colors.red,
             colorText: white,
             snackPosition: SnackPosition.TOP,
