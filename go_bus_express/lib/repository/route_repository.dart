@@ -5,6 +5,7 @@ import '../data/app_api/go_bus_api.dart';
 
 abstract class RouteRepository {
   Future<XResult<DetailRouteModel?>> fetchRouteById(int id);
+  Future<XResult<List<DetailRouteModel>>> fetchRoutes();
 }
 
 class RouteRepositoryImpl implements RouteRepository {
@@ -17,6 +18,14 @@ class RouteRepositoryImpl implements RouteRepository {
     return xResultHandler(() async {
       final result = await api.fetchRouteDetail(id);
       return result.data;
+    });
+  }
+
+  @override
+  Future<XResult<List<DetailRouteModel>>> fetchRoutes() async {
+    return xResultHandler(() async {
+      final result = await api.fetchRoutes();
+      return result.data ?? [];
     });
   }
 }
