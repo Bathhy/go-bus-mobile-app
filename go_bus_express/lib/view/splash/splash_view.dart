@@ -5,6 +5,7 @@ import 'package:go_bus_express/utils/enums/lotties_enum.dart';
 import 'package:go_bus_express/view_models/controller/splash/SplashController.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_package/config/themes.dart';
+
 import '../../core/di/app_di.dart';
 
 class SplashView extends StatefulWidget {
@@ -20,7 +21,7 @@ class _EasyAnimationState extends State<SplashView> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 4), () {
+    Future.delayed(const Duration(seconds: 1), () {
       if (_splashController.isLoggedIn.value) {
         Get.offAllNamed(AppRoutes.mainNavigation);
       } else {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/di/app_di.dart';
+import 'package:go_bus_express/models/route/detail_route_model.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:go_bus_express/view_models/controller/route/select_route/select_route_controller.dart';
 import 'package:shared_package/config/themes.dart';
@@ -24,14 +25,6 @@ class SelectRouteView extends StatelessWidget {
               '${'Phnom Penh' ?? 'Origin'} → ${'Siem Reap' ?? 'Destination'}',
           subTitle: "2025-10-08",
           onBackPressed: () => Navigator.of(context).pop(),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.calendar_month, color: Colors.white),
-              onPressed: () {
-                _showDatePicker(context);
-              },
-            ),
-          ],
         ),
         // child: Obx(
         //   () => XAppBar(
@@ -68,15 +61,18 @@ class SelectRouteView extends StatelessWidget {
                             ),
                           )
                         : ListView.separated(
-                            padding: const EdgeInsets.all(16),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: XPadding.extralarge,
+                            ),
                             itemCount:
                                 controller.state.model?.route?.length ?? 0,
                             separatorBuilder: (context, index) =>
-                                const SizedBox(height: 12),
+                                SizedBox(height: XPadding.small),
                             itemBuilder: (context, index) {
                               final model = controller.state.model?.route
                                   ?.elementAt(index);
                               return _buildBusCard(
+                                budId: model?.busId,
                                 departureTime: model?.departureTime ?? '23:30',
                                 arrivalTime: '23:22',
                                 duration: (model?.bus?.route?.durationMinutes)
@@ -99,16 +95,6 @@ class SelectRouteView extends StatelessWidget {
                 ],
               ),
       ),
-    );
-  }
-
-  Future<void> _showDatePicker(BuildContext context) async {
-    DateTime now = DateTime.now();
-    await showDatePicker(
-      context: context,
-      initialDate: now,
-      firstDate: DateTime(2023),
-      lastDate: DateTime(2026),
     );
   }
 
@@ -147,6 +133,7 @@ class SelectRouteView extends StatelessWidget {
     required String departureLocation,
     required String arrivalLocation,
     String busType = 'Bus',
+    int? budId,
   }) {
     return Container(
       width: double.infinity,
@@ -267,7 +254,8 @@ class SelectRouteView extends StatelessWidget {
               ),
               ElevatedButton(
                 onPressed: () {
-                  Get.toNamed(AppRoutes.selectSeat);
+                  // Get.toNamed(AppRoutes.selectSeat);
+                  AppRoutes.goToSeatRoute(6, budId);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: success,

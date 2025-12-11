@@ -25,4 +25,6 @@ final Map<String, String> en = {
   'Choose Payment Method': 'Choose Payment Method',
   'Scan to pay with any banking': 'Scan to pay with any banking',
   'Term & Conditions Agreement': 'Term & Conditions Agreement',
+  'Booked': 'Booked',
+  'Available': 'Available',
 };
