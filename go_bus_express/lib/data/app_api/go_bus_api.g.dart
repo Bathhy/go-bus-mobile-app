@@ -48,27 +48,35 @@ class _GoBusApi implements GoBusApi {
   }
 
   @override
-  Future<BaseResponse<DetailRouteModel>> fetchRouteDetail(int id) async {
+  Future<BaseResponse<RouteListResponseModel>> fetchBusBySchedule(
+    int destinationId, {
+    String? departureDate,
+    String? returnDate,
+  }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'departureDate': departureDate,
+      r'returnDate': returnDate,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<BaseResponse<DetailRouteModel>>(
+    final _options = _setStreamType<BaseResponse<RouteListResponseModel>>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/route/${id}',
+            '/bus/bySchedule/${destinationId}',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late BaseResponse<DetailRouteModel> _value;
+    late BaseResponse<RouteListResponseModel> _value;
     try {
-      _value = BaseResponse<DetailRouteModel>.fromJson(
+      _value = BaseResponse<RouteListResponseModel>.fromJson(
         _result.data!,
-        (json) => DetailRouteModel.fromJson(json as Map<String, dynamic>),
+        (json) => RouteListResponseModel.fromJson(json as Map<String, dynamic>),
       );
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);

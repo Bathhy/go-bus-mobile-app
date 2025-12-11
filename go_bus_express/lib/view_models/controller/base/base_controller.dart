@@ -15,3 +15,9 @@ abstract class BaseController<T> extends GetxController {
     emit(reducer(_state.value));
   }
 }
+
+abstract class BaseUiState {
+  final bool isLoading;
+
+  const BaseUiState({this.isLoading = false});
+}

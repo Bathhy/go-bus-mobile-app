@@ -14,9 +14,10 @@ abstract class GoBusApi {
   @GET('/profile/getProfile')
   Future<BaseResponse<ProfileModel>> fetchProfile();
 
-  @GET('/route/{id}')
-  Future<BaseResponse<DetailRouteModel>> fetchRouteDetail(@Path('id') int id);
-
-  @GET('/route')
-  Future<BaseResponse<List<DetailRouteModel>>> fetchRoutes();
+  @GET('/bus/bySchedule/{destinationId}')
+  Future<BaseResponse<RouteListResponseModel>> fetchBusBySchedule(
+    @Path('destinationId') int destinationId, {
+    @Query('departureDate') String? departureDate,
+    @Query('returnDate') String? returnDate,
+  });
 }

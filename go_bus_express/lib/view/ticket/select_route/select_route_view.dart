@@ -19,22 +19,36 @@ class SelectRouteView extends StatelessWidget {
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
-        child: Obx(
-          () => XAppBar(
-            title:
-                '${controller.state.model?.origin ?? 'Origin'} → ${controller.state.model?.destination ?? 'Destination'}',
-            subTitle: "2025-10-08",
-            onBackPressed: () => Navigator.of(context).pop(),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.calendar_month, color: Colors.white),
-                onPressed: () {
-                  _showDatePicker(context);
-                },
-              ),
-            ],
-          ),
+        child: XAppBar(
+          title:
+              '${'Phnom Penh' ?? 'Origin'} → ${'Siem Reap' ?? 'Destination'}',
+          subTitle: "2025-10-08",
+          onBackPressed: () => Navigator.of(context).pop(),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.calendar_month, color: Colors.white),
+              onPressed: () {
+                _showDatePicker(context);
+              },
+            ),
+          ],
         ),
+        // child: Obx(
+        //   () => XAppBar(
+        //     title:
+        //         '${'Phnom Penh' ?? 'Origin'} → ${'Siem Reap' ?? 'Destination'}',
+        //     subTitle: "2025-10-08",
+        //     onBackPressed: () => Navigator.of(context).pop(),
+        //     actions: [
+        //       IconButton(
+        //         icon: const Icon(Icons.calendar_month, color: Colors.white),
+        //         onPressed: () {
+        //           _showDatePicker(context);
+        //         },
+        //       ),
+        //     ],
+        //   ),
+        // ),
       ),
       body: Obx(
         () => controller.state.isLoading
@@ -43,9 +57,7 @@ class SelectRouteView extends StatelessWidget {
                 children: [
                   _buildTripInfo(controller),
                   Expanded(
-                    child:
-                        controller.state.model?.buses == null ||
-                            controller.state.model!.buses!.isEmpty
+                    child: controller.state.model?.route?.isEmpty == true
                         ? Center(
                             child: Text(
                               'No buses available',
@@ -58,25 +70,27 @@ class SelectRouteView extends StatelessWidget {
                         : ListView.separated(
                             padding: const EdgeInsets.all(16),
                             itemCount:
-                                controller.state.model?.buses?.length ?? 0,
+                                controller.state.model?.route?.length ?? 0,
                             separatorBuilder: (context, index) =>
                                 const SizedBox(height: 12),
                             itemBuilder: (context, index) {
-                              final bus = controller.state.model!.buses![index];
-                              final model = controller.state.model!;
+                              final model = controller.state.model?.route
+                                  ?.elementAt(index);
                               return _buildBusCard(
-                                departureTime: '17:30',
-                                arrivalTime: '23:30',
-                                duration:
-                                    '${model.durationMinutes ?? 0 ~/ 60}:${(model.durationMinutes ?? 0) % 60} h',
-                                price: '\$13.00',
+                                departureTime: model?.departureTime ?? '23:30',
+                                arrivalTime: '23:22',
+                                duration: (model?.bus?.route?.durationMinutes)
+                                    .toString(),
+                                // duration:
+                                //     '${model.durationMinutes ?? 0 ~/ 60}:${(model.durationMinutes ?? 0) % 60} h',
+                                price: '\$${model?.price}',
                                 availableSeats:
-                                    '4/${bus.totalSeats ?? 0} Seats',
+                                    '${model?.bus?.bookedSeats ?? 0}/${model?.bus?.totalSeats ?? 0} Seats',
                                 departureLocation:
-                                    'Boarding: ${model.origin ?? 'N/A'}',
+                                    'Boarding: ${model?.bus?.route?.origin ?? 'N/A'}',
                                 arrivalLocation:
-                                    'Boarding: ${model.destination ?? 'N/A'}',
-                                busType: bus.busType ?? 'Bus',
+                                    'Boarding: ${model?.bus?.route?.destination ?? 'N/A'}',
+                                busType: model?.bus?.busType ?? 'Bus',
                               );
                             },
                           ),
@@ -99,7 +113,7 @@ class SelectRouteView extends StatelessWidget {
   }
 
   Widget _buildTripInfo(SelectRouteController controller) {
-    final busCount = controller.state.model?.buses?.length ?? 0;
+    final busCount = controller.state.model?.route?.length ?? 0;
     return Container(
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -266,7 +280,7 @@ class SelectRouteView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                child:  Text(
+                child: Text(
                   'Book Now'.tr,
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),

@@ -1,88 +1,94 @@
+import 'package:go_bus_express/models/home/all_route_model.dart';
 import 'package:json_annotation/json_annotation.dart';
-
-import '../home/all_route_model.dart';
 
 part 'detail_route_model.g.dart';
 
 @JsonSerializable()
+class RouteListResponseModel {
+  final List<DetailRouteModel>? route;
+  final int? count;
+  final RouteSummary? summary;
+
+  const RouteListResponseModel({
+    this.route,
+    this.count,
+    this.summary,
+  });
+
+  factory RouteListResponseModel.fromJson(Map<String, dynamic> json) =>
+      _$RouteListResponseModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RouteListResponseModelToJson(this);
+}
+
+@JsonSerializable()
 class DetailRouteModel {
   final int? id;
-  final String? origin;
-  final String? destination;
-  final int? distanceKm;
-  final int? durationMinutes;
-  final Location? location;
-  final List<Bus>? buses;
+  final int? busId;
+  final double? price;
+  final DateTime? departureDate;
+  final String? arrivalTime;
+  final String? departureTime;
+  final BusModel? bus;
 
   const DetailRouteModel({
     this.id,
-    this.origin,
-    this.destination,
-    this.distanceKm,
-    this.durationMinutes,
-    this.location,
-    this.buses,
+    this.busId,
+    this.price,
+    this.departureDate,
+    this.arrivalTime,
+    this.departureTime,
+    this.bus,
   });
-
-  DetailRouteModel copyWith({
-    int? id,
-    String? origin,
-    String? destination,
-    int? distanceKm,
-    int? durationMinutes,
-    Location? location,
-    List<Bus>? buses,
-  }) => DetailRouteModel(
-    id: id ?? this.id,
-    origin: origin ?? this.origin,
-    destination: destination ?? this.destination,
-    distanceKm: distanceKm ?? this.distanceKm,
-    durationMinutes: durationMinutes ?? this.durationMinutes,
-    location: location ?? this.location,
-    buses: buses ?? this.buses,
-  );
-
-  factory DetailRouteModel.fromJson(Map<String, dynamic> json) =>
-      _$DetailRouteModelFromJson(json);
+  factory DetailRouteModel.fromJson(Map<String, dynamic> json) => _$DetailRouteModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$DetailRouteModelToJson(this);
 }
 
 @JsonSerializable()
-class Bus {
+class BusModel {
   final int? id;
   final int? routeId;
   final String? busNumber;
   final String? busType;
   final int? totalSeats;
   final int? layoutId;
+  final AllRouteModel? route;
+  // New variables added here
+  final int? availableSeats;
+  final int? bookedSeats;
 
-  const Bus({
+  BusModel({
     this.id,
     this.routeId,
     this.busNumber,
     this.busType,
     this.totalSeats,
     this.layoutId,
+    this.route,
+    this.availableSeats,
+    this.bookedSeats,
   });
 
-  Bus copyWith({
-    int? id,
-    int? routeId,
-    String? busNumber,
-    String? busType,
-    int? totalSeats,
-    int? layoutId,
-  }) => Bus(
-    id: id ?? this.id,
-    routeId: routeId ?? this.routeId,
-    busNumber: busNumber ?? this.busNumber,
-    busType: busType ?? this.busType,
-    totalSeats: totalSeats ?? this.totalSeats,
-    layoutId: layoutId ?? this.layoutId,
-  );
+  factory BusModel.fromJson(Map<String, dynamic> json) => _$BusModelFromJson(json);
 
-  factory Bus.fromJson(Map<String, dynamic> json) => _$BusFromJson(json);
+  Map<String, dynamic> toJson() => _$BusModelToJson(this);
+}
 
-  Map<String, dynamic> toJson() => _$BusToJson(this);
+@JsonSerializable()
+class RouteSummary {
+  final int? totalSchedules;
+  final int? totalAvailableSeats;
+  final int? totalBookedSeats;
+
+  RouteSummary({
+    this.totalSchedules,
+    this.totalAvailableSeats,
+    this.totalBookedSeats,
+  });
+
+  factory RouteSummary.fromJson(Map<String, dynamic> json) =>
+      _$RouteSummaryFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RouteSummaryToJson(this);
 }
