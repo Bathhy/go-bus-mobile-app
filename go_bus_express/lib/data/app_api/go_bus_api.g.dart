@@ -48,35 +48,27 @@ class _GoBusApi implements GoBusApi {
   }
 
   @override
-  Future<BaseResponse<RouteListResponseModel>> fetchBusBySchedule(
-    int destinationId, {
-    String? departureDate,
-    String? returnDate,
-  }) async {
+  Future<BaseResponse<DetailRouteModel>> fetchRouteDetail(int id) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{
-      r'departureDate': departureDate,
-      r'returnDate': returnDate,
-    };
-    queryParameters.removeWhere((k, v) => v == null);
+    final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<BaseResponse<RouteListResponseModel>>(
+    final _options = _setStreamType<BaseResponse<DetailRouteModel>>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/bus/bySchedule/${destinationId}',
+            '/route/${id}',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late BaseResponse<RouteListResponseModel> _value;
+    late BaseResponse<DetailRouteModel> _value;
     try {
-      _value = BaseResponse<RouteListResponseModel>.fromJson(
+      _value = BaseResponse<DetailRouteModel>.fromJson(
         _result.data!,
-        (json) => RouteListResponseModel.fromJson(json as Map<String, dynamic>),
+        (json) => DetailRouteModel.fromJson(json as Map<String, dynamic>),
       );
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
@@ -149,6 +141,80 @@ class _GoBusApi implements GoBusApi {
                   )
                   .toList()
             : List.empty(),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<BaseResponse<RouteListResponseModel>> fetchBusBySchedule(
+    int destinationId, {
+    String? departureDate,
+    String? returnDate,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'departureDate': departureDate,
+      r'returnDate': returnDate,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<BaseResponse<RouteListResponseModel>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/bus/bySchedule/${destinationId}',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late BaseResponse<RouteListResponseModel> _value;
+    try {
+      _value = BaseResponse<RouteListResponseModel>.fromJson(
+        _result.data!,
+        (json) => RouteListResponseModel.fromJson(json as Map<String, dynamic>),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<BaseResponse<SeatLayoutModel>> fetchBusSeat(
+    int scheduleId,
+    int busId,
+  ) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'scheduleId': scheduleId,
+      r'busId': busId,
+    };
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<BaseResponse<SeatLayoutModel>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/bus/seat/seatAndLayout',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late BaseResponse<SeatLayoutModel> _value;
+    try {
+      _value = BaseResponse<SeatLayoutModel>.fromJson(
+        _result.data!,
+        (json) => SeatLayoutModel.fromJson(json as Map<String, dynamic>),
       );
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/go_bus_express/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/go_bus_express/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/go_bus_express/build" />
+      <excludeFolder url="file://$MODULE_DIR$/shared_package/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/shared_package/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/shared_package/build" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
