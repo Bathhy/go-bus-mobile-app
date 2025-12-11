@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/resources/app_images.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
+import 'package:go_bus_express/view_models/controller/route/select_seat/select_seat_controller.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 import 'package:shared_package/design_system/x_widget/AppImage.dart';
 import 'package:shared_package/design_system/x_widget/ButtonComponent.dart';
 import 'package:shared_package/design_system/x_widget/TextComponent.dart';
 import 'package:shared_package/design_system/x_widget/x_app_bar.dart';
+
+import '../../../core/di/app_di.dart';
 
 class SelectSeatView extends StatefulWidget {
   const SelectSeatView({super.key});
@@ -17,11 +20,9 @@ class SelectSeatView extends StatefulWidget {
 }
 
 class _SelectSeatViewState extends State<SelectSeatView> {
-  final List<int> bookedSeats = [1, 2, 3, 5, 6, 7, 12];
-  int? selectedSeat;
-
   @override
   Widget build(BuildContext context) {
+    final SelectSeatController controller = getIt<SelectSeatController>();
     return Scaffold(
       backgroundColor: white,
       appBar: PreferredSize(
@@ -29,83 +30,99 @@ class _SelectSeatViewState extends State<SelectSeatView> {
         child: XAppBar(
           title: 'Phnom Penh → Siem Reap',
           subTitle: "2025-10-08",
-          onBackPressed: () => Navigator.of(context).pop(),
+          onBackPressed: () => Get.back(),
         ),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: XPadding.extralarge),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: XPadding.large,
-                children: [
-                  SizedBox(height: XPadding.extralarge),
-                  XTextLarge(
-                    label: 'Select Seat'.tr,
-                    colortext: black,
-                    fontWeight: FontWeight.w600,
-                  ),
+      body: Obx(() {
+        final state = controller.state;
+        
+        if (state.isLoading) {
+          return Center(child: CircularProgressIndicator());
+        }
 
-                  Row(
-                    spacing: XPadding.large,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: XPadding.large,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
-                          color: Colors.red.shade300,
-                        ),
-                      ),
-                      XTextMedium(label: 'Booked', colortext: Colors.grey),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: XPadding.large,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
-                          color: Colors.grey,
-                        ),
-                      ),
-                      XTextMedium(label: 'Available', colortext: Colors.grey),
-                    ],
-                  ),
-                  // Driver icon
-                  AppSvgImage(
-                    path: AppImages.icBusDriver,
-                    width: 60,
-                    height: 60,
-                  ),
-                  SizedBox(height: XPadding.medium),
+        final layout = state.model?.layout?.layout?.layout;
+        
+        if (layout == null || layout.isEmpty) {
+          return Center(
+            child: XTextMedium(
+              label: 'No seat layout available',
+              colortext: Colors.grey,
+            ),
+          );
+        }
 
-                  // Seat layout
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          _buildSeatRow(1, 5, 9, 13),
-                          SizedBox(height: XPadding.medium),
-                          _buildSeatRow(2, 6, 10, 14),
-                          SizedBox(height: XPadding.medium),
-                          _buildSeatRow(3, 7, 11, 15),
-                          SizedBox(height: XPadding.medium),
-                          _buildSeatRow(4, 8, 12, 16),
-                        ],
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: XPadding.extralarge),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: XPadding.large,
+                  children: [
+                    SizedBox(height: XPadding.extralarge),
+                    XTextLarge(
+                      label: 'Select Seat'.tr,
+                      colortext: black,
+                      fontWeight: FontWeight.w600,
+                    ),
+
+                    Row(
+                      spacing: XPadding.large,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: XPadding.large,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            color: Colors.red.shade300,
+                          ),
+                        ),
+                        XTextMedium(label: 'Booked'.tr, colortext: Colors.grey),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: XPadding.large,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            color: Colors.grey,
+                          ),
+                        ),
+                        XTextMedium(label: 'Available'.tr, colortext: Colors.grey),
+                      ],
+                    ),
+                    // Driver icon
+                    AppSvgImage(
+                      path: AppImages.icBusDriver,
+                      width: 60,
+                      height: 60,
+                    ),
+                    SizedBox(height: XPadding.medium),
+
+                    // Seat layout - dynamically built from API
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: layout.map((row) {
+                            return Padding(
+                              padding: EdgeInsets.only(bottom: XPadding.medium),
+                              child: _buildDynamicSeatRow(row, controller),
+                            );
+                          }).toList(),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      }),
       // move the confirm button to bottomNavigationBar so it always sticks to the bottom
       bottomNavigationBar: SafeArea(
         top: false,
@@ -135,7 +152,8 @@ class _SelectSeatViewState extends State<SelectSeatView> {
   }
 
   Widget _buildSeat(
-    int seatNumber, {
+    String seatNumber,
+    SelectSeatController controller, {
     bool isBooked = false,
     bool isSelected = false,
   }) {
@@ -149,14 +167,11 @@ class _SelectSeatViewState extends State<SelectSeatView> {
     }
 
     return GestureDetector(
-      onTap:
-          isBooked
-              ? null
-              : () {
-                setState(() {
-                  selectedSeat = seatNumber;
-                });
-              },
+      onTap: isBooked
+          ? null
+          : () {
+              controller.toggleSeat(seatNumber);
+            },
       child: SizedBox(
         width: 70,
         height: 70,
@@ -170,9 +185,9 @@ class _SelectSeatViewState extends State<SelectSeatView> {
               color: seatColor,
             ),
             Text(
-              seatNumber.toString(),
+              seatNumber,
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
@@ -183,34 +198,38 @@ class _SelectSeatViewState extends State<SelectSeatView> {
     );
   }
 
-  Widget _buildSeatRow(int seat1, int seat2, int seat3, int seat4) {
+  Widget _buildDynamicSeatRow(
+    List<String?> rowSeats,
+    SelectSeatController controller,
+  ) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _buildSeat(
-          seat1,
-          isBooked: bookedSeats.contains(seat1),
-          isSelected: selectedSeat == seat1,
-        ),
-        SizedBox(width: XPadding.small),
-        _buildSeat(
-          seat2,
-          isBooked: bookedSeats.contains(seat2),
-          isSelected: selectedSeat == seat2,
-        ),
-        SizedBox(width: XPadding.extralarge * 2),
-        _buildSeat(
-          seat3,
-          isBooked: bookedSeats.contains(seat3),
-          isSelected: selectedSeat == seat3,
-        ),
-        SizedBox(width: XPadding.small),
-        _buildSeat(
-          seat4,
-          isBooked: bookedSeats.contains(seat4),
-          isSelected: selectedSeat == seat4,
-        ),
-      ],
+      children: rowSeats.asMap().entries.map((entry) {
+        final index = entry.key;
+        final seatNumber = entry.value;
+        
+        if (seatNumber == null) {
+          // Aisle space - wider gap between seat groups
+          return SizedBox(width: XPadding.extralarge * 2, height: 70);
+        }
+        
+        final isBooked = !controller.isSeatAvailable(seatNumber);
+        final isSelected = controller.isSeatSelected(seatNumber);
+        
+        // Add small spacing between seats in the same group
+        final needsSpacing = index > 0 && rowSeats[index - 1] != null;
+        
+        return Row(
+          children: [
+            if (needsSpacing) SizedBox(width: XPadding.small),
+            _buildSeat(
+              seatNumber,
+              controller,
+              isBooked: isBooked,
+              isSelected: isSelected,
+            ),
+          ],
+        );
+      }).toList(),
     );
   }
 }

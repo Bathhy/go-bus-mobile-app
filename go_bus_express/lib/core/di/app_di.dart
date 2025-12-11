@@ -12,6 +12,7 @@ import 'package:go_bus_express/view_models/controller/auth/AuthController.dart';
 import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
 import 'package:go_bus_express/view_models/controller/profile/profile_controller.dart';
 import 'package:go_bus_express/view_models/controller/route/select_route/select_route_controller.dart';
+import 'package:go_bus_express/view_models/controller/route/select_seat/select_seat_controller.dart';
 import 'package:go_bus_express/view_models/controller/splash/SplashController.dart';
 
 import '../../data/network/dio_service.dart';
@@ -68,6 +69,11 @@ Future<void> setupDependencyInjection() async {
   });
   getIt.registerFactory<SelectRouteController>(() {
     final controller = SelectRouteController(getIt());
+    Get.put(controller);
+    return controller;
+  });
+  getIt.registerFactory<SelectSeatController>(() {
+    final controller = SelectSeatController(getIt());
     Get.put(controller);
     return controller;
   });

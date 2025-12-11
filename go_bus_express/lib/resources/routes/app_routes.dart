@@ -24,13 +24,10 @@ class AppRoutes {
   static const String editProfile = "/editProfile";
   static const String ticket = "/ticket";
 
-  // static void goToDetailCategoryRoute(
-  //         int? categoryId, String? uniName, String? uniDescription) =>
-  //     Get.toNamed(arguments: {
-  //       "categoryId": categoryId,m
-  //       "uniname": uniName,
-  //       "unidescription": uniDescription
-  //     }, detailtopmajorroute);
+  static void goToSeatRoute(int? scheduleId, int? busId) => Get.toNamed(
+    arguments: {"scheduleId": scheduleId, "busId": busId},
+    selectSeat,
+  );
 
   static final routes = [
     GetPage(name: choosePayment, page: () => const ChoosePaymentView()),

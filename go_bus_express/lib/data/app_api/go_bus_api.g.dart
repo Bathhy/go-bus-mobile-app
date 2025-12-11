@@ -86,33 +86,33 @@ class _GoBusApi implements GoBusApi {
   }
 
   @override
-  Future<BaseResponse<List<DetailRouteModel>>> fetchRoutes() async {
+  Future<BaseResponse<SeatLayoutModel>> fetchBusSeat(
+    int scheduleId,
+    int busId,
+  ) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'scheduleId': scheduleId,
+      r'busId': busId,
+    };
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<BaseResponse<List<DetailRouteModel>>>(
+    final _options = _setStreamType<BaseResponse<SeatLayoutModel>>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/route',
+            '/bus/seat/seatAndLayout',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late BaseResponse<List<DetailRouteModel>> _value;
+    late BaseResponse<SeatLayoutModel> _value;
     try {
-      _value = BaseResponse<List<DetailRouteModel>>.fromJson(
+      _value = BaseResponse<SeatLayoutModel>.fromJson(
         _result.data!,
-        (json) => json is List<dynamic>
-            ? json
-                  .map<DetailRouteModel>(
-                    (i) => DetailRouteModel.fromJson(i as Map<String, dynamic>),
-                  )
-                  .toList()
-            : List.empty(),
+        (json) => SeatLayoutModel.fromJson(json as Map<String, dynamic>),
       );
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);

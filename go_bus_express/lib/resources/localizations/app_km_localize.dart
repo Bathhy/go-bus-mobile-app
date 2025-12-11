@@ -24,5 +24,7 @@ final Map<String, String> km = {
   "Note": "ចំណាំ",
   "Choose Payment Method": "ជ្រើសរើសវិធីសាស្ត្រទូទាត់",
   "Scan to pay with any banking": "ស្កេនដើម្បីទូទាត់ដោយធនាគារណាមួយ",
-  "Term & Conditions Agreement": "ការយល់ព្រមលើលក្ខខណ្ឌ"
+  "Term & Conditions Agreement": "ការយល់ព្រមលើលក្ខខណ្ឌ",
+  'Booked': 'បានកក់រួចហើយ',
+  'Available': 'ទំនេរ',
 };

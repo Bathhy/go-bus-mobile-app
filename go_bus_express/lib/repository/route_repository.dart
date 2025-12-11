@@ -1,4 +1,5 @@
 import 'package:go_bus_express/models/route/detail_route_model.dart';
+import 'package:go_bus_express/models/route/seat_layout_model.dart';
 import 'package:shared_package/network/x_result.dart';
 
 import '../data/app_api/go_bus_api.dart';
@@ -9,6 +10,8 @@ abstract class RouteRepository {
     String? departureDate,
     String? returnDate,
   );
+
+  Future<XResult<SeatLayoutModel?>> fetchBusSeat(int scheduleId, int busId);
 }
 
 class RouteRepositoryImpl implements RouteRepository {
@@ -28,6 +31,17 @@ class RouteRepositoryImpl implements RouteRepository {
         departureDate: departureDate,
         returnDate: returnDate,
       );
+      return result.data;
+    });
+  }
+
+  @override
+  Future<XResult<SeatLayoutModel?>> fetchBusSeat(
+    int scheduleId,
+    int busId,
+  ) async {
+    return xResultHandler(() async {
+      final result = await api.fetchBusSeat(scheduleId, busId);
       return result.data;
     });
   }
