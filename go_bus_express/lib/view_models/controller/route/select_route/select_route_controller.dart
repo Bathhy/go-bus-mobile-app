@@ -20,19 +20,27 @@ class SelectRouteController extends BaseController<SelectRouteState> {
   Future<void> fetchRouteByID() async {
     // Set loading
     updateState((state) => state.copyWith(isLoading: true));
-    final result = await _repository.fetchRouteById(6);
+    final result = await _repository.fetchRouteById(
+      6,
+      '2025-11-20',
+      '2026-01-20',
+    );
 
     switch (result) {
-      case Success<DetailRouteModel?>():
-        // Update profile
-        updateState(
-          (state) => state.copyWith(isLoading: false, model: result.data),
-        );
-
-      case Error<DetailRouteModel?>():
-        // Error
-        updateState((state) => state.copyWith(isLoading: false));
-        log('Profile error: ${result.error}');
+      case Success<RouteListResponseModel?>():
+        {
+          updateState(
+            (state) => state.copyWith(
+              model: result.data ?? RouteListResponseModel(),
+              isLoading: false,
+            ),
+          );
+          log("Success ${result.data}");
+        }
+      case Error<RouteListResponseModel?>():
+        {
+          updateState((state) => state.copyWith(isLoading: false));
+        }
     }
   }
 }
