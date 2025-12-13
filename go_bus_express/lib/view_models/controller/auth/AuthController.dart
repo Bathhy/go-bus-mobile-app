@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:go_bus_express/core/storage/base_share_preference.dart';
 import 'package:go_bus_express/core/storage/local_repository.dart';
 import 'package:go_bus_express/models/auth/auth_model.dart';
 import 'package:go_bus_express/models/body/auth_body.dart';
@@ -18,34 +17,62 @@ class AuthController extends BaseController<AuthState> {
   final AuthRepository _repository;
   final LocalRepository _localRepository;
 
-  AuthController(this._repository, this._localRepository) : super(AuthState());
+  AuthController(this._repository, this._localRepository)
+      : super(AuthState());
 
+  /* -------------------- SNACKBARS -------------------- */
+  void _showError(String message) {
+    if (Get.isSnackbarOpen) Get.closeAllSnackbars();
+
+    Get.showSnackbar(
+      GetSnackBar(
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.TOP,
+        duration: const Duration(seconds: 3),
+        titleText: Text(
+          'Error',
+          style: TextStyle(color: white, fontWeight: FontWeight.bold),
+        ),
+        messageText: Text(
+          message,
+          style: TextStyle(color: white),
+        ),
+      ),
+    );
+  }
+
+  void _showSuccess(String message) {
+    if (Get.isSnackbarOpen) Get.closeAllSnackbars();
+
+    Get.showSnackbar(
+      GetSnackBar(
+        backgroundColor: Colors.green,
+        snackPosition: SnackPosition.TOP,
+        duration: const Duration(seconds: 2),
+        titleText: Text(
+          'Success',
+          style: TextStyle(color: white, fontWeight: FontWeight.bold),
+        ),
+        messageText: Text(
+          message,
+          style: TextStyle(color: white),
+        ),
+      ),
+    );
+  }
+
+  /* -------------------- LOGIN -------------------- */
   Future<void> login(String email, String password) async {
-    // Validate inputs
     if (email.isEmpty || password.isEmpty) {
-      Get.snackbar(
-        'Error',
-        'Please fill in all fields',
-        backgroundColor: Colors.red,
-        colorText: white,
-        snackPosition: SnackPosition.TOP,
-      );
+      _showError('Please fill in all fields');
       return;
     }
 
-    // Validate email format
     if (!GetUtils.isEmail(email)) {
-      Get.snackbar(
-        'Error',
-        'Please enter a valid email',
-        backgroundColor: Colors.red,
-        colorText: white,
-        snackPosition: SnackPosition.TOP,
-      );
+      _showError('Please enter a valid email');
       return;
     }
 
-    // Set loading state
     updateState((state) => state.copyWith(null, true));
 
     try {
@@ -53,23 +80,65 @@ class AuthController extends BaseController<AuthState> {
       final result = await _repository.login(body: body);
 
       switch (result) {
-        case Success<AuthModel?>():
-          {
-            _localRepository.saveToken(result.data?.token ?? "");
-            Get.offAllNamed(AppRoutes.mainNavigation);
-            log("Login success >>>>>>>> ${result.data?.token}");
-          }
+        case Success<AuthModel>():
+          _localRepository.saveToken(result.data.token ?? "");
+          Get.offAllNamed(AppRoutes.mainNavigation);
+          log("Login success >>> ${result.data.token}");
+          break;
 
-        case Error<AuthModel?>():
-          // Error - show message
-          log("Login error: ${result.error}");
-          Get.snackbar(
-            'Error',
-            result.error.displayMessage,
-            backgroundColor: Colors.red,
-            colorText: white,
-            snackPosition: SnackPosition.TOP,
-          );
+        case Error<AuthModel>():
+          log("Login error >>> ${result.error}");
+          _showError(result.error.toString());
+          break;
+      }
+    } finally {
+      updateState((state) => state.copyWith(null, false));
+    }
+  }
+
+  /* -------------------- SIGN UP -------------------- */
+  Future<void> signup(
+    String email,
+    String password,
+    String username,
+  ) async {
+    if (email.isEmpty || password.isEmpty || username.isEmpty) {
+      _showError('Please fill in all fields');
+      return;
+    }
+
+    if (!GetUtils.isEmail(email)) {
+      _showError('Please enter a valid email');
+      return;
+    }
+
+    if (password.length < 6) {
+      _showError('Password must be at least 6 characters');
+      return;
+    }
+
+    updateState((state) => state.copyWith(null, true));
+
+    try {
+      final body = SignupBody(
+        email: email,
+        password: password,
+        username: username,
+      );
+
+      final result = await _repository.signup(body: body);
+
+      switch (result) {
+        case Success<AuthModel>():
+          log("Signup success >>> ${result.data.token}");
+          _showSuccess('Account created successfully');
+          Get.back();
+          break;
+
+        case Error<AuthModel>():
+          log("Signup error >>> ${result.error}");
+          _showError(result.error.toString());
+          break;
       }
     } finally {
       updateState((state) => state.copyWith(null, false));
