@@ -5,6 +5,7 @@ import 'package:retrofit/http.dart';
 import 'package:shared_package/network/base_response.dart';
 
 import '../../models/body/auth_body.dart';
+
 part 'auth_api.g.dart';
 
 @RestApi()
@@ -12,8 +13,8 @@ abstract class AuthApi {
   factory AuthApi(Dio dio, {String baseUrl}) = _AuthApi;
 
   @POST('/login')
-  Future<AuthModel> login({@Body() required LoginBody body});
+  Future<BaseResponse<AuthModel>> login({@Body() required LoginBody body});
 
-  @POST('/signup')
-  Future<AuthModel> signup({@Body() required SignupBody body});
+  @POST('/register')
+  Future<BaseResponse<AuthModel>> signup({@Body() required SignupBody body});
 }

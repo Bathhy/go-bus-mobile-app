@@ -6,9 +6,9 @@ import 'package:shared_package/network/x_result.dart';
 import '../models/body/auth_body.dart';
 
 abstract class AuthRepository {
-  Future<XResult<AuthModel>> login({required LoginBody body});
-  Future<XResult<AuthModel>> signup({required SignupBody body});
+  Future<XResult<AuthModel?>> login({required LoginBody body});
 
+  Future<XResult<AuthModel?>> signup({required SignupBody body});
 }
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -22,12 +22,13 @@ class AuthRepositoryImpl implements AuthRepository {
       final res = await api.login(body: body);
       return res.data;
     });
-
   }
+
   @override
-  Future<XResult<AuthModel>> signup({required SignupBody body}) {
-     return xResultHandler(() async {
-      return await api.signup(body: body);
+  Future<XResult<AuthModel?>> signup({required SignupBody body}) {
+    return xResultHandler(() async {
+      final res = await api.signup(body: body);
+      return res.data;
     });
   }
 }

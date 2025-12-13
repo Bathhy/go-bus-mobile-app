@@ -80,13 +80,13 @@ class AuthController extends BaseController<AuthState> {
       final result = await _repository.login(body: body);
 
       switch (result) {
-        case Success<AuthModel>():
-          _localRepository.saveToken(result.data.token ?? "");
+        case Success<AuthModel?>():
+          _localRepository.saveToken(result.data?.token ?? "");
           Get.offAllNamed(AppRoutes.mainNavigation);
-          log("Login success >>> ${result.data.token}");
+          log("Login success >>> ${result.data?.token}");
           break;
 
-        case Error<AuthModel>():
+        case Error<AuthModel?>():
           log("Login error >>> ${result.error}");
           _showError(result.error.toString());
           break;
@@ -102,20 +102,20 @@ class AuthController extends BaseController<AuthState> {
     String password,
     String username,
   ) async {
-    if (email.isEmpty || password.isEmpty || username.isEmpty) {
-      _showError('Please fill in all fields');
-      return;
-    }
-
-    if (!GetUtils.isEmail(email)) {
-      _showError('Please enter a valid email');
-      return;
-    }
-
-    if (password.length < 6) {
-      _showError('Password must be at least 6 characters');
-      return;
-    }
+    // if (email.isEmpty || password.isEmpty || username.isEmpty) {
+    //   _showError('Please fill in all fields');
+    //   return;
+    // }
+    //
+    // if (!GetUtils.isEmail(email)) {
+    //   _showError('Please enter a valid email');
+    //   return;
+    // }
+    //
+    // if (password.length < 6) {
+    //   _showError('Password must be at least 6 characters');
+    //   return;
+    // }
 
     updateState((state) => state.copyWith(null, true));
 
@@ -123,19 +123,20 @@ class AuthController extends BaseController<AuthState> {
       final body = SignupBody(
         email: email,
         password: password,
-        username: username,
+        fullName: username,
       );
 
       final result = await _repository.signup(body: body);
 
       switch (result) {
-        case Success<AuthModel>():
-          log("Signup success >>> ${result.data.token}");
-          _showSuccess('Account created successfully');
+        case Success<AuthModel?>():
+
           Get.back();
+          log("Signup success >>> ${result.data?.token}");
+          _showSuccess('Account created successfully');
           break;
 
-        case Error<AuthModel>():
+        case Error<AuthModel?>():
           log("Signup error >>> ${result.error}");
           _showError(result.error.toString());
           break;

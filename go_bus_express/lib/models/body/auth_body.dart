@@ -21,12 +21,12 @@ class LoginBody {
 class SignupBody {
   final String email;
   final String password;
-  final String username;
+  final String fullName;
 
   SignupBody({
     required this.email,
     required this.password,
-    required this.username,
+    required this.fullName,
   });
 
   factory SignupBody.fromJson(Map<String, dynamic> json) =>
