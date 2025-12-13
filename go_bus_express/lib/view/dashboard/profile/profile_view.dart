@@ -88,7 +88,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       },
                     ),
                     const SizedBox(height: 24),
-                    _buildLogoutButton(context),
+                    _buildLogoutButton(context, controller),
                   ],
                 ),
               ),
@@ -102,12 +102,11 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildMenuItem({
     required BuildContext context,
     required ImageType imageType,
-    required dynamic source, // Renamed from 'icon' for clarity
+    required dynamic source,
     required Color iconColor,
     required String title,
     required VoidCallback onTap,
   }) {
-    // The caret was here, this is the updated implementation.
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: XPadding.extralarge),
       child: GestureDetector(
@@ -130,7 +129,6 @@ class _ProfilePageState extends State<ProfilePage> {
               CircleAvatar(
                 radius: 20,
                 backgroundColor: shimerBgColor,
-                // USE THE DYNAMIC WIDGET BUILDER HERE
                 child: _buildDynamicIcon(
                   imageType: imageType,
                   source: source,
@@ -153,13 +151,12 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // (_buildLogoutButton and the rest of the class...)
-  Widget _buildLogoutButton(BuildContext context) {
+  Widget _buildLogoutButton(BuildContext context, ProfileController controller) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: XPadding.extralarge),
       child: GestureDetector(
         onTap: () {
-          // Handle logout
+          _showLogoutDialog(context, controller);
         },
         child: Container(
           width: double.infinity,
@@ -178,7 +175,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Icon(Icons.logout, color: errorPrimary),
                 ),
                 SizedBox(width: 12),
-                XTextMedium(label: 'Log out'.tr, colortext: Colors.white),
+                XTextMedium(label: 'Logout'.tr, colortext: Colors.white),
               ],
             ),
           ),
@@ -187,28 +184,183 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // This helper widget decides which image widget to render based on the type.
   Widget _buildDynamicIcon({
     required ImageType imageType,
-    required dynamic source, // This will be IconData or a String path/URL
+    required dynamic source,
     required Color color,
     double size = 24.0,
   }) {
     switch (imageType) {
       case ImageType.iconData:
-        // Source is IconData
         return Icon(source as IconData, color: color, size: size);
 
       case ImageType.svgImage:
-        // Source is a String path to an SVG asset
         return AppSvgImage(path: source as String, width: size, height: size);
     }
   }
 
+  void _showLogoutDialog(BuildContext context, ProfileController controller) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: EdgeInsets.all(XPadding.extralarge),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Icon with gradient background
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      errorPrimary.withOpacity(0.8),
+                      errorPrimary,
+                    ],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: errorPrimary.withOpacity(0.3),
+                      blurRadius: 15,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.logout_rounded,
+                  color: Colors.white,
+                  size: 40,
+                ),
+              ),
+
+              SizedBox(height: XPadding.extralarge),
+
+              // Title
+              XTextLarge(
+                label: 'Logout'.tr,
+                colortext: black,
+                fontWeight: FontWeight.bold,
+              ),
+
+              SizedBox(height: XPadding.medium),
+
+              // Message
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: XPadding.medium),
+                child: Text(
+                  'Are you sure you want to logout from your account?'.tr,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                    height: 1.5,
+                  ),
+                ),
+              ),
+
+              SizedBox(height: XPadding.extralarge + XPadding.medium),
+
+              // Buttons
+              Row(
+                children: [
+                  // Cancel Button
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => Get.back(),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: XPadding.large),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
+                        ),
+                        child: Center(
+                          child: XTextMedium(
+                            label: 'Cancel'.tr,
+                            colortext: black,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(width: XPadding.large),
+
+                  // Logout Button
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        Get.back();
+                        controller.logout();
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: XPadding.large),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              errorPrimary.withOpacity(0.9),
+                              errorPrimary,
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: errorPrimary.withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: XTextMedium(
+                            label: 'Yes'.tr,
+                            colortext: white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showLanguageBottomSheet(
-    BuildContext context,
-    ProfileController controller,
-  ) {
+      BuildContext context,
+      ProfileController controller,
+      ) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,

@@ -7,7 +7,7 @@ final Map<String, String> en = {
   'Languages': 'Languages',
   'Booking History': 'Booking History',
   'Choose Your Language': 'Choose Your Language',
-  'Log out': 'Log out',
+  'Logout': 'Logout',
   'Cancel': 'Cancel',
   'Book Now': 'Book Now',
   'Select Time': 'Select Time',
@@ -27,4 +27,5 @@ final Map<String, String> en = {
   'Term & Conditions Agreement': 'Term & Conditions Agreement',
   'Booked': 'Booked',
   'Available': 'Available',
+  'Yes': 'Yes',
 };
