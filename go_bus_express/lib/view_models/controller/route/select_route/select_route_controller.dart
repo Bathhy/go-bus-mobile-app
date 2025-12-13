@@ -21,7 +21,7 @@ class SelectRouteController extends BaseController<SelectRouteState> {
     // Set loading
     updateState((state) => state.copyWith(isLoading: true));
     final result = await _repository.fetchRouteById(
-      6,
+      3,
       '2025-11-20',
       '2026-01-20',
     );

@@ -9,6 +9,7 @@ import 'package:go_bus_express/view_models/controller/profile/profile_state.dart
 import '../../../core/storage/local_repository.dart';
 import '../../../models/profile/profile_model.dart';
 import '../../../resources/localizations/app_localization.dart';
+import '../../../resources/routes/app_routes.dart';
 
 class ProfileController extends BaseController<ProfileState> {
   final LocalRepository _localRepository;
@@ -55,5 +56,10 @@ class ProfileController extends BaseController<ProfileState> {
   Future<void> clearLanguage() async {
     await AppLocalization.clearLanguage();
     log('Language cleared, reverting to default');
+  }
+
+  void logout() {
+    _localRepository.logout();
+    Get.offAllNamed(AppRoutes.signIn);
   }
 }

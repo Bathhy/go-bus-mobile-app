@@ -7,7 +7,7 @@ final Map<String, String> km = {
   'Languages': 'ភាសា',
   'Booking History': 'ប្រវត្តិកក់',
   'Choose Your Language': 'ជ្រើសរើសភាសារបស់អ្នក',
-  'Log out': 'ចាកចេញ',
+  'Logout': 'ចាកចេញ',
   'Cancel': 'បោះបង់',
   'Book Now': 'កក់ឥឡូវនេះ',
   'Select Time': 'ជ្រើសរើសពេលវេលា',
@@ -27,4 +27,5 @@ final Map<String, String> km = {
   "Term & Conditions Agreement": "ការយល់ព្រមលើលក្ខខណ្ឌ",
   'Booked': 'បានកក់រួចហើយ',
   'Available': 'ទំនេរ',
+  'Yes': 'បាទ/ចាស',
 };

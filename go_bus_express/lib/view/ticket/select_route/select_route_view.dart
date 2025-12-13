@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/di/app_di.dart';
+import 'package:go_bus_express/core/utils/string_ext.dart';
 import 'package:go_bus_express/models/route/detail_route_model.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:go_bus_express/view_models/controller/route/select_route/select_route_controller.dart';
@@ -75,8 +76,9 @@ class SelectRouteView extends StatelessWidget {
                                 budId: model?.busId,
                                 departureTime: model?.departureTime ?? '23:30',
                                 arrivalTime: '23:22',
-                                duration: (model?.bus?.route?.durationMinutes)
-                                    .toString(),
+                                duration: minutesToHours(
+                                  model?.bus?.route?.durationMinutes ?? 0,
+                                ).toString(),
                                 // duration:
                                 //     '${model.durationMinutes ?? 0 ~/ 60}:${(model.durationMinutes ?? 0) % 60} h',
                                 price: '\$${model?.price}',

@@ -140,8 +140,7 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
             ),
             SizedBox(height: XPadding.medium),
             KhqrCardWidget(
-              qr:
-                  "00020101021229220018chin_kongming@aclb520459995802KH5914CHIN KONG MING6010Phnom Penh991700131762878671390541100000000.01530384062530111TRX012345670211855813620350305MShop0710Cashier-01630454B0",
+              qr:"00020101021229220018chin_kongming@aclb520459995802KH5914CHIN KONG MING6010Phnom Penh991700131765642735004541100000000.01530384062530111TRX012345670211855813620350305MShop0710Cashier-0163046168",
               width: 300.0,
               receiverName: 'GO-Bus Express',
               amount: 10002.00,
