@@ -21,7 +21,7 @@ class _EasyAnimationState extends State<SplashView> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 8), () {
+    Future.delayed(const Duration(seconds: 1), () {
       if (_splashController.isLoggedIn.value) {
         Get.offAllNamed(AppRoutes.mainNavigation);
       } else {

@@ -140,9 +140,9 @@ class _SignUpViewState extends State<SignUpView> {
               child: ElevatedButton(
                 onPressed: () {
                   authController.signup(
-                    usernameController.text,
                     emailController.text,
                     passwordController.text,
+                    usernameController.text,
                   );
                 },
                 style: ElevatedButton.styleFrom(
