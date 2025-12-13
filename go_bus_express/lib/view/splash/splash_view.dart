@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:go_bus_express/utils/enums/lotties_enum.dart';
-import 'package:go_bus_express/view/auth/sign_up_view.dart';
 import 'package:go_bus_express/view_models/controller/splash/SplashController.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_package/config/themes.dart';

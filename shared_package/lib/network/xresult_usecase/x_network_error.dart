@@ -1,33 +1,54 @@
-sealed class XNetworkError {
-  String errorMessage();
+abstract class XNetworkError {
+  final String? message;
+  final int? statusCode;
+
+  XNetworkError({this.message, this.statusCode});
+
+  String get displayMessage => message ?? defaultMessage;
+
+  String get defaultMessage;
 }
 
-// class NetworkNotFound implements XNetworkError {
-//   @override
-//   String errorMessage() => "Network Not Found";
-// }
+class UnauthorizedError extends XNetworkError {
+  UnauthorizedError({super.message, super.statusCode});
 
-class ServerError implements XNetworkError {
   @override
-  String errorMessage() => "Server Error";
+  String get defaultMessage => 'Session expired. Please login again.';
 }
 
-class NetworkError implements XNetworkError {
+class ForbiddenError extends XNetworkError {
+  ForbiddenError({super.message, super.statusCode});
+
   @override
-  String errorMessage() => "Network Error";
+  String get defaultMessage =>
+      'You don\'t have permission to access this resource.';
 }
 
-class SomethingWrongError implements XNetworkError {
+class NetworkTimeOut extends XNetworkError {
+  NetworkTimeOut({super.message, super.statusCode});
+
   @override
-  String errorMessage() => "Something went Wrong";
+  String get defaultMessage => 'Connection timeout. Please try again.';
 }
 
-// class ServiceUnavailable implements XNetworkError {
-//   @override
-//   String errorMessage() => "Service Unavailable";
-// }
+class ServerError extends XNetworkError {
+  ServerError({super.message, super.statusCode});
 
-class NetworkTimeOut implements XNetworkError {
   @override
-  String errorMessage() => "Network TimeOut";
+  String get defaultMessage => 'Server error occurred. Please try again later.';
+}
+
+class NetworkError extends XNetworkError {
+  NetworkError({super.message, super.statusCode});
+
+  @override
+  String get defaultMessage =>
+      'No internet connection. Please check your network.';
+}
+
+class SomethingWrongError extends XNetworkError {
+  SomethingWrongError({super.message, super.statusCode});
+
+  @override
+  String get defaultMessage => 'Something went wrong. Please try again.';
 }

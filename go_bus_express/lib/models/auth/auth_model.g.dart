@@ -7,7 +7,7 @@ part of 'auth_model.dart';
 // **************************************************************************
 
 AuthModel _$AuthModelFromJson(Map<String, dynamic> json) =>
-    AuthModel(json['token'] as String?);
+    AuthModel(token: json['token'] as String?);
 
 Map<String, dynamic> _$AuthModelToJson(AuthModel instance) => <String, dynamic>{
   'token': instance.token,

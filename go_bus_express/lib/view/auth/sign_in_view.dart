@@ -105,7 +105,7 @@ class _SignInViewState extends State<SignInView> {
               SizedBox(height: XPadding.extralarge),
               // Sign in button
               Obx(
-                () => SizedBox(
+                    () => SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: authController.state.isLoading
@@ -120,21 +120,21 @@ class _SignInViewState extends State<SignInView> {
                     ),
                     child: authController.state.isLoading
                         ? SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              color: white,
-                              strokeWidth: 2,
-                            ),
-                          )
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        color: white,
+                        strokeWidth: 2,
+                      ),
+                    )
                         : Text(
-                            'Sign in',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: white,
-                            ),
-                          ),
+                      'Sign in',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: white,
+                      ),
+                    ),
                   ),
                 ),
               ),

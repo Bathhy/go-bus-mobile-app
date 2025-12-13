@@ -33,7 +33,7 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: XAppBar(
-          title: 'Choose Payment',
+          title: 'Choose Payment'.tr,
           onBackPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -45,21 +45,21 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
             children: [
               // Trip Summary
               XTextLarge(
-                label: 'Trip Summary',
+                label: 'Trip Summary'.tr,
                 colortext: black,
                 fontWeight: FontWeight.bold,
               ),
               SizedBox(height: XPadding.large),
 
-              _buildSummaryRow('Direction', 'Phnom Penh - Siem Reap'),
+              _buildSummaryRow('Direction'.tr, 'Phnom Penh - Siem Reap'),
               SizedBox(height: XPadding.medium),
-              _buildSummaryRow('Departure Date', '2025-05-12 0 4:30 PM'),
+              _buildSummaryRow('Departure Date'.tr, '2025-05-12 0 4:30 PM'),
               SizedBox(height: XPadding.medium),
-              _buildSummaryRow('Seat No', '10'),
+              _buildSummaryRow('Seat No'.tr, '10'),
               SizedBox(height: XPadding.medium),
-              _buildSummaryRow('Unit Price', '\$13.00'),
+              _buildSummaryRow('Unit Price'.tr, '\$13.00'),
               SizedBox(height: XPadding.medium),
-              _buildSummaryRow('Discount', '\$0.00'),
+              _buildSummaryRow('Discount'.tr, '\$0.00'),
               SizedBox(height: XPadding.medium),
               _buildSummaryRow('Net Price', '\$13.00', isBold: true),
               SizedBox(height: XPadding.extralarge),
@@ -82,7 +82,7 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
                       child: TextField(
                         controller: noteController,
                         decoration: InputDecoration(
-                          hintText: 'Note',
+                          hintText: 'Note'.tr,
                           border: InputBorder.none,
                           hintStyle: TextStyle(color: Colors.grey.shade500),
                         ),
@@ -95,7 +95,7 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
 
               // Choose Payment Method
               XTextLarge(
-                label: 'Choose Payment Method',
+                label: 'Choose Payment Method'.tr,
                 colortext: black,
                 fontWeight: FontWeight.bold,
               ),
@@ -104,7 +104,7 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
               _buildPaymentOption(
                 'KHQR',
                 'KHQR',
-                'Scan to pay with any banking',
+                'Scan to pay with any banking'.tr,
                 Colors.red,
               ),
               SizedBox(height: XPadding.extralarge),
@@ -125,7 +125,7 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
                     ),
                     Expanded(
                       child: XTextMedium(
-                        label: 'Term & Conditions Agreement',
+                        label: 'Term & Conditions Agreement'.tr,
                         colortext: black,
                         fontWeight: FontWeight.w600,
                       ),
