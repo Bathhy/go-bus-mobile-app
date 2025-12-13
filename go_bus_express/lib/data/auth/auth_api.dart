@@ -4,7 +4,6 @@ import 'package:go_bus_express/models/auth/auth_model.dart';
 import 'package:retrofit/http.dart';
 
 import '../../models/body/auth_body.dart';
-
 part 'auth_api.g.dart';
 
 @RestApi()
@@ -13,4 +12,7 @@ abstract class AuthApi {
 
   @POST('/login')
   Future<AuthModel> login({@Body() required LoginBody body});
+
+  @POST('/signup')
+  Future<AuthModel> signup({@Body() required SignupBody body});
 }

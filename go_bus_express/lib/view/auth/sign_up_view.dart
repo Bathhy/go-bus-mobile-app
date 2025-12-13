@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_bus_express/core/di/app_di.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
-
 import 'sign_in_view.dart'; // correct path
+import 'package:get_it/get_it.dart';
+import '../../view_models/controller/auth/AuthController.dart';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
@@ -18,6 +20,7 @@ class _SignUpViewState extends State<SignUpView> {
   final TextEditingController passwordController = TextEditingController();
 
   bool showPassword = false;
+  final AuthController authController = getIt<AuthController>();
 
   @override
   void dispose() {
@@ -136,12 +139,11 @@ class _SignUpViewState extends State<SignUpView> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  if (passwordController.text.length != 8) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Password must be exactly 8 digits.")),
-                    );
-                    return;
-                  }
+                  authController.signup(
+                    usernameController.text,
+                    emailController.text,
+                    passwordController.text,
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: goBusPrimary,
