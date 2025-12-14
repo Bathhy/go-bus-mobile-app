@@ -60,14 +60,14 @@ class SelectRouteView extends StatelessWidget {
                               final model = controller.state.model?.schedules
                                   ?.elementAt(index);
                               return _buildBusCard(
+                                departDate: controller.state.departureDate,
+                                routeModel: controller.state.model?.route,
                                 budId: model?.busId,
                                 departureTime: model?.departureTime ?? '23:30',
                                 arrivalTime: '23:22',
                                 duration: minutesToHours(
                                   model?.bus?.route?.durationMinutes ?? 0,
                                 ).toString(),
-                                // duration:
-                                //     '${model.durationMinutes ?? 0 ~/ 60}:${(model.durationMinutes ?? 0) % 60} h',
                                 price: '\$${model?.price}',
                                 availableSeats:
                                     '${model?.bus?.bookedSeats ?? 0}/${model?.bus?.totalSeats ?? 0} Seats',
@@ -123,6 +123,8 @@ class SelectRouteView extends StatelessWidget {
     required String arrivalLocation,
     String busType = 'Bus',
     int? budId,
+    RouteModel? routeModel,
+    required String departDate,
   }) {
     return Container(
       width: double.infinity,
@@ -243,8 +245,19 @@ class SelectRouteView extends StatelessWidget {
               ),
               ElevatedButton(
                 onPressed: () {
-                  // Get.toNamed(AppRoutes.selectSeat);
-                  AppRoutes.goToSeatRoute(6, budId);
+                  Get.toNamed(
+                    AppRoutes.selectSeat,
+                    arguments: {
+                      'scheduleId': 6,
+                      'busId': budId,
+                      'origin': routeModel?.origin ?? 'Origin',
+                      'destination': routeModel?.destination ?? 'Destination',
+                      'departureDate': departDate.orDefault("N/A"),
+                      'departureTime': departureTime,
+                      'unitPrice':
+                          double.tryParse(price.replaceAll('\$', '')) ?? 0.0,
+                    },
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: success,

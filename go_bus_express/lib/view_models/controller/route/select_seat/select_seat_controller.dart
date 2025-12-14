@@ -16,12 +16,42 @@ class SelectSeatController extends BaseController<SelectSeatState> {
   @override
   void onInit() {
     super.onInit();
-    fetchBusSeat();
+    _initializeFromArguments();
   }
 
-  final busId = Get.arguments['busId'];
+  void _initializeFromArguments() {
+    final args = Get.arguments as Map<String, dynamic>?;
 
-  Future<void> fetchBusSeat() async {
+    if (args == null) {
+      log('❌ No arguments passed to SelectSeatController');
+      return;
+    }
+
+    // Extract all arguments
+    final busId = args['busId'] as int?;
+    final origin = args['origin'] as String? ?? '';
+    final destination = args['destination'] as String? ?? '';
+    final departureDate = args['departureDate'] as String?;
+    final departureTime = args['departureTime'] as String? ?? '';
+    final unitPrice = (args['unitPrice'] as num?)?.toDouble() ?? 0.0;
+
+    // Update state with route information
+    updateState(
+      (state) => state.copyWith(
+        origin: origin,
+        destination: destination,
+        departureDate: departureDate,
+        departureTime: departureTime,
+        unitPrice: unitPrice,
+      ),
+    );
+    fetchBusSeat(busId ?? 0);
+    log(
+      '✅ Seat selection initialized: $origin → $destination, Price: \$$unitPrice',
+    );
+  }
+
+  Future<void> fetchBusSeat(int busId) async {
     // Set loading
     updateState((state) => state.copyWith(isLoading: true));
     final result = await _repository.fetchBusSeat(6, busId);
@@ -59,7 +89,7 @@ class SelectSeatController extends BaseController<SelectSeatState> {
 
   void toggleSeat(String seatNumber) {
     final currentSeats = List<String>.from(state.selectedSeats);
-    
+
     if (currentSeats.contains(seatNumber)) {
       // Deselect if already selected
       currentSeats.remove(seatNumber);
@@ -67,7 +97,7 @@ class SelectSeatController extends BaseController<SelectSeatState> {
       // Select the seat
       currentSeats.add(seatNumber);
     }
-    
+
     updateState((state) => state.copyWith(selectedSeats: currentSeats));
   }
 
