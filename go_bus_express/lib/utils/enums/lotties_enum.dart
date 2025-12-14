@@ -1,6 +1,6 @@
 enum LottieConstant {
   goBus(
-    'https://lottie.host/6370ec08-1f68-43dd-8484-4723c395627c/oM8FjhaHyd.json',
+    'https://lottie.host/d6e98bff-b7a4-4455-bd3d-c49ae02cafeb/mlbEZuyTzH.json',
   );
 
   final String url;
