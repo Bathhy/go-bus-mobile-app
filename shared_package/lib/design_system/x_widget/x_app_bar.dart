@@ -5,6 +5,7 @@ class XAppBar extends StatelessWidget {
   final List<Widget>? actions;
   final String? subTitle;
   final String title;
+  final bool isCenter;
   final void Function()? onBackPressed;
   const XAppBar({
     super.key,
@@ -12,12 +13,14 @@ class XAppBar extends StatelessWidget {
     this.subTitle,
     required this.title,
     this.onBackPressed,
+    this.isCenter = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: goBusPrimary,
+      centerTitle: isCenter,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back, color: Colors.white),
         onPressed: onBackPressed,

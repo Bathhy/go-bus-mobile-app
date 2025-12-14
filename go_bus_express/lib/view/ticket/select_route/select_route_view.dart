@@ -4,6 +4,7 @@ import 'package:go_bus_express/core/di/app_di.dart';
 import 'package:go_bus_express/core/utils/string_ext.dart';
 import 'package:go_bus_express/models/route/detail_route_model.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
+import 'package:go_bus_express/utils/string_ext.dart';
 import 'package:go_bus_express/view_models/controller/route/select_route/select_route_controller.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
@@ -21,28 +22,14 @@ class SelectRouteView extends StatelessWidget {
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
-        child: XAppBar(
-          title:
-              '${'Phnom Penh' ?? 'Origin'} → ${'Siem Reap' ?? 'Destination'}',
-          subTitle: "2025-10-08",
-          onBackPressed: () => Navigator.of(context).pop(),
+        child: Obx(
+          () => XAppBar(
+            title:
+                '${controller.state.model?.route?.origin.orDefault("Origin")} → ${controller.state.model?.route?.destination.orDefault("Destination")}',
+            subTitle: controller.state.departureDate.orDefault("N/A"),
+            onBackPressed: () => Get.back(),
+          ),
         ),
-        // child: Obx(
-        //   () => XAppBar(
-        //     title:
-        //         '${'Phnom Penh' ?? 'Origin'} → ${'Siem Reap' ?? 'Destination'}',
-        //     subTitle: "2025-10-08",
-        //     onBackPressed: () => Navigator.of(context).pop(),
-        //     actions: [
-        //       IconButton(
-        //         icon: const Icon(Icons.calendar_month, color: Colors.white),
-        //         onPressed: () {
-        //           _showDatePicker(context);
-        //         },
-        //       ),
-        //     ],
-        //   ),
-        // ),
       ),
       body: Obx(
         () => controller.state.isLoading
@@ -51,10 +38,10 @@ class SelectRouteView extends StatelessWidget {
                 children: [
                   _buildTripInfo(controller),
                   Expanded(
-                    child: controller.state.model?.route?.isEmpty == true
+                    child: controller.state.model?.schedules?.isEmpty == true
                         ? Center(
                             child: Text(
-                              'No buses available',
+                              'No buses available'.tr,
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey,
@@ -66,11 +53,11 @@ class SelectRouteView extends StatelessWidget {
                               horizontal: XPadding.extralarge,
                             ),
                             itemCount:
-                                controller.state.model?.route?.length ?? 0,
+                                controller.state.model?.schedules?.length ?? 0,
                             separatorBuilder: (context, index) =>
                                 SizedBox(height: XPadding.small),
                             itemBuilder: (context, index) {
-                              final model = controller.state.model?.route
+                              final model = controller.state.model?.schedules
                                   ?.elementAt(index);
                               return _buildBusCard(
                                 budId: model?.busId,
@@ -101,7 +88,7 @@ class SelectRouteView extends StatelessWidget {
   }
 
   Widget _buildTripInfo(SelectRouteController controller) {
-    final busCount = controller.state.model?.route?.length ?? 0;
+    final busCount = controller.state.model?.schedules?.length ?? 0;
     return Container(
       padding: const EdgeInsets.all(16),
       child: Row(

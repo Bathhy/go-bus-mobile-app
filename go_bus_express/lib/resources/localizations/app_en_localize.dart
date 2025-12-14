@@ -28,4 +28,5 @@ final Map<String, String> en = {
   'Booked': 'Booked',
   'Available': 'Available',
   'Yes': 'Yes',
+  'No buses available' : 'No buses available',
 };

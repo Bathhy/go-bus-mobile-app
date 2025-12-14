@@ -33,5 +33,5 @@ abstract class GoBusApi {
   Future<BaseResponse<DetailRouteModel>> fetchRouteDetail(@Path('id') int id);
 
   @GET('/route')
-  Future<BaseResponse<List<DetailRouteModel>>> fetchRoutes();
+  Future<BaseResponse<List<AllRouteModel>>> fetchRoutes();
 }

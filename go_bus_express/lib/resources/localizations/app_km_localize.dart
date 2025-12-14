@@ -28,4 +28,5 @@ final Map<String, String> km = {
   'Booked': 'បានកក់រួចហើយ',
   'Available': 'ទំនេរ',
   'Yes': 'បាទ/ចាស',
+  'No buses available' : 'មិនមានឡានក្រុងទេ',
 };
