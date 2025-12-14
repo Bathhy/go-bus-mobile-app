@@ -1,7 +1,8 @@
-import 'dart:ffi';
+//import 'dart:ffi';
 
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/storage/local_repository.dart';
+import 'package:go_bus_express/resources/routes/app_routes.dart';
 
 class SplashController extends GetxController {
   //Class Construct
@@ -23,3 +24,5 @@ class SplashController extends GetxController {
     return isLoggedIn;
   }
 }
+
+
