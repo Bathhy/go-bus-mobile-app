@@ -6,6 +6,8 @@ import 'package:retrofit/http.dart';
 import 'package:go_bus_express/core/network/parse_error_logger.dart';
 import 'package:shared_package/network/base_response.dart';
 
+import '../../models/home/all_route_model.dart';
+
 part 'go_bus_api.g.dart';
 
 @RestApi()

@@ -3,10 +3,11 @@ import 'package:go_bus_express/models/route/seat_layout_model.dart';
 import 'package:shared_package/network/x_result.dart';
 
 import '../data/app_api/go_bus_api.dart';
+import '../models/home/all_route_model.dart';
 
 abstract class RouteRepository {
   Future<XResult<DetailRouteModel?>> fetchRouteById(int id);
-  Future<XResult<List<DetailRouteModel>>> fetchRoutes();
+  Future<XResult<List<AllRouteModel>>> fetchRoutes();
   Future<XResult<RouteListResponseModel?>> fetchBusBySchedule(
     int id,
     String? departureDate,
@@ -33,7 +34,7 @@ class RouteRepositoryImpl implements RouteRepository {
   }
 
   @override
-  Future<XResult<List<DetailRouteModel>>> fetchRoutes() async {
+  Future<XResult<List<AllRouteModel>>> fetchRoutes() async {
     return xResultHandler(() async {
       final result = await api.fetchRoutes();
       return result.data ?? [];
