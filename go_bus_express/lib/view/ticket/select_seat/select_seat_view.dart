@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/resources/app_images.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
+import 'package:go_bus_express/utils/string_ext.dart';
 import 'package:go_bus_express/view_models/controller/route/select_seat/select_seat_controller.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
@@ -23,25 +24,29 @@ class _SelectSeatViewState extends State<SelectSeatView> {
   @override
   Widget build(BuildContext context) {
     final SelectSeatController controller = getIt<SelectSeatController>();
+
     return Scaffold(
       backgroundColor: white,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
-        child: XAppBar(
-          title: 'Phnom Penh → Siem Reap',
-          subTitle: "2025-10-08",
-          onBackPressed: () => Get.back(),
-        ),
+        child: Obx(() {
+          final state = controller.state;
+          return XAppBar(
+            title: '${state.origin} → ${state.destination}',
+            subTitle: state.departureDate.orDefault("N/A"),
+            onBackPressed: () => Get.back(),
+          );
+        }),
       ),
       body: Obx(() {
         final state = controller.state;
-        
+
         if (state.isLoading) {
           return Center(child: CircularProgressIndicator());
         }
 
         final layout = state.model?.layout?.layout?.layout;
-        
+
         if (layout == null || layout.isEmpty) {
           return Center(
             child: XTextMedium(
@@ -92,7 +97,10 @@ class _SelectSeatViewState extends State<SelectSeatView> {
                             color: Colors.grey,
                           ),
                         ),
-                        XTextMedium(label: 'Available'.tr, colortext: Colors.grey),
+                        XTextMedium(
+                          label: 'Available'.tr,
+                          colortext: Colors.grey,
+                        ),
                       ],
                     ),
                     // Driver icon
@@ -139,13 +147,36 @@ class _SelectSeatViewState extends State<SelectSeatView> {
               ),
             ],
           ),
-          child: XButton(
-            height: 52,
-            label: 'Confirm'.tr,
-            optionbutton: 1,
-            bgColor: goBusPrimary,
-            onTap: () => Get.toNamed(AppRoutes.choosePayment),
-          ),
+          child: Obx(() {
+            final state = controller.state;
+            final hasSelectedSeats = state.selectedSeats.isNotEmpty;
+
+            return XButton(
+              height: 52,
+              label: hasSelectedSeats
+                  ? 'Confirm (${state.selectedSeats.length} ${state.selectedSeats.length == 1 ? 'seat' : 'seats'})'
+                        .tr
+                  : 'Confirm'.tr,
+              optionbutton: hasSelectedSeats ? 1 : 0,
+              bgColor: hasSelectedSeats ? goBusPrimary : Colors.grey,
+              onTap: hasSelectedSeats
+                  ? () {
+                      Get.toNamed(
+                        AppRoutes.choosePayment,
+                        arguments: {
+                          'origin': state.origin,
+                          'destination': state.destination,
+                          'departureDate': state.departureDate,
+                          'departureTime': state.departureTime,
+                          'selectedSeats': state.selectedSeats,
+                          'unitPrice': state.unitPrice,
+                          'discount': 0.0,
+                        },
+                      );
+                    }
+                  : null,
+            );
+          }),
         ),
       ),
     );
@@ -206,18 +237,18 @@ class _SelectSeatViewState extends State<SelectSeatView> {
       children: rowSeats.asMap().entries.map((entry) {
         final index = entry.key;
         final seatNumber = entry.value;
-        
+
         if (seatNumber == null) {
           // Aisle space - wider gap between seat groups
           return SizedBox(width: XPadding.extralarge * 2, height: 70);
         }
-        
+
         final isBooked = !controller.isSeatAvailable(seatNumber);
         final isSelected = controller.isSeatSelected(seatNumber);
-        
+
         // Add small spacing between seats in the same group
         final needsSpacing = index > 0 && rowSeats[index - 1] != null;
-        
+
         return Row(
           children: [
             if (needsSpacing) SizedBox(width: XPadding.small),

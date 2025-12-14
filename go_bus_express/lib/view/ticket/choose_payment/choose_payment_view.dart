@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/resources/app_images.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
+import 'package:go_bus_express/view_models/controller/payment/choose_payment_controller.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 import 'package:shared_package/design_system/x_widget/ButtonComponent.dart';
@@ -16,9 +17,14 @@ class ChoosePaymentView extends StatefulWidget {
 }
 
 class _ChoosePaymentViewState extends State<ChoosePaymentView> {
-  String? selectedPayment;
-  bool agreedToTerms = false;
   final TextEditingController noteController = TextEditingController();
+  late final ChoosePaymentController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(ChoosePaymentController());
+  }
 
   @override
   void dispose() {
@@ -37,129 +43,159 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
           onBackPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(XPadding.extralarge),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Trip Summary
-              XTextLarge(
-                label: 'Trip Summary'.tr,
-                colortext: black,
-                fontWeight: FontWeight.bold,
-              ),
-              SizedBox(height: XPadding.large),
+      body: Obx(() {
+        final state = controller.state;
 
-              _buildSummaryRow('Direction'.tr, 'Phnom Penh - Siem Reap'),
-              SizedBox(height: XPadding.medium),
-              _buildSummaryRow('Departure Date'.tr, '2025-05-12 0 4:30 PM'),
-              SizedBox(height: XPadding.medium),
-              _buildSummaryRow('Seat No'.tr, '10'),
-              SizedBox(height: XPadding.medium),
-              _buildSummaryRow('Unit Price'.tr, '\$13.00'),
-              SizedBox(height: XPadding.medium),
-              _buildSummaryRow('Discount'.tr, '\$0.00'),
-              SizedBox(height: XPadding.medium),
-              _buildSummaryRow('Net Price', '\$13.00', isBold: true),
-              SizedBox(height: XPadding.extralarge),
+        return SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(XPadding.extralarge),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Trip Summary
+                XTextLarge(
+                  label: 'Trip Summary'.tr,
+                  colortext: black,
+                  fontWeight: FontWeight.bold,
+                ),
+                SizedBox(height: XPadding.large),
 
-              // Note field
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: XPadding.large,
-                  vertical: XPadding.medium,
+                _buildSummaryRow('Direction'.tr, state.direction),
+                SizedBox(height: XPadding.medium),
+                _buildSummaryRow('Departure Date'.tr, state.departureDate),
+                SizedBox(height: XPadding.medium),
+                _buildSummaryRow('Seat No'.tr, state.seatsDisplay),
+                SizedBox(height: XPadding.medium),
+                _buildSummaryRow(
+                  'Unit Price'.tr,
+                  '\$${state.unitPrice.toStringAsFixed(2)}',
                 ),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(12),
+                SizedBox(height: XPadding.medium),
+                _buildSummaryRow('Quantity'.tr, '${state.quantity}'),
+                SizedBox(height: XPadding.medium),
+                _buildSummaryRow(
+                  'Discount'.tr,
+                  '\$${state.discount.toStringAsFixed(2)}',
                 ),
-                child: Row(
-                  children: [
-                    Icon(Icons.edit, color: Colors.grey.shade600, size: 20),
-                    SizedBox(width: XPadding.medium),
-                    Expanded(
-                      child: TextField(
-                        controller: noteController,
-                        decoration: InputDecoration(
-                          hintText: 'Note'.tr,
-                          border: InputBorder.none,
-                          hintStyle: TextStyle(color: Colors.grey.shade500),
+                SizedBox(height: XPadding.medium),
+                _buildSummaryRow(
+                  'Net Price'.tr,
+                  '\$${state.totalPrice.toStringAsFixed(2)}',
+                  isBold: true,
+                ),
+                SizedBox(height: XPadding.extralarge),
+
+                // Note field
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: XPadding.large,
+                    vertical: XPadding.medium,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit, color: Colors.grey.shade600, size: 20),
+                      SizedBox(width: XPadding.medium),
+                      Expanded(
+                        child: TextField(
+                          controller: noteController,
+                          onChanged: (value) => controller.updateNote(value),
+                          decoration: InputDecoration(
+                            hintText: 'Note'.tr,
+                            border: InputBorder.none,
+                            hintStyle: TextStyle(color: Colors.grey.shade500),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              SizedBox(height: XPadding.extralarge),
+                SizedBox(height: XPadding.extralarge),
 
-              // Choose Payment Method
-              XTextLarge(
-                label: 'Choose Payment Method'.tr,
-                colortext: black,
-                fontWeight: FontWeight.bold,
-              ),
-              SizedBox(height: XPadding.large),
+                // Choose Payment Method
+                XTextLarge(
+                  label: 'Choose Payment Method'.tr,
+                  colortext: black,
+                  fontWeight: FontWeight.bold,
+                ),
+                SizedBox(height: XPadding.large),
 
-              _buildPaymentOption(
-                'KHQR',
-                'KHQR',
-                'Scan to pay with any banking'.tr,
-                Colors.red,
-              ),
-              SizedBox(height: XPadding.extralarge),
+                _buildPaymentOption(
+                  'KHQR',
+                  'KHQR',
+                  'Scan to pay with any banking'.tr,
+                  state.selectedPaymentMethod == 'KHQR',
+                ),
+                SizedBox(height: XPadding.medium),
 
-              // Terms checkbox
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    agreedToTerms = !agreedToTerms;
-                  });
-                },
-                child: Row(
-                  children: [
-                    Checkbox(
-                      value: true,
-                      onChanged: (value) {},
-                      activeColor: Colors.greenAccent,
-                    ),
-                    Expanded(
-                      child: XTextMedium(
-                        label: 'Term & Conditions Agreement'.tr,
-                        colortext: black,
-                        fontWeight: FontWeight.w600,
+                // Terms checkbox
+                GestureDetector(
+                  onTap: () => controller.toggleTermsAgreement(),
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        value: state.agreedToTerms,
+                        onChanged: (_) => controller.toggleTermsAgreement(),
+                        activeColor: goBusPrimary,
                       ),
-                    ),
-                  ],
+                      Expanded(
+                        child: XTextMedium(
+                          label: 'Term & Conditions Agreement'.tr,
+                          colortext: black,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+                SizedBox(height: XPadding.extralarge),
+              ],
+            ),
+          ),
+        );
+      }),
+      bottomNavigationBar: Obx(() {
+        final state = controller.state;
+        final canProceed = controller.canProceedToPayment();
+
+        return Container(
+          padding: EdgeInsets.all(XPadding.extralarge),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: Offset(0, -2),
               ),
-              SizedBox(height: XPadding.extralarge),
             ],
           ),
-        ),
-      ),
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.all(XPadding.extralarge),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: Offset(0, -2),
+          child: SafeArea(
+            child: XButton(
+              height: 52,
+              label: 'Pay \$${state.totalPrice.toStringAsFixed(2)}',
+              optionbutton: canProceed ? 1 : 0,
+              bgColor: canProceed ? goBusPrimary : Colors.grey,
+              onTap: canProceed
+                  ? () => Get.toNamed(
+                      AppRoutes.makePayment,
+                      arguments: {
+                        'totalAmount': state.totalPrice,
+                        'paymentMethod': state.selectedPaymentMethod,
+                        'note': state.note,
+                        'direction': state.direction,
+                        'departureDate': state.departureDate,
+                        'seats': state.selectedSeats,
+                      },
+                    )
+                  : null,
             ),
-          ],
-        ),
-        child: SafeArea(
-          child: XButton(
-            height: 52,
-            label: 'Pay \$13:00',
-            optionbutton: 1,
-            bgColor: goBusPrimary,
-            onTap: () => Get.toNamed(AppRoutes.makePayment),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 
@@ -191,44 +227,56 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
     String id,
     String title,
     String subtitle,
-    Color logoColor,
+    bool isSelected,
   ) {
-    return Container(
-      padding: EdgeInsets.all(XPadding.large),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300, width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: Offset(0, 2),
+    return GestureDetector(
+      onTap: () => controller.selectPaymentMethod(id),
+      child: Container(
+        padding: EdgeInsets.all(XPadding.large),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? goBusPrimary : Colors.grey.shade300,
+            width: isSelected ? 2 : 1,
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.asset(AppImages.imgBakong, width: 40, height: 40),
-          ),
-          SizedBox(width: XPadding.large),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                XTextMedium(
-                  label: title,
-                  colortext: black,
-                  fontWeight: FontWeight.bold,
-                ),
-                SizedBox(height: 4),
-                XTextSmall(label: subtitle, colortext: Colors.grey.shade600),
-              ],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 4,
+              offset: Offset(0, 2),
             ),
-          ),
-        ],
+          ],
+        ),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.asset(
+                id == 'KHQR' ? AppImages.imgBakong : AppImages.imgBakong,
+                width: 40,
+                height: 40,
+              ),
+            ),
+            SizedBox(width: XPadding.large),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  XTextMedium(
+                    label: title,
+                    colortext: black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  SizedBox(height: 4),
+                  XTextSmall(label: subtitle, colortext: Colors.grey.shade600),
+                ],
+              ),
+            ),
+            if (isSelected)
+              Icon(Icons.check_circle, color: goBusPrimary, size: 24),
+          ],
+        ),
       ),
     );
   }
