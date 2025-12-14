@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:get/get.dart';
 import 'package:go_bus_express/models/route/detail_route_model.dart';
 import 'package:go_bus_express/repository/route_repository.dart';
 import 'package:go_bus_express/view_models/controller/base/base_controller.dart';
@@ -14,14 +15,53 @@ class SelectRouteController extends BaseController<SelectRouteState> {
   @override
   void onInit() {
     super.onInit();
-    fetchRouteByID();
+    _initArgsAndFetch();
   }
 
-  Future<void> fetchRouteByID() async {
-    // Set loading
-    updateState((state) => state.copyWith(isLoading: true));
+  void _initArgsAndFetch() {
+    final args = Get.arguments as Map<String, dynamic>?;
+
+    if (args == null) {
+      log('❌ No arguments passed to SelectRouteController');
+      return;
+    }
+
+    final routeId = args['route_id'] as int?;
+    final departureDate = args['departure_date'] as String?;
+    final returnDate = args['return_date'] as String?;
+
+    if (routeId == null || departureDate == null || returnDate == null) {
+      log('❌ Missing required parameters');
+      return;
+    }
+
+    /// 🔥 Update state immediately so UI can show data
+    updateState(
+      (state) => state.copyWith(
+        routeId: routeId,
+        departureDate: departureDate,
+        returnDate: returnDate,
+        isLoading: true,
+      ),
+    );
+
+    /// Then fetch data
+    fetchRouteByID(
+      routeId: routeId,
+      departureDate: departureDate,
+      returnDate: returnDate,
+    );
+  }
+
+  Future<void> fetchRouteByID({
+    required int routeId,
+    required String departureDate,
+    required String returnDate,
+  }) async {
     final result = await _repository.fetchBusBySchedule(
-      3,
+      routeId,
+      // departureDate,
+      //
       '2025-11-20',
       '2026-01-20',
     );
@@ -35,12 +75,15 @@ class SelectRouteController extends BaseController<SelectRouteState> {
               isLoading: false,
             ),
           );
-          log("Success ${result.data}");
+          log(
+            "Route>>>>>>"
+            '${result.data?.route?.origin}',
+          );
         }
+
       case Error<RouteListResponseModel?>():
-        {
-          updateState((state) => state.copyWith(isLoading: false));
-        }
+        updateState((state) => state.copyWith(isLoading: false));
+        log("❌ Error loading schedules: ${result.error.displayMessage}");
     }
   }
 }

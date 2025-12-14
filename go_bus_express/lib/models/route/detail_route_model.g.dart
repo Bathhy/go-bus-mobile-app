@@ -9,21 +9,25 @@ part of 'detail_route_model.dart';
 RouteListResponseModel _$RouteListResponseModelFromJson(
   Map<String, dynamic> json,
 ) => RouteListResponseModel(
-  route: (json['route'] as List<dynamic>?)
+  schedules: (json['schedules'] as List<dynamic>?)
       ?.map((e) => DetailRouteModel.fromJson(e as Map<String, dynamic>))
       .toList(),
   count: (json['count'] as num?)?.toInt(),
   summary: json['summary'] == null
       ? null
       : RouteSummary.fromJson(json['summary'] as Map<String, dynamic>),
+  route: json['route'] == null
+      ? null
+      : RouteModel.fromJson(json['route'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$RouteListResponseModelToJson(
   RouteListResponseModel instance,
 ) => <String, dynamic>{
-  'route': instance.route,
+  'schedules': instance.schedules,
   'count': instance.count,
   'summary': instance.summary,
+  'route': instance.route,
 };
 
 DetailRouteModel _$DetailRouteModelFromJson(Map<String, dynamic> json) =>
@@ -89,4 +93,21 @@ Map<String, dynamic> _$RouteSummaryToJson(RouteSummary instance) =>
       'totalSchedules': instance.totalSchedules,
       'totalAvailableSeats': instance.totalAvailableSeats,
       'totalBookedSeats': instance.totalBookedSeats,
+    };
+
+RouteModel _$RouteModelFromJson(Map<String, dynamic> json) => RouteModel(
+  id: (json['id'] as num?)?.toInt(),
+  origin: json['origin'] as String?,
+  destination: json['destination'] as String?,
+  distanceKm: (json['distanceKm'] as num?)?.toInt(),
+  durationMinutes: (json['durationMinutes'] as num?)?.toInt(),
+);
+
+Map<String, dynamic> _$RouteModelToJson(RouteModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'origin': instance.origin,
+      'destination': instance.destination,
+      'distanceKm': instance.distanceKm,
+      'durationMinutes': instance.durationMinutes,
     };

@@ -5,14 +5,16 @@ part 'detail_route_model.g.dart';
 
 @JsonSerializable()
 class RouteListResponseModel {
-  final List<DetailRouteModel>? route;
+  final List<DetailRouteModel>? schedules;
   final int? count;
   final RouteSummary? summary;
+  final RouteModel? route;
 
   const RouteListResponseModel({
-    this.route,
+    this.schedules,
     this.count,
     this.summary,
+    this.route,
   });
 
   factory RouteListResponseModel.fromJson(Map<String, dynamic> json) =>
@@ -40,7 +42,9 @@ class DetailRouteModel {
     this.departureTime,
     this.bus,
   });
-  factory DetailRouteModel.fromJson(Map<String, dynamic> json) => _$DetailRouteModelFromJson(json);
+
+  factory DetailRouteModel.fromJson(Map<String, dynamic> json) =>
+      _$DetailRouteModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$DetailRouteModelToJson(this);
 }
@@ -54,6 +58,7 @@ class BusModel {
   final int? totalSeats;
   final int? layoutId;
   final AllRouteModel? route;
+
   // New variables added here
   final int? availableSeats;
   final int? bookedSeats;
@@ -70,7 +75,8 @@ class BusModel {
     this.bookedSeats,
   });
 
-  factory BusModel.fromJson(Map<String, dynamic> json) => _$BusModelFromJson(json);
+  factory BusModel.fromJson(Map<String, dynamic> json) =>
+      _$BusModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$BusModelToJson(this);
 }
@@ -91,4 +97,40 @@ class RouteSummary {
       _$RouteSummaryFromJson(json);
 
   Map<String, dynamic> toJson() => _$RouteSummaryToJson(this);
+}
+
+@JsonSerializable()
+class RouteModel {
+  final int? id;
+  final String? origin;
+  final String? destination;
+  final int? distanceKm;
+  final int? durationMinutes;
+
+  RouteModel({
+    this.id,
+    this.origin,
+    this.destination,
+    this.distanceKm,
+    this.durationMinutes,
+  });
+
+  RouteModel copyWith({
+    int? id,
+    String? origin,
+    String? destination,
+    int? distanceKm,
+    int? durationMinutes,
+  }) => RouteModel(
+    id: id ?? this.id,
+    origin: origin ?? this.origin,
+    destination: destination ?? this.destination,
+    distanceKm: distanceKm ?? this.distanceKm,
+    durationMinutes: durationMinutes ?? this.durationMinutes,
+  );
+
+  factory RouteModel.fromJson(Map<String, dynamic> json) =>
+      _$RouteModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RouteModelToJson(this);
 }

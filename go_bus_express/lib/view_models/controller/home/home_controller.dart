@@ -107,8 +107,8 @@ class HomeController extends BaseController<HomeState> {
     updateState(
       (state) => state.copyWith(
         selectedRouteId: route.id,
-        // selectedRouteOrigin: route.origin,
-        // selectedRouteDestination: route.destination,
+        selectedRouteOrigin: route.origin,
+        selectedRouteDestination: route.destination,
       ),
     );
   }
