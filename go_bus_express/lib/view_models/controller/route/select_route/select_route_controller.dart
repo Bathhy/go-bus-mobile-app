@@ -20,7 +20,7 @@ class SelectRouteController extends BaseController<SelectRouteState> {
   Future<void> fetchRouteByID() async {
     // Set loading
     updateState((state) => state.copyWith(isLoading: true));
-    final result = await _repository.fetchRouteById(
+    final result = await _repository.fetchBusBySchedule(
       3,
       '2025-11-20',
       '2026-01-20',

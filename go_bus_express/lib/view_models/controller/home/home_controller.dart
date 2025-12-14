@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:go_bus_express/core/storage/local_repository.dart';
 import 'package:go_bus_express/models/profile/profile_model.dart';
 import 'package:go_bus_express/models/route/detail_route_model.dart';
@@ -9,16 +11,16 @@ import 'package:go_bus_express/view_models/controller/base/base_controller.dart'
 import 'package:go_bus_express/view_models/controller/home/home_state.dart';
 import 'package:shared_package/network/x_result.dart';
 
+import '../../../models/home/all_route_model.dart';
+import '../../../resources/routes/app_routes.dart';
+
 class HomeController extends BaseController<HomeState> {
   final ProfileRepository _repository;
   final LocalRepository _localRepository;
   final RouteRepository _routeRepository;
 
-  HomeController(
-    this._repository,
-    this._localRepository,
-    this._routeRepository,
-  ) : super(HomeState());
+  HomeController(this._repository, this._localRepository, this._routeRepository)
+    : super(HomeState());
 
   @override
   void onInit() {
@@ -46,6 +48,7 @@ class HomeController extends BaseController<HomeState> {
         }
       case Error<ProfileModel?>():
         // Error
+        logout();
         updateState((state) => state.copyWith(isLoading: false));
         log('Profile error: ${result.error}');
     }
@@ -57,7 +60,7 @@ class HomeController extends BaseController<HomeState> {
       try {
         final List<dynamic> routesData = jsonDecode(cachedRoutesJson);
         final routes = routesData
-            .map((json) => DetailRouteModel.fromJson(json))
+            .map((json) => AllRouteModel.fromJson(json))
             .toList();
         updateState((state) => state.copyWith(routes: routes));
         log('📦 Loaded ${routes.length} routes from cache');
@@ -78,37 +81,36 @@ class HomeController extends BaseController<HomeState> {
     final result = await _routeRepository.fetchRoutes();
 
     switch (result) {
-      case Success<List<DetailRouteModel>>():
+      case Success<List<AllRouteModel>>():
         updateState(
-          (state) => state.copyWith(
-            isLoadingRoutes: false,
-            routes: result.data,
-          ),
+          (state) =>
+              state.copyWith(isLoadingRoutes: false, routes: result.data),
         );
-        
+
         // Save to cache
         final routesJson = jsonEncode(
           result.data.map((route) => route.toJson()).toList(),
         );
         await _localRepository.saveRoutes(routesJson);
-        
+
         log('✅ Routes fetched successfully: ${result.data.length} routes');
-        for (var route in result.data) {
-          log('  📍 Route ${route.id}: ${route.origin} → ${route.destination} (${route.distanceKm}km, ${route.durationMinutes}min)');
-        }
-      case Error<List<DetailRouteModel>>():
+      // for (var route in result.data) {
+      //   log('  📍 Route ${route.id}: ${route.origin} → ${route.destination} (${route.distanceKm}km, ${route.durationMinutes}min)');
+      // }
+      case Error<List<AllRouteModel>>():
         updateState((state) => state.copyWith(isLoadingRoutes: false));
         log('❌ Routes error: ${result.error}');
     }
   }
 
-  void selectRoute(DetailRouteModel route) {
-    updateState((state) => state.copyWith(
-          selectedRouteId: route.id,
-          selectedRouteOrigin: route.origin,
-          selectedRouteDestination: route.destination,
-        ));
-    log('Route selected: ID=${route.id}, ${route.origin} → ${route.destination}');
+  void selectRoute(AllRouteModel route) {
+    updateState(
+      (state) => state.copyWith(
+        selectedRouteId: route.id,
+        // selectedRouteOrigin: route.origin,
+        // selectedRouteDestination: route.destination,
+      ),
+    );
   }
 
   Map<String, dynamic>? getSearchParams() {
@@ -142,5 +144,10 @@ class HomeController extends BaseController<HomeState> {
   void selectReturnDate(DateTime date) {
     updateState((state) => state.copyWith(returnDate: date));
     log('Return date selected: ${date.toString().split(' ')[0]}');
+  }
+
+  void logout() {
+    _localRepository.logout();
+    Get.offAllNamed(AppRoutes.signIn);
   }
 }

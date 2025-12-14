@@ -1,10 +1,12 @@
 import 'package:go_bus_express/models/profile/profile_model.dart';
 import 'package:go_bus_express/models/route/detail_route_model.dart';
 
+import '../../../models/home/all_route_model.dart';
+
 class HomeState {
   final bool isLoading;
   final ProfileModel? profileModel;
-  final List<DetailRouteModel> routes;
+  final List<AllRouteModel> routes;
   final bool isLoadingRoutes;
   final int? selectedRouteId;
   final String? selectedRouteOrigin;
@@ -29,7 +31,7 @@ class HomeState {
   HomeState copyWith({
     bool? isLoading,
     ProfileModel? profileModel,
-    List<DetailRouteModel>? routes,
+    List<AllRouteModel>? routes,
     bool? isLoadingRoutes,
     int? selectedRouteId,
     String? selectedRouteOrigin,

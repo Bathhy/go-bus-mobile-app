@@ -32,19 +32,14 @@ class RouteSelectionDialog {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: Colors.grey[300]!),
-        ),
+        border: Border(bottom: BorderSide(color: Colors.grey[300]!)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text(
             'Select Route',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           IconButton(
             icon: const Icon(Icons.close),
@@ -84,10 +79,7 @@ class RouteSelectionDialog {
                   color: Colors.blue[100],
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
-                  Icons.directions_bus,
-                  color: Colors.blue[700],
-                ),
+                child: Icon(Icons.directions_bus, color: Colors.blue[700]),
               ),
               title: Text(
                 '${route.origin} → ${route.destination}',
