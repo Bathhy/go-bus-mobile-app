@@ -9,6 +9,8 @@ import 'package:shared_package/design_system/x_widget/ButtonComponent.dart';
 import 'package:shared_package/design_system/x_widget/TextComponent.dart';
 import 'package:shared_package/design_system/x_widget/x_app_bar.dart';
 
+import '../../../core/di/app_di.dart';
+
 class ChoosePaymentView extends StatefulWidget {
   const ChoosePaymentView({super.key});
 
@@ -18,19 +20,7 @@ class ChoosePaymentView extends StatefulWidget {
 
 class _ChoosePaymentViewState extends State<ChoosePaymentView> {
   final TextEditingController noteController = TextEditingController();
-  late final ChoosePaymentController controller;
-
-  @override
-  void initState() {
-    super.initState();
-    controller = Get.put(ChoosePaymentController());
-  }
-
-  @override
-  void dispose() {
-    noteController.dispose();
-    super.dispose();
-  }
+  final ChoosePaymentController controller = getIt<ChoosePaymentController>();
 
   @override
   Widget build(BuildContext context) {
@@ -179,19 +169,7 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
               label: 'Pay \$${state.totalPrice.toStringAsFixed(2)}',
               optionbutton: canProceed ? 1 : 0,
               bgColor: canProceed ? goBusPrimary : Colors.grey,
-              onTap: canProceed
-                  ? () => Get.toNamed(
-                      AppRoutes.makePayment,
-                      arguments: {
-                        'totalAmount': state.totalPrice,
-                        'paymentMethod': state.selectedPaymentMethod,
-                        'note': state.note,
-                        'direction': state.direction,
-                        'departureDate': state.departureDate,
-                        'seats': state.selectedSeats,
-                      },
-                    )
-                  : null,
+              onTap: canProceed ? () => controller.createBooking() : null,
             ),
           ),
         );

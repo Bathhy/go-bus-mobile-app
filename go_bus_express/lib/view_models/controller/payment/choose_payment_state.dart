@@ -5,11 +5,13 @@ class ChoosePaymentState extends BaseUiState {
   final String departureDate;
   final String departureTime;
   final List<String> selectedSeats;
+  final List<int> selectedSeatIds;
   final double unitPrice;
   final double discount;
   final String? selectedPaymentMethod;
   final bool agreedToTerms;
   final String note;
+  final int scheduleId;
 
   ChoosePaymentState({
     super.isLoading = false,
@@ -17,15 +19,17 @@ class ChoosePaymentState extends BaseUiState {
     this.departureDate = '',
     this.departureTime = '',
     this.selectedSeats = const [],
+    this.selectedSeatIds = const [],
     this.unitPrice = 0.0,
     this.discount = 0.0,
     this.selectedPaymentMethod,
     this.agreedToTerms = false,
     this.note = '',
+    this.scheduleId = 0,
   });
 
   int get quantity => selectedSeats.length;
-  
+
   double get totalPrice => (unitPrice * quantity) - discount;
 
   String get seatsDisplay => selectedSeats.join(', ');
@@ -36,11 +40,13 @@ class ChoosePaymentState extends BaseUiState {
     String? departureDate,
     String? departureTime,
     List<String>? selectedSeats,
+    List<int>? selectedSeatIds,
     double? unitPrice,
     double? discount,
     String? selectedPaymentMethod,
     bool? agreedToTerms,
     String? note,
+    int? scheduleId,
   }) {
     return ChoosePaymentState(
       isLoading: isLoading ?? this.isLoading,
@@ -48,11 +54,14 @@ class ChoosePaymentState extends BaseUiState {
       departureDate: departureDate ?? this.departureDate,
       departureTime: departureTime ?? this.departureTime,
       selectedSeats: selectedSeats ?? this.selectedSeats,
+      selectedSeatIds: selectedSeatIds ?? this.selectedSeatIds,
       unitPrice: unitPrice ?? this.unitPrice,
       discount: discount ?? this.discount,
-      selectedPaymentMethod: selectedPaymentMethod ?? this.selectedPaymentMethod,
+      selectedPaymentMethod:
+          selectedPaymentMethod ?? this.selectedPaymentMethod,
       agreedToTerms: agreedToTerms ?? this.agreedToTerms,
       note: note ?? this.note,
+      scheduleId: scheduleId ?? this.scheduleId,
     );
   }
 }

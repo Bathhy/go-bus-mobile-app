@@ -168,9 +168,11 @@ class _SelectSeatViewState extends State<SelectSeatView> {
                           'destination': state.destination,
                           'departureDate': state.departureDate,
                           'departureTime': state.departureTime,
-                          'selectedSeats': state.selectedSeats,
+                          'selectedSeats': state.selectedSeats, // For display
+                          'selectedSeatIds': state.selectedSeatIds, // For backend
                           'unitPrice': state.unitPrice,
                           'discount': 0.0,
+                          'scheduleId': state.scheduleId,
                         },
                       );
                     }

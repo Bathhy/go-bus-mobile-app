@@ -5,11 +5,14 @@ import 'package:go_bus_express/core/network/auth_interceptor.dart';
 import 'package:go_bus_express/core/storage/local_repository.dart';
 import 'package:go_bus_express/data/app_api/go_bus_api.dart';
 import 'package:go_bus_express/data/auth/auth_api.dart';
+import 'package:go_bus_express/data/booking/booking_api.dart';
 import 'package:go_bus_express/repository/auth_repository.dart';
+import 'package:go_bus_express/repository/booking_repository.dart';
 import 'package:go_bus_express/repository/profile_repository.dart';
 import 'package:go_bus_express/repository/route_repository.dart';
 import 'package:go_bus_express/view_models/controller/auth/AuthController.dart';
 import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
+import 'package:go_bus_express/view_models/controller/payment/choose_payment_controller.dart';
 import 'package:go_bus_express/view_models/controller/profile/profile_controller.dart';
 import 'package:go_bus_express/view_models/controller/route/select_route/select_route_controller.dart';
 import 'package:go_bus_express/view_models/controller/route/select_seat/select_seat_controller.dart';
@@ -29,6 +32,7 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton(() => dio);
   getIt.registerLazySingleton<AuthApi>(() => AuthApi(getIt<Dio>()));
   getIt.registerLazySingleton<GoBusApi>(() => GoBusApi(getIt<Dio>()));
+  getIt.registerLazySingleton<BookingApi>(() => BookingApi(getIt<Dio>()));
 
   // Repositories
   getIt.registerLazySingleton<AuthRepository>(
@@ -39,6 +43,9 @@ Future<void> setupDependencyInjection() async {
   );
   getIt.registerLazySingleton<RouteRepository>(
     () => RouteRepositoryImpl(getIt<GoBusApi>()),
+  );
+  getIt.registerLazySingleton<BookingRepository>(
+    () => BookingRepositoryImpl(getIt()),
   );
 
   // Controller
@@ -74,6 +81,11 @@ Future<void> setupDependencyInjection() async {
   });
   getIt.registerFactory<SelectSeatController>(() {
     final controller = SelectSeatController(getIt());
+    Get.put(controller);
+    return controller;
+  });
+  getIt.registerFactory<ChoosePaymentController>(() {
+    final controller = ChoosePaymentController(getIt());
     Get.put(controller);
     return controller;
   });

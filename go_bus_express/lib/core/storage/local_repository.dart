@@ -63,4 +63,14 @@ class LocalRepository with BaseSharePreference {
   Future<void> logout() async {
     await logoutBox();
   }
+
+  // MARK : Payment Method
+
+  Future<void> saveMD5(String md5) async {
+    await storeValue(PreferencesKey.md5, md5);
+  }
+
+  String? getMD5() {
+    return readString(PreferencesKey.md5);
+  }
 }
