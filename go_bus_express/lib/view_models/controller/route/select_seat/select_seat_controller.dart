@@ -29,6 +29,7 @@ class SelectSeatController extends BaseController<SelectSeatState> {
 
     // Extract all arguments
     final busId = args['busId'] as int?;
+    final scheduleId = args['scheduleId'] as int?;
     final origin = args['origin'] as String? ?? '';
     final destination = args['destination'] as String? ?? '';
     final departureDate = args['departureDate'] as String?;
@@ -43,6 +44,7 @@ class SelectSeatController extends BaseController<SelectSeatState> {
         departureDate: departureDate,
         departureTime: departureTime,
         unitPrice: unitPrice,
+        scheduleId: scheduleId,
       ),
     );
     fetchBusSeat(busId ?? 0);
@@ -89,16 +91,36 @@ class SelectSeatController extends BaseController<SelectSeatState> {
 
   void toggleSeat(String seatNumber) {
     final currentSeats = List<String>.from(state.selectedSeats);
+    final currentSeatIds = List<int>.from(state.selectedSeatIds);
+
+    // Find the seat object to get its ID
+    final seat = state.model?.seats?.firstWhere(
+      (s) => s.seatNumber == seatNumber,
+      orElse: () => Seat(),
+    );
 
     if (currentSeats.contains(seatNumber)) {
       // Deselect if already selected
       currentSeats.remove(seatNumber);
+      if (seat?.id != null) {
+        currentSeatIds.remove(seat!.id);
+      }
     } else {
       // Select the seat
       currentSeats.add(seatNumber);
+      if (seat?.id != null) {
+        currentSeatIds.add(seat!.id!);
+      }
     }
 
-    updateState((state) => state.copyWith(selectedSeats: currentSeats));
+    updateState(
+      (state) => state.copyWith(
+        selectedSeats: currentSeats,
+        selectedSeatIds: currentSeatIds,
+      ),
+    );
+    
+    log('Selected seats: $currentSeats, IDs: $currentSeatIds');
   }
 
   bool isSeatSelected(String seatNumber) {
