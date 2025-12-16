@@ -6,6 +6,7 @@ import 'package:go_bus_express/core/storage/local_repository.dart';
 import 'package:go_bus_express/data/app_api/go_bus_api.dart';
 import 'package:go_bus_express/data/auth/auth_api.dart';
 import 'package:go_bus_express/data/booking/booking_api.dart';
+import 'package:go_bus_express/data/payment/payment_api.dart';
 import 'package:go_bus_express/repository/auth_repository.dart';
 import 'package:go_bus_express/repository/booking_repository.dart';
 import 'package:go_bus_express/repository/profile_repository.dart';
@@ -19,20 +20,27 @@ import 'package:go_bus_express/view_models/controller/route/select_seat/select_s
 import 'package:go_bus_express/view_models/controller/splash/SplashController.dart';
 
 import '../../data/network/dio_service.dart';
+import '../../data/network/payment_dio_service.dart';
 
 final getIt = GetIt.instance;
 
 Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<LocalRepository>(() => LocalRepository());
 
-  // NetWork
+  // Network - Main API Service
   final dioService = DioService(getIt<LocalRepository>());
   final dio = dioService.dio;
-  dio.interceptors.add(AuthInterceptor());
   getIt.registerLazySingleton(() => dio);
   getIt.registerLazySingleton<AuthApi>(() => AuthApi(getIt<Dio>()));
   getIt.registerLazySingleton<GoBusApi>(() => GoBusApi(getIt<Dio>()));
   getIt.registerLazySingleton<BookingApi>(() => BookingApi(getIt<Dio>()));
+
+  // Network - Payment API Service
+  final paymentDioService = PaymentDioService();
+  final paymentDio = paymentDioService.dio;
+  getIt.registerLazySingleton<PaymentBakongApi>(
+    () => PaymentBakongApi(paymentDio),
+  );
 
   // Repositories
   getIt.registerLazySingleton<AuthRepository>(
@@ -45,7 +53,7 @@ Future<void> setupDependencyInjection() async {
     () => RouteRepositoryImpl(getIt<GoBusApi>()),
   );
   getIt.registerLazySingleton<BookingRepository>(
-    () => BookingRepositoryImpl(getIt()),
+    () => BookingRepositoryImpl(getIt(), getIt()),
   );
 
   // Controller
@@ -85,7 +93,7 @@ Future<void> setupDependencyInjection() async {
     return controller;
   });
   getIt.registerFactory<ChoosePaymentController>(() {
-    final controller = ChoosePaymentController(getIt());
+    final controller = ChoosePaymentController(getIt(), getIt());
     Get.put(controller);
     return controller;
   });
