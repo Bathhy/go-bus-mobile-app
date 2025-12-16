@@ -1,8 +1,12 @@
 import 'dart:developer';
+import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_bus_express/core/storage/local_repository.dart';
 import 'package:go_bus_express/models/body/booking_body.dart';
+import 'package:go_bus_express/models/body/payment_body.dart';
 import 'package:go_bus_express/models/booking/booking_model.dart';
+import 'package:go_bus_express/models/payment/generate_qr_model.dart';
 import 'package:go_bus_express/repository/booking_repository.dart';
 import 'package:go_bus_express/view_models/controller/base/base_controller.dart';
 import 'package:go_bus_express/view_models/controller/payment/choose_payment_state.dart';
@@ -13,10 +17,11 @@ import 'package:shared_package/network/x_result.dart';
 import '../../../resources/routes/app_routes.dart';
 
 class ChoosePaymentController extends BaseController<ChoosePaymentState> {
-  ChoosePaymentController(this._bookingRepository)
+  ChoosePaymentController(this._bookingRepository, this._localRepository)
     : super(ChoosePaymentState());
 
   final BookingRepository _bookingRepository;
+  final LocalRepository _localRepository;
 
   @override
   void onInit() {
@@ -38,9 +43,11 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
     final departureDate = args['departureDate'] as String?;
     final departureTime = args['departureTime'] as String? ?? '';
     final selectedSeats = args['selectedSeats'] as List<String>? ?? [];
-    final selectedSeatIds = (args['selectedSeatIds'] as List<dynamic>?)
-        ?.map((e) => e as int)
-        .toList() ?? [];
+    final selectedSeatIds =
+        (args['selectedSeatIds'] as List<dynamic>?)
+            ?.map((e) => e as int)
+            .toList() ??
+        [];
     final unitPrice = (args['unitPrice'] as num?)?.toDouble() ?? 0.0;
     final discount = (args['discount'] as num?)?.toDouble() ?? 0.0;
     final scheduleId = args['scheduleId'] as int?;
@@ -90,23 +97,38 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
       scheduleId: state.scheduleId,
       seatIds: state.selectedSeatIds,
     );
-    
+
     log('Creating booking with seat IDs: ${state.selectedSeatIds}');
     log('Booking body: ${body.toJson()}');
-    
+
     final result = await _bookingRepository.createBooking(body: body);
 
     switch (result) {
       case Success<BookingModel?>():
         log('✅ Booking created successfully');
-        Get.toNamed(AppRoutes.makePayment, arguments: {
-          'totalAmount': state.totalPrice,
-          'bookingId': result.data?.id,
-        });
+        _generateQr(state.totalPrice);
         break;
 
       case Error<BookingModel?>():
-        log("❌ Booking error >>> ${result.error}");
+        _showError(result.error.displayMessage);
+        break;
+    }
+  }
+
+  void _generateQr(double amount) async {
+    final body = PaymentBody(amount: amount, currency: "USD");
+    final result = await _bookingRepository.generateQr(body: body);
+
+    switch (result) {
+      case Success<GenerateQrModel>():
+        {
+          _localRepository.saveMD5(result.data.md5 ?? '');
+          Get.toNamed(
+            AppRoutes.makePayment,
+            arguments: {'qr': result.data.qr ?? ""},
+          );
+        }
+      case Error<GenerateQrModel>():
         _showError(result.error.displayMessage);
         break;
     }

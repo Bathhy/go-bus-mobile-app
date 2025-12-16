@@ -18,15 +18,13 @@ class _PaymentBakongApi implements PaymentBakongApi {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<BaseResponse<BookingModel>> generateQr({
-    required PaymentBody body,
-  }) async {
+  Future<GenerateQrModel> generateQr({required PaymentBody body}) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     _data.addAll(body.toJson());
-    final _options = _setStreamType<BaseResponse<BookingModel>>(
+    final _options = _setStreamType<GenerateQrModel>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -37,12 +35,9 @@ class _PaymentBakongApi implements PaymentBakongApi {
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late BaseResponse<BookingModel> _value;
+    late GenerateQrModel _value;
     try {
-      _value = BaseResponse<BookingModel>.fromJson(
-        _result.data!,
-        (json) => BookingModel.fromJson(json as Map<String, dynamic>),
-      );
+      _value = GenerateQrModel.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
