@@ -14,6 +14,7 @@ import 'package:go_bus_express/repository/route_repository.dart';
 import 'package:go_bus_express/view_models/controller/auth/AuthController.dart';
 import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
 import 'package:go_bus_express/view_models/controller/payment/choose_payment_controller.dart';
+import 'package:go_bus_express/view_models/controller/payment/kh_qr/kh_qr_controller.dart';
 import 'package:go_bus_express/view_models/controller/profile/profile_controller.dart';
 import 'package:go_bus_express/view_models/controller/route/select_route/select_route_controller.dart';
 import 'package:go_bus_express/view_models/controller/route/select_seat/select_seat_controller.dart';
@@ -94,6 +95,11 @@ Future<void> setupDependencyInjection() async {
   });
   getIt.registerFactory<ChoosePaymentController>(() {
     final controller = ChoosePaymentController(getIt(), getIt());
+    Get.put(controller);
+    return controller;
+  });
+  getIt.registerFactory<KhQrController>(() {
+    final controller = KhQrController(getIt(), getIt());
     Get.put(controller);
     return controller;
   });

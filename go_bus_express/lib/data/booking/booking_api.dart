@@ -15,4 +15,9 @@ abstract class BookingApi {
   Future<BaseResponse<BookingModel>> createBooking({
     @Body() required BookingBody body,
   });
+
+  @POST('/booking/cancelBooking/{id}')
+  Future<BaseResponse<void>> cancelBooking({
+    @Path('id') required int id,
+  });
 }
