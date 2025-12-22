@@ -73,4 +73,8 @@ class LocalRepository with BaseSharePreference {
   String? getMD5() {
     return readString(PreferencesKey.md5);
   }
+
+  Future<void> removeMD5() async {
+    await removeValue(PreferencesKey.md5);
+  }
 }

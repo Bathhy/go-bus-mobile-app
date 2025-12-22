@@ -4,6 +4,7 @@ import 'package:go_bus_express/core/di/app_di.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_package/config/themes.dart';
 import 'route_selection_dialog.dart';
 import 'country_selection_dialog.dart';
 
@@ -19,9 +20,10 @@ class BookingCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
+        /*  gradient: LinearGradient(
             colors: [Colors.blue[600]!, Colors.blue[700]!],
-          ),
+          ),*/
+          color: goBusPrimary,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(

@@ -8,18 +8,18 @@ part of 'seat_layout_model.dart';
 
 SeatLayoutModel _$SeatLayoutModelFromJson(Map<String, dynamic> json) =>
     SeatLayoutModel(
-      layout: json['layout'] == null
+      busLayout: json['busLayout'] == null
           ? null
-          : BusLayoutModel.fromJson(json['layout'] as Map<String, dynamic>),
-      seats: (json['seats'] as List<dynamic>?)
+          : BusLayoutModel.fromJson(json['busLayout'] as Map<String, dynamic>),
+      seat: (json['seat'] as List<dynamic>?)
           ?.map((e) => Seat.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
 Map<String, dynamic> _$SeatLayoutModelToJson(SeatLayoutModel instance) =>
     <String, dynamic>{
-      'layout': instance.layout?.toJson(),
-      'seats': instance.seats?.map((e) => e.toJson()).toList(),
+      'busLayout': instance.busLayout?.toJson(),
+      'seat': instance.seat?.map((e) => e.toJson()).toList(),
     };
 
 BusLayoutModel _$BusLayoutModelFromJson(Map<String, dynamic> json) =>

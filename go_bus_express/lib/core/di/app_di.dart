@@ -37,24 +37,24 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<BookingApi>(() => BookingApi(getIt<Dio>()));
 
   // Network - Payment API Service
-  final paymentDioService = PaymentDioService();
+  final paymentDioService = PaymentDioService(getIt());
   final paymentDio = paymentDioService.dio;
   getIt.registerLazySingleton<PaymentBakongApi>(
-    () => PaymentBakongApi(paymentDio),
+        () => PaymentBakongApi(paymentDio),
   );
 
   // Repositories
   getIt.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(getIt<AuthApi>()),
+        () => AuthRepositoryImpl(getIt<AuthApi>()),
   );
   getIt.registerLazySingleton<ProfileRepository>(
-    () => ProfileRepositoryImpl(getIt<GoBusApi>()),
+        () => ProfileRepositoryImpl(getIt<GoBusApi>()),
   );
   getIt.registerLazySingleton<RouteRepository>(
-    () => RouteRepositoryImpl(getIt<GoBusApi>()),
+        () => RouteRepositoryImpl(getIt<GoBusApi>()),
   );
   getIt.registerLazySingleton<BookingRepository>(
-    () => BookingRepositoryImpl(getIt(), getIt()),
+        () => BookingRepositoryImpl(getIt(), getIt()),
   );
 
   // Controller

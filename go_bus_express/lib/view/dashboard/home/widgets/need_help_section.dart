@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_package/config/themes.dart';
 
 class NeedHelpSection extends StatelessWidget {
   const NeedHelpSection({super.key});
@@ -22,9 +23,7 @@ class NeedHelpSection extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.blue[600]!, Colors.blue[700]!],
-              ),
+              color: goBusPrimary,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(

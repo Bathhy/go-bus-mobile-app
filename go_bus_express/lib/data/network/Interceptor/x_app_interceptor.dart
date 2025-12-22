@@ -75,7 +75,8 @@ class XInterceptor extends Interceptor {
 }
 
 class PaymentXInterceptor extends Interceptor {
-  PaymentXInterceptor();
+  final LocalRepository _localRepository;
+  PaymentXInterceptor(this._localRepository);
 
   @override
   Future onRequest(
@@ -88,7 +89,7 @@ class PaymentXInterceptor extends Interceptor {
     options.headers['Accept-Language'] = 'en';
     options.headers['x-push-token'] = '';
 
-    options.headers['Authorization'] = NetworkConstant.bakongToken;
+    options.headers['Authorization'] = 'Bearer ${NetworkConstant.bakongToken}';
 
     final method = options.method.toUpperCase();
     debug('$method  ${options.uri}');

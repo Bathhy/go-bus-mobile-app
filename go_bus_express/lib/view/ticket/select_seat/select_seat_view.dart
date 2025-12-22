@@ -45,7 +45,7 @@ class _SelectSeatViewState extends State<SelectSeatView> {
           return Center(child: CircularProgressIndicator());
         }
 
-        final layout = state.model?.layout?.layout?.layout;
+        final layout = state.model?.busLayout?.layout?.layout;
 
         if (layout == null || layout.isEmpty) {
           return Center(

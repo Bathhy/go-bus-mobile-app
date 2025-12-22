@@ -17,6 +17,10 @@ BookingModel _$BookingModelFromJson(Map<String, dynamic> json) => BookingModel(
   createdAt: json['createdAt'] == null
       ? null
       : DateTime.parse(json['createdAt'] as String),
+  message: json['message'] as String?,
+  booking: json['booking'] == null
+      ? null
+      : BookingModel.fromJson(json['booking'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$BookingModelToJson(BookingModel instance) =>
@@ -29,4 +33,6 @@ Map<String, dynamic> _$BookingModelToJson(BookingModel instance) =>
       'promoId': instance.promoId,
       'paymentStatus': instance.paymentStatus,
       'createdAt': instance.createdAt?.toIso8601String(),
+      'message': instance.message,
+      'booking': instance.booking,
     };

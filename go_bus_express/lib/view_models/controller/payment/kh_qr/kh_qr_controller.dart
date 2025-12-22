@@ -9,7 +9,7 @@ import 'package:go_bus_express/models/body/verify_payment_body.dart';
 import 'package:go_bus_express/models/payment/verify_payment_model.dart';
 import 'package:go_bus_express/repository/booking_repository.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
-import 'package:go_bus_express/utils/enums/payment_status_enum.dart';
+import 'package:go_bus_express/utils/enums/enum.dart';
 import 'package:go_bus_express/view_models/controller/base/base_controller.dart';
 import 'package:go_bus_express/view_models/controller/payment/kh_qr/kh_qr_state.dart';
 import 'package:shared_package/config/themes.dart';
@@ -87,22 +87,15 @@ class KhQrController extends BaseController<KhQrState> {
     switch (result) {
       case Success<VerifyPaymentModel>():
         {
-          final payment = result.data;
-          if (payment.status == PaymentStatusEnum.paid.status) {
-            log('✅ Payment verified successfully!');
-            updateState(
-              (state) => state.copyWith(
-                isPaid: true,
-                paymentStatus: payment.status,
-                transactionId: payment.transactionId,
-              ),
-            );
+          final payment = result.data.result;
+          if (payment?.payment?.status == BakongPaymentStatusEnum.paid.status) {
             _stopVerificationPolling();
             _stopCountdownTimer();
+            _removeMd5();
             // Navigate to success screen
             _handlePaymentSuccess();
           } else {
-            log('⏳ Payment status: ${payment.status}');
+            log('⏳ Payment status: ${payment?.payment?.status}');
           }
         }
       case Error<VerifyPaymentModel>():
@@ -112,7 +105,6 @@ class KhQrController extends BaseController<KhQrState> {
           if (_retryCount <= 3) {
             _showError(result.error.displayMessage);
           }
-          // Continue polling on error
         }
     }
   }
@@ -227,6 +219,8 @@ class KhQrController extends BaseController<KhQrState> {
       ),
     );
   }
+
+  void _removeMd5() async => _localRepository.removeMD5();
 
   @override
   void onClose() {

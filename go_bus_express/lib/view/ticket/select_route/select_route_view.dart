@@ -6,6 +6,7 @@ import 'package:go_bus_express/models/route/detail_route_model.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:go_bus_express/utils/string_ext.dart';
 import 'package:go_bus_express/view_models/controller/route/select_route/select_route_controller.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 import 'package:shared_package/design_system/x_widget/x_app_bar.dart';
@@ -59,22 +60,46 @@ class SelectRouteView extends StatelessWidget {
                             itemBuilder: (context, index) {
                               final model = controller.state.model?.schedules
                                   ?.elementAt(index);
+                              
+                              // Format departure time from ISO 8601
+                              String formattedDepartureTime = 'N/A';
+                              if (model?.departureTime != null) {
+                                try {
+                                  final dt = DateTime.parse(model!.departureTime!);
+                                  formattedDepartureTime = DateFormat('HH:mm').format(dt);
+                                } catch (e) {
+                                  formattedDepartureTime = model?.departureTime ?? 'N/A';
+                                }
+                              }
+                              
+                              // Format arrival time from ISO 8601
+                              String formattedArrivalTime = 'N/A';
+                              if (model?.arrivalTime != null) {
+                                try {
+                                  final dt = DateTime.parse(model!.arrivalTime!);
+                                  formattedArrivalTime = DateFormat('HH:mm').format(dt);
+                                } catch (e) {
+                                  formattedArrivalTime = model?.arrivalTime ?? 'N/A';
+                                }
+                              }
+                              
                               return _buildBusCard(
+                                scheduleId: model?.id,
                                 departDate: controller.state.departureDate,
                                 routeModel: controller.state.model?.route,
                                 budId: model?.busId,
-                                departureTime: model?.departureTime ?? '23:30',
-                                arrivalTime: '23:22',
+                                departureTime: formattedDepartureTime,
+                                arrivalTime: formattedArrivalTime,
                                 duration: minutesToHours(
-                                  model?.bus?.route?.durationMinutes ?? 0,
+                                  controller.state.model?.route?.durationMinutes ?? 0,
                                 ).toString(),
-                                price: '\$${model?.price}',
+                                price: '\$${model?.price?.toStringAsFixed(2) ?? '0.00'}',
                                 availableSeats:
-                                    '${model?.bus?.bookedSeats ?? 0}/${model?.bus?.totalSeats ?? 0} Seats',
+                                    '${model?.bus?.availableSeats ?? 0}/${model?.bus?.totalSeats ?? 0} Seats',
                                 departureLocation:
-                                    'Boarding: ${model?.bus?.route?.origin ?? 'N/A'}',
+                                    'Boarding: ${controller.state.model?.route?.origin ?? 'N/A'}',
                                 arrivalLocation:
-                                    'Boarding: ${model?.bus?.route?.destination ?? 'N/A'}',
+                                    'Drop-off: ${controller.state.model?.route?.destination ?? 'N/A'}',
                                 busType: model?.bus?.busType ?? 'Bus',
                               );
                             },
@@ -123,6 +148,7 @@ class SelectRouteView extends StatelessWidget {
     required String arrivalLocation,
     String busType = 'Bus',
     int? budId,
+    int? scheduleId,
     RouteModel? routeModel,
     required String departDate,
   }) {
@@ -248,8 +274,8 @@ class SelectRouteView extends StatelessWidget {
                   Get.toNamed(
                     AppRoutes.selectSeat,
                     arguments: {
-                      'scheduleId': 6,
-                      'busId': budId,
+                      'scheduleId': scheduleId ?? 0,
+                      'busId': budId ?? 0,
                       'origin': routeModel?.origin ?? 'Origin',
                       'destination': routeModel?.destination ?? 'Destination',
                       'departureDate': departDate.orDefault("N/A"),

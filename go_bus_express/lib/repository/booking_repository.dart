@@ -30,7 +30,8 @@ class BookingRepositoryImpl implements BookingRepository {
   Future<XResult<BookingModel?>> createBooking({required BookingBody body}) {
     return xResultHandler(() async {
       final res = await _bookingApi.createBooking(body: body);
-      return res.data;
+      // If the response has a nested booking, return it; otherwise return data directly
+      return res.data?.booking ?? res.data;
     });
   }
 

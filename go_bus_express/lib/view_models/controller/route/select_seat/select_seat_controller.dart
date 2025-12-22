@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:get/get.dart';
 import 'package:go_bus_express/models/route/seat_layout_model.dart';
+import 'package:go_bus_express/utils/enums/enum.dart';
 import 'package:go_bus_express/view_models/controller/base/base_controller.dart';
 import 'package:go_bus_express/view_models/controller/route/select_seat/select_seat_state.dart';
 import 'package:shared_package/network/x_result.dart';
@@ -56,7 +57,7 @@ class SelectSeatController extends BaseController<SelectSeatState> {
   Future<void> fetchBusSeat(int busId) async {
     // Set loading
     updateState((state) => state.copyWith(isLoading: true));
-    final result = await _repository.fetchBusSeat(6, busId);
+    final result = await _repository.fetchBusSeat(state.scheduleId, busId);
     switch (result) {
       case Success<SeatLayoutModel?>():
         {
@@ -74,19 +75,19 @@ class SelectSeatController extends BaseController<SelectSeatState> {
   }
 
   bool isSeatBooked(String seatNumber) {
-    final seat = state.model?.seats?.firstWhere(
+    final seat = state.model?.seat?.firstWhere(
       (s) => s.seatNumber == seatNumber,
       orElse: () => Seat(),
     );
-    return seat?.status == 'BOOKED';
+    return seat?.status == SeatStatusEnum.unavailable.status;
   }
 
   bool isSeatAvailable(String seatNumber) {
-    final seat = state.model?.seats?.firstWhere(
+    final seat = state.model?.seat?.firstWhere(
       (s) => s.seatNumber == seatNumber,
       orElse: () => Seat(),
     );
-    return seat?.status == 'AVAILABLE';
+    return seat?.status == SeatStatusEnum.available.status;
   }
 
   void toggleSeat(String seatNumber) {
@@ -94,7 +95,7 @@ class SelectSeatController extends BaseController<SelectSeatState> {
     final currentSeatIds = List<int>.from(state.selectedSeatIds);
 
     // Find the seat object to get its ID
-    final seat = state.model?.seats?.firstWhere(
+    final seat = state.model?.seat?.firstWhere(
       (s) => s.seatNumber == seatNumber,
       orElse: () => Seat(),
     );
@@ -119,7 +120,7 @@ class SelectSeatController extends BaseController<SelectSeatState> {
         selectedSeatIds: currentSeatIds,
       ),
     );
-    
+
     log('Selected seats: $currentSeats, IDs: $currentSeatIds');
   }
 
