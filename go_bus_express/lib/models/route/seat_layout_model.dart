@@ -4,12 +4,12 @@ part 'seat_layout_model.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class SeatLayoutModel {
-  final BusLayoutModel? layout;
-  final List<Seat>? seats;
+  final BusLayoutModel? busLayout;
+  final List<Seat>? seat;
 
   const SeatLayoutModel({
-    this.layout,
-    this.seats,
+    this.busLayout,
+    this.seat,
   });
 
   factory SeatLayoutModel.fromJson(Map<String, dynamic> json) =>

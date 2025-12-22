@@ -11,6 +11,10 @@ class BookingModel {
   final String? promoId;
   final String? paymentStatus;
   final DateTime? createdAt;
+  
+  // For handling the wrapper response
+  final String? message;
+  final BookingModel? booking;
 
   BookingModel({
     this.id,
@@ -21,6 +25,8 @@ class BookingModel {
     this.promoId,
     this.paymentStatus,
     this.createdAt,
+    this.message,
+    this.booking,
   });
 
   factory BookingModel.fromJson(Map<String, dynamic> json) =>

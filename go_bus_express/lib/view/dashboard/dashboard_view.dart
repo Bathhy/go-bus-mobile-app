@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:go_bus_express/view/dashboard/home/home_view.dart';
 import 'package:go_bus_express/view/dashboard/profile/profile_view.dart';
 import 'package:go_bus_express/view/dashboard/my_ticket/my_ticket_view.dart';
+import 'package:shared_package/config/themes.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -33,7 +34,8 @@ class _MainNavigationState extends State<MainNavigation> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.blue[700],
+          // color: Colors.blue[700],
+          color: goBusPrimary,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.1),
@@ -46,7 +48,7 @@ class _MainNavigationState extends State<MainNavigation> {
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
           type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.blue[700],
+          backgroundColor: goBusPrimary,
           selectedItemColor: Colors.white,
           unselectedItemColor: Colors.white70,
           selectedFontSize: 12,

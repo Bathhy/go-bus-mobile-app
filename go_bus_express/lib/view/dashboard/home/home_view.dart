@@ -30,17 +30,12 @@ class HomePage extends StatelessWidget {
                   return UserProfileCard(
                     name: homeController.state.profileModel!.fullName ?? "NA",
                     email: homeController.state.profileModel!.email ?? "NA",
-                    onTap: () {
-                      // Handle profile tap
-                    },
                   );
                 }
                 return const SizedBox.shrink();
               }),
               const SizedBox(height: 16),
               const BookingCard(),
-              const SizedBox(height: 16),
-              const FastBookingSection(),
               const SizedBox(height: 16),
               const PromotionsSection(),
               const SizedBox(height: 16),

@@ -107,7 +107,9 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
       case Success<BookingModel?>():
         log('✅ Booking created successfully');
         final bookingId = result.data?.id;
+        log('✅ Booking ID ${bookingId}');
         if (bookingId != null) {
+          log('✅ Booking created successfully ${bookingId}');
           _generateQr(state.totalPrice, bookingId);
         }
         break;
@@ -119,7 +121,7 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
   }
 
   void _generateQr(double amount, int bookingId) async {
-    final body = PaymentBody(amount: amount, currency: "USD");
+    final body = PaymentBody(amount: 0.01, currency: "USD");
     final result = await _bookingRepository.generateQr(body: body);
 
     switch (result) {
@@ -131,7 +133,8 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
             AppRoutes.makePayment,
             arguments: {
               'qrData': result.data.qr ?? '',
-              'amount': amount,
+              // 'amount': amount,
+              'amount': 0.01,
               'currency': 'USD',
               'bookingId': bookingId,
             },

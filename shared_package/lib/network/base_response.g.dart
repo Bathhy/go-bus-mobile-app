@@ -1,5 +1,3 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
-
 part of 'base_response.dart';
 
 // **************************************************************************
@@ -9,12 +7,18 @@ part of 'base_response.dart';
 BaseResponse<T> _$BaseResponseFromJson<T>(
   Map<String, dynamic> json,
   T Function(Object? json) fromJsonT,
-) => BaseResponse<T>(data: _$nullableGenericFromJson(json['data'], fromJsonT));
+) => BaseResponse<T>(
+  message: json['message'] as String?,
+  data: _$nullableGenericFromJson(json['data'], fromJsonT),
+);
 
 Map<String, dynamic> _$BaseResponseToJson<T>(
   BaseResponse<T> instance,
   Object? Function(T value) toJsonT,
-) => <String, dynamic>{'data': _$nullableGenericToJson(instance.data, toJsonT)};
+) => <String, dynamic>{
+  'message': instance.message,
+  'data': _$nullableGenericToJson(instance.data, toJsonT),
+};
 
 T? _$nullableGenericFromJson<T>(
   Object? input,
