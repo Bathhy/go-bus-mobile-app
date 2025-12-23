@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_bus_express/core/services/local_notification_service.dart';
 import 'package:go_bus_express/core/storage/local_repository.dart';
 import 'package:go_bus_express/models/body/verify_payment_body.dart';
 import 'package:go_bus_express/models/payment/verify_payment_model.dart';
@@ -92,8 +93,14 @@ class KhQrController extends BaseController<KhQrState> {
             _stopVerificationPolling();
             _stopCountdownTimer();
             _removeMd5();
-            // Navigate to success screen
-            _handlePaymentSuccess();
+
+            // Show success notification
+            _showPaymentSuccessNotification();
+
+            // Delay 5s before navigate to main
+            Future.delayed(Duration(seconds: 5), () {
+              _handlePaymentSuccess();
+            });
           } else {
             log('⏳ Payment status: ${payment?.payment?.status}');
           }
@@ -111,6 +118,14 @@ class KhQrController extends BaseController<KhQrState> {
 
   void _handlePaymentSuccess() {
     Get.offAllNamed(AppRoutes.mainNavigation);
+  }
+
+  void _showPaymentSuccessNotification() {
+    LocalNotificationService().showPaymentSuccessNotification(
+      bookingId: state.bookingId,
+      amount: state.amount,
+      currency: state.currency,
+    );
   }
 
   // MARK: Local Storage
@@ -135,7 +150,12 @@ class KhQrController extends BaseController<KhQrState> {
         if (!state.isPaid) {
           updateState((state) => state.copyWith(isExpired: true));
           _stopVerificationPolling();
-          _cancelBooking(); // ← Cancel booking when timer expires
+
+          // Show expiration notification
+          /*LocalNotificationService().showPaymentExpiredNotification(
+            bookingId: state.bookingId,
+          );*/
+
           log('⏰ Payment session expired');
         }
       }
@@ -169,7 +189,7 @@ class KhQrController extends BaseController<KhQrState> {
   }
 
   // MARK: API Cancel Booking
-  void _cancelBooking() async {
+  void cancelBooking() async {
     if (state.bookingId == 0) {
       log('⚠️ No booking ID to cancel');
       return;
@@ -181,6 +201,7 @@ class KhQrController extends BaseController<KhQrState> {
       case Success<void>():
         {
           log('✅ Booking ${state.bookingId} canceled successfully');
+          Get.offAllNamed(AppRoutes.mainNavigation);
         }
       case Error<void>():
         {

@@ -19,7 +19,6 @@ class ChoosePaymentView extends StatefulWidget {
 }
 
 class _ChoosePaymentViewState extends State<ChoosePaymentView> {
-  final TextEditingController noteController = TextEditingController();
   final ChoosePaymentController controller = getIt<ChoosePaymentController>();
 
   @override
@@ -74,37 +73,6 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
                   isBold: true,
                 ),
                 SizedBox(height: XPadding.extralarge),
-
-                // Note field
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: XPadding.large,
-                    vertical: XPadding.medium,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.edit, color: Colors.grey.shade600, size: 20),
-                      SizedBox(width: XPadding.medium),
-                      Expanded(
-                        child: TextField(
-                          controller: noteController,
-                          onChanged: (value) => controller.updateNote(value),
-                          decoration: InputDecoration(
-                            hintText: 'Note'.tr,
-                            border: InputBorder.none,
-                            hintStyle: TextStyle(color: Colors.grey.shade500),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: XPadding.extralarge),
-
                 // Choose Payment Method
                 XTextLarge(
                   label: 'Choose Payment Method'.tr,

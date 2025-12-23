@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "762414355642",
+    "project_id": "tosbookeventdashboard",
+    "storage_bucket": "tosbookeventdashboard.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:762414355642:android:f5772bd34e292fca0c1e83",
+        "android_client_info": {
+          "package_name": "com.example.go_bus_express"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuzokMrn6p-_yKsK61HRtT-54RSodrtdw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
