@@ -19,7 +19,7 @@ class KhQrState extends BaseUiState {
     this.amount = 0.0,
     this.currency = 'USD',
     this.receiverName = 'Go-Bus Express',
-    this.remainingSeconds = 180, // 3 minutes
+    this.remainingSeconds = 60, // 3 minutes
     this.isExpired = false,
     this.isPaid = false,
     this.paymentStatus,
