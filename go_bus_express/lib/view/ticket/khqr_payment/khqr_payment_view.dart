@@ -23,6 +23,7 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
       context: context,
       barrierDismissible: true,
       builder: (context) => Dialog(
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -46,8 +47,8 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
               const SizedBox(height: 24),
 
               // Title
-              const Text(
-                'Cancel Payment?',
+               Text(
+                'Cancel Payment?'.tr,
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -59,7 +60,7 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
 
               // Message
               Text(
-                'Are you sure you want to leave?\nYour booking will be cancelled.',
+                'Are you sure you want to leave?\nYour booking will be cancelled.'.tr,
                 style: TextStyle(
                   fontSize: 15,
                   color: Colors.grey.shade600,
@@ -74,12 +75,13 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
                   Expanded(
                     child: SizedBox(
                       height: 50,
-                      child: ElevatedButton(
+                      child: OutlinedButton(
                         onPressed: () {
                           Get.back();
                         },
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.grey.shade700,
+                          backgroundColor: Colors.white,
                           side: BorderSide(
                             color: Colors.grey.shade300,
                             width: 1.5,
@@ -90,7 +92,7 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
                         ),
                         child: Text(
                           'Cancel'.tr,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -104,7 +106,7 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
                   Expanded(
                     child: SizedBox(
                       height: 50,
-                      child: OutlinedButton(
+                      child: ElevatedButton(
                         onPressed: () {
                           controller.cancelBooking();
                         },
@@ -116,10 +118,9 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
                           ),
                           elevation: 0,
                         ),
-
                         child: Text(
-                          'Ok'.tr,
-                          style: TextStyle(
+                          'OK'.tr,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -141,6 +142,7 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
       context: context,
       barrierDismissible: true,
       builder: (context) => Dialog(
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -164,8 +166,8 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
               const SizedBox(height: 24),
 
               // Title
-              const Text(
-                'Payment Timeout',
+              Text(
+                'Payment Timeout'.tr,
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -177,7 +179,8 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
 
               // Message
               Text(
-                'Your payment session has expired.\nWe will cancel your booking.',
+                'Your payment session has expired.\nWe will cancel your booking.'
+                    .tr,
                 style: TextStyle(
                   fontSize: 15,
                   color: Colors.grey.shade600,
@@ -203,8 +206,8 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
                     ),
                     elevation: 0,
                   ),
-                  child: const Text(
-                    'Confirm',
+                  child: Text(
+                    'Confirm'.tr,
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -218,135 +221,138 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: shimerBgColor,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight),
-        child: Obx(() {
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        backgroundColor: shimerBgColor,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: Obx(() {
+            final state = controller.state;
+
+            // Show timeout dialog when expired
+            if (state.isExpired) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                _showTimeoutDialog();
+              });
+            }
+
+            return Column(
+              children: [
+                XAppBar(
+                  title: 'Payment'.tr,
+                  onBackPressed: () => _showCancelPaymentDialog(),
+                  actions: [
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        vertical: XPadding.medium,
+                        horizontal: XPadding.small,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(XPadding.medium),
+                        ),
+                        color: controller.isLowTime()
+                            ? Colors.red.shade100
+                            : Colors.orange.shade100,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.timer_outlined,
+                            color: controller.isLowTime()
+                                ? Colors.red
+                                : Colors.orange,
+                            size: 20,
+                          ),
+                          SizedBox(width: XPadding.small),
+                          Text(
+                            controller.formatTime(),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: controller.isLowTime()
+                                  ? Colors.red.shade900
+                                  : Colors.orange.shade900,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: XPadding.extralarge),
+                  ],
+                ),
+              ],
+            );
+          }),
+        ),
+        body: Obx(() {
           final state = controller.state;
 
-          // Show timeout dialog when expired
-          if (state.isExpired) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              _showTimeoutDialog();
-            });
-          }
+          return SafeArea(
+            child: Column(
+              spacing: XPadding.extralarge,
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: 80,
+                  color: white,
+                  child: Image.asset(AppImages.imgBus),
+                ),
+                SizedBox(height: XPadding.medium),
 
-          return Column(
-            children: [
-              XAppBar(
-                title: 'Make Payment',
-                onBackPressed: () => _showCancelPaymentDialog(),
-                actions: [
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      vertical: XPadding.medium,
-                      horizontal: XPadding.small,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(XPadding.medium),
-                      ),
-                      color: controller.isLowTime()
-                          ? Colors.red.shade100
-                          : Colors.orange.shade100,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.timer_outlined,
-                          color: controller.isLowTime()
-                              ? Colors.red
-                              : Colors.orange,
-                          size: 20,
-                        ),
-                        SizedBox(width: XPadding.small),
-                        Text(
-                          controller.formatTime(),
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: controller.isLowTime()
-                                ? Colors.red.shade900
-                                : Colors.orange.shade900,
-                          ),
-                        ),
-                      ],
-                    ),
+                // Show loading or QR code
+                if (state.qrData.isEmpty)
+                  const CircularProgressIndicator()
+                else
+                  KhqrCardWidget(
+                    qr: state.qrData,
+                    width: 300.0,
+                    receiverName: state.receiverName,
+                    amount: state.amount,
+                    keepIntegerDecimal: false,
+                    currency: state.currency == 'USD'
+                        ? KhqrCurrency.usd
+                        : KhqrCurrency.khr,
                   ),
-                  SizedBox(width: XPadding.extralarge),
-                ],
-              ),
-            ],
+
+                // Instructions
+                Text(
+                  'Scan to pay with any banking'.tr,
+                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                ),
+
+                // SubTotal
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'SubTotal: '.tr,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      TextSpan(
+                        text: '\$${state.amount.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF4CAF50),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+              ],
+            ),
           );
         }),
       ),
-      body: Obx(() {
-        final state = controller.state;
-
-        return SafeArea(
-          child: Column(
-            spacing: XPadding.extralarge,
-            children: [
-              Container(
-                width: double.infinity,
-                height: 80,
-                color: white,
-                child: Image.asset(AppImages.imgBus),
-              ),
-              SizedBox(height: XPadding.medium),
-
-              // Show loading or QR code
-              if (state.qrData.isEmpty)
-                CircularProgressIndicator()
-              else
-                KhqrCardWidget(
-                  qr: state.qrData,
-                  width: 300.0,
-                  receiverName: state.receiverName,
-                  amount: state.amount,
-                  keepIntegerDecimal: false,
-                  currency: state.currency == 'USD'
-                      ? KhqrCurrency.usd
-                      : KhqrCurrency.khr,
-                ),
-
-              // Instructions
-              const Text(
-                'Scan to pay with any banking',
-                style: TextStyle(fontSize: 16, color: Colors.black54),
-              ),
-
-              // SubTotal
-              RichText(
-                text: TextSpan(
-                  children: [
-                    const TextSpan(
-                      text: 'SubTotal: ',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    TextSpan(
-                      text: '\$${state.amount.toStringAsFixed(2)}',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF4CAF50),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 30),
-            ],
-          ),
-        );
-      }),
     );
   }
 }

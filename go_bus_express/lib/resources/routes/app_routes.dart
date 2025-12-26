@@ -8,6 +8,7 @@ import 'package:go_bus_express/view/splash/splash_view.dart';
 import 'package:go_bus_express/view/edit_profile/edit_profile_view.dart';
 import 'package:go_bus_express/view/ticket/choose_payment/choose_payment_view.dart';
 import 'package:go_bus_express/view/ticket/khqr_payment/khqr_payment_view.dart';
+import 'package:go_bus_express/view/ticket/payment_success/payment_success_view.dart';
 import 'package:go_bus_express/view/ticket/select_route/select_route_view.dart';
 import 'package:go_bus_express/view/ticket/select_seat/select_seat_view.dart';
 
@@ -16,6 +17,7 @@ class AppRoutes {
   static const String selectRoute = "/selectRoute";
   static const String choosePayment = "/choosePayment";
   static const String makePayment = "/makePayment";
+  static const String paymentSuccess = "/paymentSuccess";
   static const String mainNavigation = "/mainNavigation";
   static const String signIn = "/signIn";
   static const String signUp = "/signUp";
@@ -34,6 +36,11 @@ class AppRoutes {
     GetPage(name: selectRoute, page: () => const SelectRouteView()),
     GetPage(name: selectSeat, page: () => const SelectSeatView()),
     GetPage(name: makePayment, page: () => const KHQRPaymentView()),
+    GetPage(
+      transition: Transition.rightToLeftWithFade,
+      name: paymentSuccess,
+      page: () => const PaymentSuccessView(),
+    ),
     GetPage(name: mainNavigation, page: () => const MainNavigation()),
     GetPage(name: signIn, page: () => const SignInView()),
     GetPage(name: signUp, page: () => const SignUpView()),

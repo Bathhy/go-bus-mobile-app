@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:shared_package/config/themes.dart';
 
 class NeedHelpSection extends StatelessWidget {
@@ -11,8 +12,8 @@ class NeedHelpSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Need Help?',
+           Text(
+            'Need Help?'.tr,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,

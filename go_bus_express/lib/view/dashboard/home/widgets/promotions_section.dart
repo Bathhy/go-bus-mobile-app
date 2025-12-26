@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 
 class PromotionsSection extends StatelessWidget {
   const PromotionsSection({super.key});
@@ -10,8 +11,8 @@ class PromotionsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'New & Promotions',
+           Text(
+            'New & Promotions'.tr,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
