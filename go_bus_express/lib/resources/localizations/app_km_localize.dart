@@ -28,5 +28,26 @@ final Map<String, String> km = {
   'Booked': 'បានកក់រួចហើយ',
   'Available': 'ទំនេរ',
   'Yes': 'បាទ/ចាស',
-  'No buses available' : 'មិនមានឡានក្រុងទេ',
+  'No buses available': 'មិនមានឡានក្រុងទេ',
+  'Payment was successful': 'ការទូទាត់បានជោគជ័យ',
+  'Thanks for riding with us. Have a great trip!':
+      'អរគុណដែលបានជ្រើសរើសធ្វើដំណើរជាមួយយើង។ សូមឲ្យដំណើររបស់អ្នកប្រកបដោយភាពរីករាយ!',
+  "Go To HomePage": "ត្រឡប់ទៅទំព័រដើម",
+  "Search": "ស្វែងរក",
+  "Choose Direction": "ជ្រើសរើសទិសដៅ",
+  "New & Promotions": "ព័ត៌មានថ្មី និងការផ្តល់ជូនពិសេស",
+  "Need Help?": "ត្រូវការជំនួយ?",
+  "Select Date": "ជ្រើសរើសថ្ងៃ",
+  "Return Date": "ថ្ងៃមកវិញ",
+  "Please select route, departure and return dates":
+      "សូមជ្រើសរើសផ្លូវធ្វើដំណើរ កាលបរិច្ឆេទចេញដំណើរ និងកាលបរិច្ឆេទត្រឡប់",
+  "Cancel Payment?": "បោះបង់ការទូទាត់",
+  "Payment Timeout": "ការទូទាត់បានផុតកំណត់",
+  "Your payment session has expired.\nWe will cancel your booking.": "រយៈពេលទូទាត់របស់អ្នកបានផុតកំណត់។\nយើងនឹងលុបការកក់របស់អ្នក។",
+  "Payment": "ការទូទាត់",
+  "SubTotal: ": "សរុប: ",
+  "Are you sure you want to leave?\nYour booking will be cancelled.": "តើអ្នកប្រាកដថាចង់ចាកចេញ?\nការកក់របស់អ្នកនឹងត្រូវបានលុប។"
+
+
+
 };

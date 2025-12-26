@@ -28,5 +28,25 @@ final Map<String, String> en = {
   'Booked': 'Booked',
   'Available': 'Available',
   'Yes': 'Yes',
-  'No buses available' : 'No buses available',
+  'No buses available': 'No buses available',
+  'Payment was successful': 'Payment was successful',
+  'Thanks for riding with us. Have a great trip!':
+      'Thanks for riding with us. Have a great trip',
+  "Go To HomePage": "Go To HomePage",
+  "Search": "Search",
+  "Choose Direction": "Choose Direction",
+  "New & Promotions": "New & Promotions",
+  "Need Help?": "Need Help?",
+  "Select Date": "Select Date",
+  "Return Date": "Return Date",
+  "Please select route, departure and return dates":
+      "Please select route, departure and return dates",
+  "Cancel Payment?": "Cancel Payment?",
+  "Payment Timeout": "Payment Timeout",
+  "Your payment session has expired.\nWe will cancel your booking.":
+      "Your payment session has expired.\nWe will cancel your booking.",
+  "Payment": "Payment",
+  "SubTotal: ": "SubTotal: ",
+  "Are you sure you want to leave?\nYour booking will be cancelled.":
+      "Are you sure you want to leave?\nYour booking will be cancelled.",
 };

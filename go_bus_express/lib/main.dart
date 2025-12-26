@@ -154,7 +154,6 @@ class _MyAppState extends State<MyApp> {
     return GetMaterialApp(
       navigatorKey: MyApp.navigatorKey,
       initialRoute: AppRoutes.animation,
-      // initialRoute: AppRoutes.ticket,
       translations: AppLocalization(),
       locale: AppLocalization.getInitialLocale(),
       fallbackLocale: const Locale('en'),

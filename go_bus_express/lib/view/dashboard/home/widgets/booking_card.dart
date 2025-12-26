@@ -32,7 +32,7 @@ class BookingCard extends StatelessWidget {
               final hasRoute = homeController.state.selectedRouteId != null;
               final routeText = hasRoute
                   ? '${homeController.state.selectedRouteOrigin} → ${homeController.state.selectedRouteDestination}'
-                  : 'Choose Direction';
+                  : 'Choose Direction'.tr;
               return GestureDetector(
                 onTap: () => RouteSelectionDialog.show(homeController),
                 child: _buildDirectionRow(routeText, Icons.flag_outlined),
@@ -56,11 +56,11 @@ class BookingCard extends StatelessWidget {
                   child: Obx(() => GestureDetector(
                         onTap: () => _selectDepartureDate(context, homeController),
                         child: _buildDatePicker(
-                          'Departure Date',
+                          'Departure Date'.tr,
                           homeController.state.departureDate != null
                               ? DateFormat('yyyy-MM-dd')
                                   .format(homeController.state.departureDate!)
-                              : 'Select Date',
+                              : 'Select Date'.tr,
                         ),
                       )),
                 ),
@@ -69,11 +69,11 @@ class BookingCard extends StatelessWidget {
                   child: Obx(() => GestureDetector(
                         onTap: () => _selectReturnDate(context, homeController),
                         child: _buildDatePicker(
-                          'Return Date',
+                          'Return Date'.tr,
                           homeController.state.returnDate != null
                               ? DateFormat('yyyy-MM-dd')
                                   .format(homeController.state.returnDate!)
-                              : 'Select Date',
+                              : 'Select Date'.tr,
                         ),
                       )),
                 ),
@@ -90,8 +90,8 @@ class BookingCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(24),
                 ),
               ),
-              child: const Text(
-                'Search',
+              child:  Text(
+                'Search'.tr,
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
             ),
@@ -118,7 +118,7 @@ class BookingCard extends StatelessWidget {
               const SizedBox(width: 12),
               Text(
                 text,
-                style: const TextStyle(color: Colors.white, fontSize: 16),
+                style: const TextStyle(color: Colors.white, fontSize: 14),
               ),
             ],
           ),
@@ -229,7 +229,7 @@ class BookingCard extends StatelessWidget {
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Please select route, departure and return dates'),
+          content:  Text('Please select route, departure and return dates'.tr),
           backgroundColor: Colors.red[700],
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(

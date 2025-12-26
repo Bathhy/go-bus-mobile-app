@@ -41,7 +41,6 @@ class KhQrController extends BaseController<KhQrState> {
     final args = Get.arguments as Map<String, dynamic>?;
 
     if (args == null) {
-      log('❌ No arguments passed to KhQrController');
       return;
     }
 
@@ -57,9 +56,6 @@ class KhQrController extends BaseController<KhQrState> {
         bookingId: bookingId,
       ),
     );
-
-    log('✅ KHQR initialized: BookingId: $bookingId, Amount: \$$amount');
-    log('✅ KHQR initialized:  Qr Data: \$$qrData');
   }
 
   // MARK: API Call - Verify Payment
@@ -79,7 +75,6 @@ class KhQrController extends BaseController<KhQrState> {
     }
 
     _retryCount++;
-    log('🔍 Verifying payment (attempt $_retryCount/$_maxRetries)...');
 
     final body = VerifyPaymentBody(md5: state.md5, bookingId: state.bookingId);
 
@@ -97,7 +92,7 @@ class KhQrController extends BaseController<KhQrState> {
             // Show success notification
             _showPaymentSuccessNotification();
 
-            // Delay 5s before navigate to main
+            // Delay 5s before navigate to Success
             Future.delayed(Duration(seconds: 5), () {
               _handlePaymentSuccess();
             });
@@ -107,7 +102,6 @@ class KhQrController extends BaseController<KhQrState> {
         }
       case Error<VerifyPaymentModel>():
         {
-          log('❌ Verification error: ${result.error.displayMessage}');
           // Show error only on first few attempts to avoid spam
           if (_retryCount <= 3) {
             _showError(result.error.displayMessage);
@@ -117,7 +111,7 @@ class KhQrController extends BaseController<KhQrState> {
   }
 
   void _handlePaymentSuccess() {
-    Get.offAllNamed(AppRoutes.mainNavigation);
+    Get.offAllNamed(AppRoutes.paymentSuccess);
   }
 
   void _showPaymentSuccessNotification() {
@@ -133,7 +127,6 @@ class KhQrController extends BaseController<KhQrState> {
   void _loadMd5() async {
     final md5 = _localRepository.getMD5();
     updateState((state) => state.copyWith(md5: md5));
-    log('📝 Loaded MD5: $md5');
   }
 
   // MARK: Timers
@@ -150,13 +143,6 @@ class KhQrController extends BaseController<KhQrState> {
         if (!state.isPaid) {
           updateState((state) => state.copyWith(isExpired: true));
           _stopVerificationPolling();
-
-          // Show expiration notification
-          /*LocalNotificationService().showPaymentExpiredNotification(
-            bookingId: state.bookingId,
-          );*/
-
-          log('⏰ Payment session expired');
         }
       }
     });
