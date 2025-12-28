@@ -9,6 +9,7 @@ import 'package:go_bus_express/core/storage/local_repository.dart';
 import 'package:go_bus_express/models/body/verify_payment_body.dart';
 import 'package:go_bus_express/models/payment/verify_payment_model.dart';
 import 'package:go_bus_express/repository/booking_repository.dart';
+import 'package:go_bus_express/repository/hive_manager_repository.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:go_bus_express/utils/enums/enum.dart';
 import 'package:go_bus_express/view_models/controller/base/base_controller.dart';
@@ -19,6 +20,7 @@ import 'package:shared_package/network/x_result.dart';
 class KhQrController extends BaseController<KhQrState> {
   final BookingRepository _bookingRepo;
   final LocalRepository _localRepository;
+  final HiveManagerRepository _hiveManager;
   Timer? _countdownTimer;
   Timer? _verificationTimer;
 
@@ -26,7 +28,7 @@ class KhQrController extends BaseController<KhQrState> {
   static const int _maxRetries = 36; // 36 * 5 = 180 seconds (3 minutes)
   int _retryCount = 0;
 
-  KhQrController(this._bookingRepo, this._localRepository) : super(KhQrState());
+  KhQrController(this._bookingRepo, this._localRepository, this._hiveManager) : super(KhQrState());
 
   @override
   void onInit() {
@@ -88,6 +90,9 @@ class KhQrController extends BaseController<KhQrState> {
             _stopVerificationPolling();
             _stopCountdownTimer();
             _removeMd5();
+            
+            // Clear pending payment from Hive
+            await _hiveManager.clearPendingPayment();
 
             // Show success notification
             _showPaymentSuccessNotification();
@@ -187,6 +192,7 @@ class KhQrController extends BaseController<KhQrState> {
       case Success<void>():
         {
           log('✅ Booking ${state.bookingId} canceled successfully');
+          await _hiveManager.clearPendingPayment();
           Get.offAllNamed(AppRoutes.mainNavigation);
         }
       case Error<void>():

@@ -70,7 +70,7 @@ class _SignInViewState extends State<SignInView> {
                   ),
                 ),
               ),
-              SizedBox(height: XPadding.large),
+              SizedBox(height: XPadding.extralarge),
 
               // Password field
               Container(
@@ -102,7 +102,7 @@ class _SignInViewState extends State<SignInView> {
                   ),
                 ),
               ),
-              SizedBox(height: XPadding.extralarge),
+              SizedBox(height: 30),
               // Sign in button
               Obx(
                     () => SizedBox(
@@ -138,7 +138,7 @@ class _SignInViewState extends State<SignInView> {
                   ),
                 ),
               ),
-              SizedBox(height: XPadding.extralarge),
+             /* SizedBox(height: XPadding.extralarge),
               Row(
                 children: [
                   Expanded(child: Divider(color: Colors.grey.shade300)),
@@ -151,9 +151,9 @@ class _SignInViewState extends State<SignInView> {
                   ),
                   Expanded(child: Divider(color: Colors.grey.shade300)),
                 ],
-              ),
-              SizedBox(height: XPadding.extralarge),
-              // Social login buttons
+              ),*/
+              SizedBox(height: 50),
+            /*  // Social login buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -165,7 +165,7 @@ class _SignInViewState extends State<SignInView> {
                 ],
               ),
               SizedBox(height: XPadding.extralarge),
-
+*/
               // Sign up link
               Center(
                 child: Row(
@@ -199,7 +199,7 @@ class _SignInViewState extends State<SignInView> {
     authController.login(emailController.text.trim(), passwordController.text);
   }
 
-  Widget _buildSocialButton({
+ /* Widget _buildSocialButton({
     required IconData icon,
     required Color color,
     required VoidCallback onTap,
@@ -217,5 +217,5 @@ class _SignInViewState extends State<SignInView> {
         child: Icon(icon, color: color, size: 32),
       ),
     );
-  }
+  }*/
 }

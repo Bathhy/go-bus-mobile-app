@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:go_bus_express/core/storage/local_repository.dart';
 import 'package:go_bus_express/models/profile/profile_model.dart';
-import 'package:go_bus_express/models/route/detail_route_model.dart';
+import 'package:go_bus_express/repository/booking_repository.dart';
+import 'package:go_bus_express/repository/hive_manager_repository.dart';
 import 'package:go_bus_express/repository/profile_repository.dart';
 import 'package:go_bus_express/repository/route_repository.dart';
 import 'package:go_bus_express/view_models/controller/base/base_controller.dart';
@@ -12,15 +12,23 @@ import 'package:go_bus_express/view_models/controller/home/home_state.dart';
 import 'package:shared_package/network/x_result.dart';
 
 import '../../../models/home/all_route_model.dart';
+import '../../../models/payment/pending_payment_model.dart';
 import '../../../resources/routes/app_routes.dart';
 
 class HomeController extends BaseController<HomeState> {
   final ProfileRepository _repository;
   final LocalRepository _localRepository;
   final RouteRepository _routeRepository;
+  final HiveManagerRepository _hiveRepository;
+  final BookingRepository _bookingRepository;
 
-  HomeController(this._repository, this._localRepository, this._routeRepository)
-    : super(HomeState());
+  HomeController(
+    this._repository,
+    this._localRepository,
+    this._routeRepository,
+    this._hiveRepository,
+    this._bookingRepository,
+  ) : super(HomeState());
 
   @override
   void onInit() {
@@ -48,7 +56,9 @@ class HomeController extends BaseController<HomeState> {
         }
       case Error<ProfileModel?>():
         // Error
-        logout();
+        if (result.error.statusCode == 403) {
+          logout();
+        }
         updateState((state) => state.copyWith(isLoading: false));
         log('Profile error: ${result.error}');
     }
@@ -149,5 +159,39 @@ class HomeController extends BaseController<HomeState> {
   void logout() {
     _localRepository.logout();
     Get.offAllNamed(AppRoutes.signIn);
+  }
+
+  bool hasPendingPayment() {
+    return _hiveRepository.hasPendingPayment();
+  }
+
+  PendingPaymentModel? getPendingPayment() {
+    return _hiveRepository.getPendingPayment();
+  }
+
+  void resumePendingPayment(PendingPaymentModel pending) {
+    Get.toNamed(
+      AppRoutes.makePayment,
+      arguments: {
+        'qrData': pending.qrData,
+        'amount': pending.amount,
+        'currency': pending.currency,
+        'bookingId': pending.bookingId,
+      },
+    );
+  }
+
+  void cancelPendingPayment(int bookingId) async {
+    final result = await _bookingRepository.cancelBooking(bookingId: bookingId);
+
+    switch (result) {
+      case Success<void>():
+        await _hiveRepository.clearPendingPayment();
+        log('✅ Pending payment canceled');
+        break;
+      case Error<void>():
+        log('❌ Failed to cancel pending payment');
+        break;
+    }
   }
 }
