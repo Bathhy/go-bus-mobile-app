@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/storage/local_repository.dart';
@@ -7,21 +6,26 @@ import 'package:go_bus_express/models/body/booking_body.dart';
 import 'package:go_bus_express/models/body/payment_body.dart';
 import 'package:go_bus_express/models/booking/booking_model.dart';
 import 'package:go_bus_express/models/payment/generate_qr_model.dart';
+import 'package:go_bus_express/models/payment/pending_payment_model.dart';
 import 'package:go_bus_express/repository/booking_repository.dart';
+import 'package:go_bus_express/repository/hive_manager_repository.dart';
 import 'package:go_bus_express/view_models/controller/base/base_controller.dart';
 import 'package:go_bus_express/view_models/controller/payment/choose_payment_state.dart';
-import 'package:intl/intl.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/network/x_result.dart';
 
 import '../../../resources/routes/app_routes.dart';
 
 class ChoosePaymentController extends BaseController<ChoosePaymentState> {
-  ChoosePaymentController(this._bookingRepository, this._localRepository)
-    : super(ChoosePaymentState());
+  ChoosePaymentController(
+    this._bookingRepository,
+    this._localRepository,
+    this._hiveManager,
+  ) : super(ChoosePaymentState());
 
   final BookingRepository _bookingRepository;
   final LocalRepository _localRepository;
+  final HiveManagerRepository _hiveManager;
 
   @override
   void onInit() {
@@ -81,10 +85,6 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
     updateState((state) => state.copyWith(agreedToTerms: !state.agreedToTerms));
   }
 
-  void updateNote(String note) {
-    updateState((state) => state.copyWith(note: note));
-  }
-
   bool canProceedToPayment() {
     return state.agreedToTerms &&
         state.selectedPaymentMethod != null &&
@@ -107,9 +107,9 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
       case Success<BookingModel?>():
         log('✅ Booking created successfully');
         final bookingId = result.data?.id;
-        log('✅ Booking ID ${bookingId}');
+        log('✅ Booking ID $bookingId');
         if (bookingId != null) {
-          log('✅ Booking created successfully ${bookingId}');
+          log('✅ Booking created successfully $bookingId');
           _generateQr(state.totalPrice, bookingId);
         }
         break;
@@ -128,6 +128,20 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
       case Success<GenerateQrModel>():
         {
           _localRepository.saveMD5(result.data.md5 ?? '');
+
+          // Save pending payment to Hive
+          final pendingPayment = PendingPaymentModel(
+            bookingId: bookingId,
+            amount: 0.01,
+            currency: 'USD',
+            qrData: result.data.qr ?? '',
+            md5: result.data.md5 ?? '',
+            createdAt: DateTime.now(),
+            direction: state.direction,
+            selectedSeats: state.selectedSeats,
+          );
+          await _hiveManager.savePendingPayment(pendingPayment);
+
           log('✅ QR generated successfully');
           Get.toNamed(
             AppRoutes.makePayment,

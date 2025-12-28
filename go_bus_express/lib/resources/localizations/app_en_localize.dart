@@ -49,4 +49,14 @@ final Map<String, String> en = {
   "SubTotal: ": "SubTotal: ",
   "Are you sure you want to leave?\nYour booking will be cancelled.":
       "Are you sure you want to leave?\nYour booking will be cancelled.",
+  "Pay Now": "Pay Now",
+  "Would you like to continue or cancel this payment?":
+      "Would you like to continue or cancel this payment?",
+  "You have an incomplete payment:": "You have an incomplete payment:",
+  "Pending Payment": "Pending Payment",
+  "Booking ID": "Booking ID:",
+  "Amount": "Amount:",
+  "No Internet Connection": "No Internet Connection",
+  "Please check your internet connection and try again":
+      "Please check your internet connection and try again",
 };

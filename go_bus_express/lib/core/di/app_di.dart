@@ -9,6 +9,7 @@ import 'package:go_bus_express/data/booking/booking_api.dart';
 import 'package:go_bus_express/data/payment/payment_api.dart';
 import 'package:go_bus_express/repository/auth_repository.dart';
 import 'package:go_bus_express/repository/booking_repository.dart';
+import 'package:go_bus_express/repository/hive_manager_repository.dart';
 import 'package:go_bus_express/repository/profile_repository.dart';
 import 'package:go_bus_express/repository/route_repository.dart';
 import 'package:go_bus_express/view_models/controller/auth/AuthController.dart';
@@ -27,6 +28,11 @@ final getIt = GetIt.instance;
 
 Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<LocalRepository>(() => LocalRepository());
+  
+  // Initialize and register HiveManagerRepository
+  final hiveManager = HiveManagerRepository();
+  await hiveManager.init();
+  getIt.registerLazySingleton<HiveManagerRepository>(() => hiveManager);
 
   // Network - Main API Service
   final dioService = DioService(getIt<LocalRepository>());
@@ -73,6 +79,8 @@ Future<void> setupDependencyInjection() async {
       getIt<ProfileRepository>(),
       getIt<LocalRepository>(),
       getIt<RouteRepository>(),
+      getIt<HiveManagerRepository>(),
+      getIt<BookingRepository>(),
     );
     Get.put(controller);
     return controller;
@@ -94,12 +102,12 @@ Future<void> setupDependencyInjection() async {
     return controller;
   });
   getIt.registerFactory<ChoosePaymentController>(() {
-    final controller = ChoosePaymentController(getIt(), getIt());
+    final controller = ChoosePaymentController(getIt(), getIt(), getIt());
     Get.put(controller);
     return controller;
   });
   getIt.registerFactory<KhQrController>(() {
-    final controller = KhQrController(getIt(), getIt());
+    final controller = KhQrController(getIt(), getIt(), getIt());
     Get.put(controller);
     return controller;
   });
