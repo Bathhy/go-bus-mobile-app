@@ -9,4 +9,8 @@ class AppImages {
   static const String imgLanguage = 'assets/images/ic_language.svg';
   static const String imgKhLang = 'assets/images/ic_cambodia.svg';
   static const String imgEngLang = 'assets/images/ic_round_english.svg';
+  static const String imgPoster1 = 'assets/images/gobus_poster2.jpg';
+  static const String imgPoster2 = 'assets/images/gobus_poster3.jpg';
+  static const String imgPoster3 = 'assets/images/gobus_poster5.jpg';
+  static const String imgPoster4 = 'assets/images/unnamed.jpg';
 }

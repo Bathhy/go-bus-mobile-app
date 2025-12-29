@@ -17,8 +17,7 @@ class AuthController extends BaseController<AuthState> {
   final AuthRepository _repository;
   final LocalRepository _localRepository;
 
-  AuthController(this._repository, this._localRepository)
-      : super(AuthState());
+  AuthController(this._repository, this._localRepository) : super(AuthState());
 
   /* -------------------- SNACKBARS -------------------- */
   void _showError(String message) {
@@ -33,10 +32,7 @@ class AuthController extends BaseController<AuthState> {
           'Error',
           style: TextStyle(color: white, fontWeight: FontWeight.bold),
         ),
-        messageText: Text(
-          message,
-          style: TextStyle(color: white),
-        ),
+        messageText: Text(message, style: TextStyle(color: white)),
       ),
     );
   }
@@ -53,10 +49,7 @@ class AuthController extends BaseController<AuthState> {
           'Success',
           style: TextStyle(color: white, fontWeight: FontWeight.bold),
         ),
-        messageText: Text(
-          message,
-          style: TextStyle(color: white),
-        ),
+        messageText: Text(message, style: TextStyle(color: white)),
       ),
     );
   }
@@ -88,7 +81,7 @@ class AuthController extends BaseController<AuthState> {
 
         case Error<AuthModel?>():
           log("Login error >>> ${result.error}");
-          _showError(result.error.toString());
+          _showError(result.error.displayMessage);
           break;
       }
     } finally {
@@ -97,11 +90,7 @@ class AuthController extends BaseController<AuthState> {
   }
 
   /* -------------------- SIGN UP -------------------- */
-  Future<void> signup(
-    String email,
-    String password,
-    String username,
-  ) async {
+  Future<void> signup(String email, String password, String username) async {
     // if (email.isEmpty || password.isEmpty || username.isEmpty) {
     //   _showError('Please fill in all fields');
     //   return;
@@ -130,7 +119,6 @@ class AuthController extends BaseController<AuthState> {
 
       switch (result) {
         case Success<AuthModel?>():
-
           Get.back();
           log("Signup success >>> ${result.data?.token}");
           _showSuccess('Account created successfully');

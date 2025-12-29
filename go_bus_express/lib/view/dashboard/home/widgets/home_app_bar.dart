@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 class HomeAppBar extends StatelessWidget {
-  const HomeAppBar({super.key});
+  final VoidCallback? onTap;
+  final VoidCallback? onTapTelegram;
+
+  const HomeAppBar({super.key, this.onTap, this.onTapTelegram});
 
   @override
   Widget build(BuildContext context) {
@@ -36,23 +39,47 @@ class HomeAppBar extends StatelessWidget {
           ),
           Row(
             children: [
-              _buildSocialIcon(Icons.messenger, Colors.purple),
+              XSocialButton(
+                icon: Icons.telegram,
+                color: Colors.blue,
+                onTap: onTapTelegram,
+              ),
               const SizedBox(width: 12),
-              _buildSocialIcon(Icons.telegram, Colors.blue),
-              const SizedBox(width: 12),
-              _buildSocialIcon(Icons.phone, Colors.green),
+              XSocialButton(
+                icon: Icons.phone,
+                color: Colors.green,
+                onTap: onTap,
+              ),
             ],
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildSocialIcon(IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-      child: Icon(icon, color: Colors.white, size: 20),
+class XSocialButton extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final VoidCallback? onTap;
+
+  const XSocialButton({
+    super.key,
+    required this.icon,
+    required this.color,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      customBorder: const CircleBorder(),
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        child: Icon(icon, color: Colors.white, size: 20),
+      ),
     );
   }
 }

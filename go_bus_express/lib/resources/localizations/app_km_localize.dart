@@ -35,7 +35,7 @@ final Map<String, String> km = {
   "Go To HomePage": "ត្រឡប់ទៅទំព័រដើម",
   "Search": "ស្វែងរក",
   "Choose Direction": "ជ្រើសរើសទិសដៅ",
-  "New & Promotions": "ព័ត៌មានថ្មី និងការផ្តល់ជូនពិសេស",
+  "New & Promotions": "ដំណឹង & ប្រម៉ូសិន",
   "Need Help?": "ត្រូវការជំនួយ?",
   "Select Date": "ជ្រើសរើសថ្ងៃ",
   "Return Date": "ថ្ងៃមកវិញ",

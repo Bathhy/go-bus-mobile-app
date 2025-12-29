@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_package/config/themes.dart';
 
+import 'home_app_bar.dart';
+
 class NeedHelpSection extends StatelessWidget {
-  const NeedHelpSection({super.key});
+  final VoidCallback? onTap;
+  final VoidCallback? onTapTelegram;
+
+  const NeedHelpSection({super.key, this.onTap, this.onTapTelegram});
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +17,7 @@ class NeedHelpSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-           Text(
+          Text(
             'Need Help?'.tr,
             style: TextStyle(
               fontSize: 16,
@@ -42,12 +47,12 @@ class NeedHelpSection extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 16),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Need Help?',
+                        'Need Help?'.tr,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -56,7 +61,7 @@ class NeedHelpSection extends StatelessWidget {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        'We are always here to help - 090 9001131',
+                        'We are always here to help',
                         style: TextStyle(color: Colors.white70, fontSize: 12),
                       ),
                     ],
@@ -65,11 +70,17 @@ class NeedHelpSection extends StatelessWidget {
                 const SizedBox(width: 8),
                 Row(
                   children: [
-                    _buildSocialIcon(Icons.messenger, Colors.purple),
-                    const SizedBox(width: 8),
-                    _buildSocialIcon(Icons.telegram, Colors.blue),
-                    const SizedBox(width: 8),
-                    _buildSocialIcon(Icons.phone, Colors.green),
+                    XSocialButton(
+                      icon: Icons.telegram,
+                      color: Colors.blue,
+                      onTap: onTapTelegram,
+                    ),
+                    const SizedBox(width: 12),
+                    XSocialButton(
+                      icon: Icons.phone,
+                      color: Colors.green,
+                      onTap: onTap,
+                    ),
                   ],
                 ),
               ],
@@ -77,14 +88,6 @@ class NeedHelpSection extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildSocialIcon(IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-      child: Icon(icon, color: Colors.white, size: 16),
     );
   }
 }
