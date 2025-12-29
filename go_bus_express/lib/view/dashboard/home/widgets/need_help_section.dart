@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_package/config/themes.dart';
+import 'package:shared_package/design_system/constant/ts_padding.dart';
+import 'package:shared_package/design_system/x_widget/AppImage.dart';
 
+import '../../../../resources/app_images.dart';
 import 'home_app_bar.dart';
 
 class NeedHelpSection extends StatelessWidget {
@@ -34,19 +37,13 @@ class NeedHelpSection extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.headset_mic,
-                    color: Colors.white,
-                    size: 32,
-                  ),
+                AppSvgImage(
+                  path: AppImages.icCustomerSupport,
+                  width: 35,
+                  height: 35,
+                  defaultColor: true,
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: XPadding.medium),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,7 +58,7 @@ class NeedHelpSection extends StatelessWidget {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        'We are always here to help',
+                        'We are always here to help'.tr,
                         style: TextStyle(color: Colors.white70, fontSize: 12),
                       ),
                     ],

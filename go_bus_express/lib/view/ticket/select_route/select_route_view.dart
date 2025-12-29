@@ -4,7 +4,6 @@ import 'package:go_bus_express/core/di/app_di.dart';
 import 'package:go_bus_express/core/utils/string_ext.dart';
 import 'package:go_bus_express/models/route/detail_route_model.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
-import 'package:go_bus_express/utils/string_ext.dart';
 import 'package:go_bus_express/view_models/controller/route/select_route/select_route_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_package/config/themes.dart';
@@ -27,7 +26,8 @@ class SelectRouteView extends StatelessWidget {
           () => XAppBar(
             title:
                 '${controller.state.model?.route?.origin.orDefault("Origin")} → ${controller.state.model?.route?.destination.orDefault("Destination")}',
-            subTitle: controller.state.departureDate.orDefault("N/A"),
+            subTitle:
+                '${controller.state.departureDate.orDefault("N/A")} → ${controller.state.returnDate.orDefault("N/A")}',
             onBackPressed: () => Get.back(),
           ),
         ),
@@ -60,29 +60,39 @@ class SelectRouteView extends StatelessWidget {
                             itemBuilder: (context, index) {
                               final model = controller.state.model?.schedules
                                   ?.elementAt(index);
-                              
+
                               // Format departure time from ISO 8601
                               String formattedDepartureTime = 'N/A';
                               if (model?.departureTime != null) {
                                 try {
-                                  final dt = DateTime.parse(model!.departureTime!);
-                                  formattedDepartureTime = DateFormat('HH:mm').format(dt);
+                                  final dt = DateTime.parse(
+                                    model!.departureTime!,
+                                  );
+                                  formattedDepartureTime = DateFormat(
+                                    'HH:mm',
+                                  ).format(dt);
                                 } catch (e) {
-                                  formattedDepartureTime = model?.departureTime ?? 'N/A';
+                                  formattedDepartureTime =
+                                      model?.departureTime ?? 'N/A';
                                 }
                               }
-                              
+
                               // Format arrival time from ISO 8601
                               String formattedArrivalTime = 'N/A';
                               if (model?.arrivalTime != null) {
                                 try {
-                                  final dt = DateTime.parse(model!.arrivalTime!);
-                                  formattedArrivalTime = DateFormat('HH:mm').format(dt);
+                                  final dt = DateTime.parse(
+                                    model!.arrivalTime!,
+                                  );
+                                  formattedArrivalTime = DateFormat(
+                                    'HH:mm',
+                                  ).format(dt);
                                 } catch (e) {
-                                  formattedArrivalTime = model?.arrivalTime ?? 'N/A';
+                                  formattedArrivalTime =
+                                      model?.arrivalTime ?? 'N/A';
                                 }
                               }
-                              
+
                               return _buildBusCard(
                                 scheduleId: model?.id,
                                 departDate: controller.state.departureDate,
@@ -91,9 +101,15 @@ class SelectRouteView extends StatelessWidget {
                                 departureTime: formattedDepartureTime,
                                 arrivalTime: formattedArrivalTime,
                                 duration: minutesToHours(
-                                  controller.state.model?.route?.durationMinutes ?? 0,
+                                  controller
+                                          .state
+                                          .model
+                                          ?.route
+                                          ?.durationMinutes ??
+                                      0,
                                 ).toString(),
-                                price: '\$${model?.price?.toStringAsFixed(2) ?? '0.00'}',
+                                price:
+                                    '\$${model?.price?.toStringAsFixed(2) ?? '0.00'}',
                                 availableSeats:
                                     '${model?.bus?.availableSeats ?? 0}/${model?.bus?.totalSeats ?? 0} Seats',
                                 departureLocation:
@@ -130,7 +146,7 @@ class SelectRouteView extends StatelessWidget {
             ],
           ),
           Text(
-            '$busCount Available Trips',
+            'available_trips'.trParams({'count': busCount.toString()}),
             style: TextStyle(fontSize: 14, color: Colors.grey),
           ),
         ],

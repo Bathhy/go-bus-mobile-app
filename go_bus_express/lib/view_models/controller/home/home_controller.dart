@@ -24,13 +24,11 @@ class HomeController extends BaseController<HomeState> {
   final HiveManagerRepository _hiveRepository;
   final BookingRepository _bookingRepository;
 
-  HomeController(
-    this._repository,
-    this._localRepository,
-    this._routeRepository,
-    this._hiveRepository,
-    this._bookingRepository,
-  ) : super(HomeState());
+  HomeController(this._repository,
+      this._localRepository,
+      this._routeRepository,
+      this._hiveRepository,
+      this._bookingRepository,) : super(HomeState());
 
   @override
   void onInit() {
@@ -46,9 +44,9 @@ class HomeController extends BaseController<HomeState> {
 
     switch (result) {
       case Success<ProfileModel?>():
-        // Update profile
+      // Update profile
         updateState(
-          (state) =>
+              (state) =>
               state.copyWith(isLoading: false, profileModel: result.data),
         );
 
@@ -57,7 +55,7 @@ class HomeController extends BaseController<HomeState> {
           await _localRepository.saveProfile(profileJson);
         }
       case Error<ProfileModel?>():
-        // Error
+      // Error
         if (result.error.statusCode == 403) {
           logout();
         }
@@ -95,7 +93,7 @@ class HomeController extends BaseController<HomeState> {
     switch (result) {
       case Success<List<AllRouteModel>>():
         updateState(
-          (state) =>
+              (state) =>
               state.copyWith(isLoadingRoutes: false, routes: result.data),
         );
 
@@ -106,9 +104,9 @@ class HomeController extends BaseController<HomeState> {
         await _localRepository.saveRoutes(routesJson);
 
         log('✅ Routes fetched successfully: ${result.data.length} routes');
-      // for (var route in result.data) {
-      //   log('  📍 Route ${route.id}: ${route.origin} → ${route.destination} (${route.distanceKm}km, ${route.durationMinutes}min)');
-      // }
+    // for (var route in result.data) {
+    //   log('  📍 Route ${route.id}: ${route.origin} → ${route.destination} (${route.distanceKm}km, ${route.durationMinutes}min)');
+    // }
       case Error<List<AllRouteModel>>():
         updateState((state) => state.copyWith(isLoadingRoutes: false));
         log('❌ Routes error: ${result.error}');
@@ -117,11 +115,12 @@ class HomeController extends BaseController<HomeState> {
 
   void selectRoute(AllRouteModel route) {
     updateState(
-      (state) => state.copyWith(
-        selectedRouteId: route.id,
-        selectedRouteOrigin: route.origin,
-        selectedRouteDestination: route.destination,
-      ),
+          (state) =>
+          state.copyWith(
+            selectedRouteId: route.id,
+            selectedRouteOrigin: route.origin,
+            selectedRouteDestination: route.destination,
+          ),
     );
   }
 
@@ -210,7 +209,7 @@ class HomeController extends BaseController<HomeState> {
         if (await canLaunchUrl(webUri)) {
           await launchUrl(webUri, mode: LaunchMode.externalApplication);
         } else {
-          throw 'Could not launch Telegram';
+          log('❌ Could not launch Telegram');
         }
       }
     } catch (e) {
@@ -229,7 +228,7 @@ class HomeController extends BaseController<HomeState> {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri);
       } else {
-        throw 'Could not make phone call';
+        log('❌ Could not make phone call');
       }
     } catch (e) {
       log('❌ Error launching phone call: $e');

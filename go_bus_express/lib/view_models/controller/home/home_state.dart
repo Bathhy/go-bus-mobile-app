@@ -24,9 +24,9 @@ class HomeState {
     this.selectedRouteOrigin,
     this.selectedRouteDestination,
     this.selectedCountry = 'Cambodia',
-    this.departureDate,
     this.returnDate,
-  });
+    DateTime? departureDate,
+  }) : departureDate = departureDate ?? DateTime.now();
 
   HomeState copyWith({
     bool? isLoading,

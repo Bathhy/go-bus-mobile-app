@@ -25,8 +25,9 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     final ProfileController controller = getIt<ProfileController>();
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: primaryBgColor,
       appBar: AppBar(
+        backgroundColor:  primaryBgColor,
         title: Text(
           'Profile'.tr,
           style: TextStyle(
@@ -396,7 +397,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     Get.back();
                   },
                   child: Container(
-                    padding: EdgeInsets.all(XPadding.large),
+                    padding: EdgeInsets.all(XPadding.extralarge),
                     decoration: BoxDecoration(
                       color: currentLanguage == 'km'
                           ? goBusPrimary
@@ -433,7 +434,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     Get.back();
                   },
                   child: Container(
-                    padding: EdgeInsets.all(XPadding.large),
+                    padding: EdgeInsets.all(XPadding.extralarge),
                     decoration: BoxDecoration(
                       color: currentLanguage == 'en'
                           ? goBusPrimary
@@ -466,7 +467,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 width: double.infinity,
                 child: XButton(
                   label: 'Cancel'.tr,
-                  optionbutton: 2,
+                  optionbutton: 1,
                   bgColor: goBusPrimary,
                   onTap: () => Get.back(),
                 ),

@@ -59,4 +59,11 @@ final Map<String, String> en = {
   "No Internet Connection": "No Internet Connection",
   "Please check your internet connection and try again":
       "Please check your internet connection and try again",
+  "We are always here to help": "We are always here to help",
+  "available_trips": "@count Available Trips",
+  "Pay": "Pay \$@amount",
+  "Are you sure you want to logout from your account?":
+      "Are you sure you want to logout from your account?",
+  "payment_success_title": "🎉 Payment Successful!",
+  "payment_success_message": "Your booking #@bookingId payment of \$@amount @currency has been confirmed."
 };

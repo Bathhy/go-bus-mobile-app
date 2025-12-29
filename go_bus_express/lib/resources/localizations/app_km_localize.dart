@@ -40,7 +40,7 @@ final Map<String, String> km = {
   "Select Date": "ជ្រើសរើសថ្ងៃ",
   "Return Date": "ថ្ងៃមកវិញ",
   "Please select route, departure and return dates":
-      "សូមជ្រើសរើសផ្លូវធ្វើដំណើរ កាលបរិច្ឆេទចេញដំណើរ និងកាលបរិច្ឆេទត្រឡប់",
+      "សូមជ្រើសរើសផ្លូវធ្វើដំណើរ កាលបរិច្ឆេទចេញដំណើរ និងថ្ងៃមកវិញ",
   "Cancel Payment?": "បោះបង់ការទូទាត់",
   "Payment Timeout": "ការទូទាត់បានផុតកំណត់",
   "Your payment session has expired.\nWe will cancel your booking.":
@@ -57,6 +57,13 @@ final Map<String, String> km = {
   "Booking ID": "លេខកក់សំបុត្រ:",
   "Amount": "Amount",
   "No Internet Connection": "គ្មានការតភ្ជាប់អ៊ីនធឺណិត",
-  "Please check your internet connection and try again": "សូមពិនិត្យការតភ្ជាប់អ៊ីនធឺណិតរបស់អ្នក ហើយព្យាយាមម្តងទៀត"
-
+  "Please check your internet connection and try again":
+      "សូមពិនិត្យការតភ្ជាប់អ៊ីនធឺណិតរបស់អ្នក ហើយព្យាយាមម្តងទៀត",
+  "We are always here to help": "យើងតែងតែស្ថិតនៅទីនេះដើម្បីជួយអ្នក",
+  "available_trips": "@count ជើងដំណើរ",
+  "Pay": "បង់ប្រាក់ \$@amount",
+  "Are you sure you want to logout from your account?":
+      "តើអ្នកប្រាកដជាចង់ចេញពីគណនីរបស់អ្នកមែនទេ?",
+  "payment_success_title": "🎉 ការទូទាត់បានជោគជ័យ!",
+  "payment_success_message": "ការទូទាត់សម្រាប់ការកក់លេខ #@bookingId ចំនួន \$@amount @currency របស់អ្នក ត្រូវបានបញ្ចប់រួចរាល់។"
 };
