@@ -114,7 +114,6 @@ class _SignUpViewState extends State<SignUpView> {
                   controller: passwordController,
                   obscureText: !showPassword,
                   inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
                     LengthLimitingTextInputFormatter(8),
                   ],
                   decoration: InputDecoration(

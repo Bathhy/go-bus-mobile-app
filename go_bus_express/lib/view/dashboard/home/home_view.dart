@@ -224,7 +224,10 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const HomeAppBar(),
+              HomeAppBar(
+                onTap: () => homeController.callPhone(),
+                onTapTelegram: () => homeController.openTelegram(),
+              ),
               const SizedBox(height: 16),
               Obx(() {
                 if (homeController.state.profileModel != null) {
@@ -240,7 +243,10 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 16),
               const PromotionsSection(),
               const SizedBox(height: 16),
-              const NeedHelpSection(),
+              NeedHelpSection(
+                onTap: () => homeController.callPhone(),
+                onTapTelegram: () => homeController.openTelegram(),
+              ),
               const SizedBox(height: 20),
             ],
           ),

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/storage/local_repository.dart';
+import 'package:go_bus_express/core/utils/social_constant.dart';
 import 'package:go_bus_express/models/profile/profile_model.dart';
 import 'package:go_bus_express/repository/booking_repository.dart';
 import 'package:go_bus_express/repository/hive_manager_repository.dart';
@@ -10,6 +11,7 @@ import 'package:go_bus_express/repository/route_repository.dart';
 import 'package:go_bus_express/view_models/controller/base/base_controller.dart';
 import 'package:go_bus_express/view_models/controller/home/home_state.dart';
 import 'package:shared_package/network/x_result.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../models/home/all_route_model.dart';
 import '../../../models/payment/pending_payment_model.dart';
@@ -192,6 +194,50 @@ class HomeController extends BaseController<HomeState> {
       case Error<void>():
         log('❌ Failed to cancel pending payment');
         break;
+    }
+  }
+
+  void openTelegram() async {
+    try {
+      final Uri uri = Uri.parse(AppConfig.baseTelegramUrl);
+
+      // Check if can launch
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        // Try web fallback
+        final webUri = Uri.parse(AppConfig.baseTelegramUrl);
+        if (await canLaunchUrl(webUri)) {
+          await launchUrl(webUri, mode: LaunchMode.externalApplication);
+        } else {
+          throw 'Could not launch Telegram';
+        }
+      }
+    } catch (e) {
+      log('❌ Error opening Telegram: $e');
+      Get.snackbar(
+        'Error',
+        'Could not open Telegram. Please make sure Telegram is installed.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  void callPhone() async {
+    try {
+      final Uri uri = Uri.parse('tel:${AppConfig.basePhNumber}');
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+      } else {
+        throw 'Could not make phone call';
+      }
+    } catch (e) {
+      log('❌ Error launching phone call: $e');
+      Get.snackbar(
+        'Error',
+        'Could not launch phone call.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 }
