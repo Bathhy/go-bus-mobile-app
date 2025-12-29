@@ -13,4 +13,9 @@ class AppImages {
   static const String imgPoster2 = 'assets/images/gobus_poster3.jpg';
   static const String imgPoster3 = 'assets/images/gobus_poster5.jpg';
   static const String imgPoster4 = 'assets/images/unnamed.jpg';
+  static const String icCustomerSupport = 'assets/images/ic_customer_support.svg';
+  static const String icProfile = 'assets/images/profile.svg';
+  static const String icHome = 'assets/images/ic_home.svg';
+  static const String icTicket = 'assets/images/ic_ticket.svg';
+
 }

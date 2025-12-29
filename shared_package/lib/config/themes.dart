@@ -14,3 +14,4 @@ const Color appBgColor = Color(0xFFFBFBFB);
 const Color goBusPrimary = Color(0xFF4169E1);
 const Color success = Color(0xFF2ECC71);
 const Color errorPrimary = Color(0xFFFE5858);
+Color? primaryBgColor = Colors.grey[100];

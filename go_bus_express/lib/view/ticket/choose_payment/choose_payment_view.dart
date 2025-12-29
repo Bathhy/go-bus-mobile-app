@@ -134,7 +134,9 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
           child: SafeArea(
             child: XButton(
               height: 52,
-              label: 'Pay \$${state.totalPrice.toStringAsFixed(2)}',
+              label: 'Pay'.trParams({
+                'amount': state.totalPrice.toStringAsFixed(2),
+              }),
               optionbutton: canProceed ? 1 : 0,
               bgColor: canProceed ? goBusPrimary : Colors.grey,
               onTap: canProceed ? () => controller.createBooking() : null,

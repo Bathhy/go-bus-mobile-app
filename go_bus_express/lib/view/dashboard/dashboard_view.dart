@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_bus_express/resources/app_images.dart';
 import 'package:go_bus_express/view/dashboard/home/home_view.dart';
 import 'package:go_bus_express/view/dashboard/profile/profile_view.dart';
 import 'package:go_bus_express/view/dashboard/my_ticket/my_ticket_view.dart';
 import 'package:shared_package/config/themes.dart';
+import 'package:shared_package/design_system/x_widget/AppImage.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -26,15 +28,10 @@ class _MainNavigationState extends State<MainNavigation> {
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
-        children: const [
-          HomePage(),
-          MyTicketView(),
-          ProfilePage(),
-        ],
+        children: const [HomePage(), MyTicketView(), ProfilePage()],
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          // color: Colors.blue[700],
           color: goBusPrimary,
           boxShadow: [
             BoxShadow(
@@ -55,15 +52,30 @@ class _MainNavigationState extends State<MainNavigation> {
           unselectedFontSize: 12,
           items: [
             BottomNavigationBarItem(
-              icon: const Icon(Icons.home),
+              icon: AppSvgImage(
+                path: AppImages.icHome,
+                width: 25,
+                height: 25,
+                color: _selectedIndex == 0 ? Colors.white : Colors.white70,
+              ),
               label: 'Home'.tr,
             ),
             BottomNavigationBarItem(
-              icon: const Icon(Icons.confirmation_number),
+              icon: AppSvgImage(
+                path: AppImages.icTicket,
+                width: 25,
+                height: 25,
+                color: _selectedIndex == 1 ? Colors.white : Colors.white70,
+              ),
               label: 'Ticket'.tr,
             ),
             BottomNavigationBarItem(
-              icon: const Icon(Icons.person),
+              icon: AppSvgImage(
+                path: AppImages.icProfile,
+                width: 25,
+                height: 25,
+                color: _selectedIndex == 2 ? Colors.white : Colors.white70,
+              ),
               label: 'Profile'.tr,
             ),
           ],

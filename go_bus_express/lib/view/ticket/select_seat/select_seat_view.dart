@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_bus_express/core/utils/string_ext.dart';
 import 'package:go_bus_express/resources/app_images.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
-import 'package:go_bus_express/utils/string_ext.dart';
 import 'package:go_bus_express/view_models/controller/route/select_seat/select_seat_controller.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
@@ -153,10 +153,7 @@ class _SelectSeatViewState extends State<SelectSeatView> {
 
             return XButton(
               height: 52,
-              label: hasSelectedSeats
-                  ? 'Confirm (${state.selectedSeats.length} ${state.selectedSeats.length == 1 ? 'seat' : 'seats'})'
-                        .tr
-                  : 'Confirm'.tr,
+              label: 'Confirm'.tr,
               optionbutton: hasSelectedSeats ? 1 : 0,
               bgColor: hasSelectedSeats ? goBusPrimary : Colors.grey,
               onTap: hasSelectedSeats
@@ -169,7 +166,8 @@ class _SelectSeatViewState extends State<SelectSeatView> {
                           'departureDate': state.departureDate,
                           'departureTime': state.departureTime,
                           'selectedSeats': state.selectedSeats, // For display
-                          'selectedSeatIds': state.selectedSeatIds, // For backend
+                          'selectedSeatIds':
+                              state.selectedSeatIds, // For backend
                           'unitPrice': state.unitPrice,
                           'discount': 0.0,
                           'scheduleId': state.scheduleId,
