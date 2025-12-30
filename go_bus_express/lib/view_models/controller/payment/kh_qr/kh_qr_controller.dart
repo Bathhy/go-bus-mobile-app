@@ -28,12 +28,12 @@ class KhQrController extends BaseController<KhQrState> {
   static const int _maxRetries = 36; // 36 * 5 = 180 seconds (3 minutes)
   int _retryCount = 0;
 
-  KhQrController(this._bookingRepo, this._localRepository, this._hiveManager) : super(KhQrState());
+  KhQrController(this._bookingRepo, this._localRepository, this._hiveManager)
+    : super(KhQrState());
 
   @override
   void onInit() {
     super.onInit();
-    _loadMd5();
     _initializeFromArguments();
     _startCountdownTimer();
     _startVerificationPolling();
@@ -50,12 +50,14 @@ class KhQrController extends BaseController<KhQrState> {
     final amount = (args['amount'] as num?)?.toDouble() ?? 0.0;
     final currency = args['currency'] as String? ?? 'USD';
     final bookingId = args['bookingId'] as int? ?? 0;
+    final md5 = args['md5'] as String? ?? '';
     updateState(
       (state) => state.copyWith(
         qrData: qrData,
         amount: amount,
         currency: currency,
         bookingId: bookingId,
+        md5: md5,
       ),
     );
   }
@@ -87,10 +89,10 @@ class KhQrController extends BaseController<KhQrState> {
         {
           final payment = result.data.result;
           if (payment?.payment?.status == BakongPaymentStatusEnum.paid.status) {
+            updateState((state) => state.copyWith(isLoading: true));
             _stopVerificationPolling();
             _stopCountdownTimer();
-            _removeMd5();
-            
+
             // Clear pending payment from Hive
             await _hiveManager.clearPendingPayment();
 
@@ -116,6 +118,7 @@ class KhQrController extends BaseController<KhQrState> {
   }
 
   void _handlePaymentSuccess() {
+    updateState((state) => state.copyWith(isLoading: false));
     Get.offAllNamed(AppRoutes.paymentSuccess);
   }
 
@@ -125,13 +128,6 @@ class KhQrController extends BaseController<KhQrState> {
       amount: state.amount,
       currency: state.currency,
     );
-  }
-
-  // MARK: Local Storage
-
-  void _loadMd5() async {
-    final md5 = _localRepository.getMD5();
-    updateState((state) => state.copyWith(md5: md5));
   }
 
   // MARK: Timers
@@ -185,18 +181,20 @@ class KhQrController extends BaseController<KhQrState> {
       log('⚠️ No booking ID to cancel');
       return;
     }
-
+    updateState((state) => state.copyWith(isLoading: true));
     final result = await _bookingRepo.cancelBooking(bookingId: state.bookingId);
 
     switch (result) {
       case Success<void>():
         {
+          updateState((state) => state.copyWith(isLoading: false));
           log('✅ Booking ${state.bookingId} canceled successfully');
           await _hiveManager.clearPendingPayment();
           Get.offAllNamed(AppRoutes.mainNavigation);
         }
       case Error<void>():
         {
+          updateState((state) => state.copyWith(isLoading: false));
           log('❌ Failed to cancel booking: ${result.error.displayMessage}');
           _showError(
             'Failed to cancel booking: ${result.error.displayMessage}',
@@ -232,8 +230,6 @@ class KhQrController extends BaseController<KhQrState> {
       ),
     );
   }
-
-  void _removeMd5() async => _localRepository.removeMD5();
 
   @override
   void onClose() {

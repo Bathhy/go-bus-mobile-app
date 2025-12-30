@@ -37,8 +37,8 @@ class RouteSelectionDialog {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
-            'Select Route',
+           Text(
+            'select_route'.tr,
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           IconButton(

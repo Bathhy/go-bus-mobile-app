@@ -27,7 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       backgroundColor: primaryBgColor,
       appBar: AppBar(
-        backgroundColor:  primaryBgColor,
+        backgroundColor: primaryBgColor,
         title: Text(
           'Profile'.tr,
           style: TextStyle(
@@ -77,7 +77,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         _showLanguageBottomSheet(context, controller);
                       },
                     ),
-                    const SizedBox(height: 12),
+                  /*  const SizedBox(height: 12),
                     _buildMenuItem(
                       context: context,
                       imageType: ImageType.iconData,
@@ -87,8 +87,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       onTap: () {
                         Get.toNamed(AppRoutes.bookingHistory);
                       },
-                    ),
-                    const SizedBox(height: 24),
+                    ),*/
+                    const SizedBox(height: 36),
                     _buildLogoutButton(context, controller),
                   ],
                 ),
@@ -152,7 +152,10 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildLogoutButton(BuildContext context, ProfileController controller) {
+  Widget _buildLogoutButton(
+    BuildContext context,
+    ProfileController controller,
+  ) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: XPadding.extralarge),
       child: GestureDetector(
@@ -205,9 +208,7 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       barrierDismissible: true,
       builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         elevation: 0,
         backgroundColor: Colors.transparent,
         child: Container(
@@ -235,10 +236,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      errorPrimary.withOpacity(0.8),
-                      errorPrimary,
-                    ],
+                    colors: [errorPrimary.withOpacity(0.8), errorPrimary],
                   ),
                   boxShadow: [
                     BoxShadow(
@@ -270,7 +268,7 @@ class _ProfilePageState extends State<ProfilePage> {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: XPadding.medium),
                 child: Text(
-                  'Are you sure you want to logout from your account?'.tr,
+                  'logout'.tr,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -359,9 +357,9 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _showLanguageBottomSheet(
-      BuildContext context,
-      ProfileController controller,
-      ) {
+    BuildContext context,
+    ProfileController controller,
+  ) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,

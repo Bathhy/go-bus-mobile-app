@@ -97,7 +97,7 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
       scheduleId: state.scheduleId,
       seatIds: state.selectedSeatIds,
     );
-
+    updateState((state) => state.copyWith(isLoading: true));
     log('Creating booking with seat IDs: ${state.selectedSeatIds}');
     log('Booking body: ${body.toJson()}');
 
@@ -110,25 +110,26 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
         log('✅ Booking ID $bookingId');
         if (bookingId != null) {
           log('✅ Booking created successfully $bookingId');
-          _generateQr(state.totalPrice, bookingId);
+          await _generateQr(state.totalPrice, bookingId);
+        } else {
+          updateState((state) => state.copyWith(isLoading: false));
         }
         break;
 
       case Error<BookingModel?>():
+        updateState((state) => state.copyWith(isLoading: false));
         _showError(result.error.displayMessage);
         break;
     }
   }
 
-  void _generateQr(double amount, int bookingId) async {
+  Future<void> _generateQr(double amount, int bookingId) async {
     final body = PaymentBody(amount: 0.01, currency: "USD");
     final result = await _bookingRepository.generateQr(body: body);
 
     switch (result) {
       case Success<GenerateQrModel>():
         {
-          _localRepository.saveMD5(result.data.md5 ?? '');
-
           // Save pending payment to Hive
           final pendingPayment = PendingPaymentModel(
             bookingId: bookingId,
@@ -141,13 +142,14 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
             selectedSeats: state.selectedSeats,
           );
           await _hiveManager.savePendingPayment(pendingPayment);
-
-          log('✅ QR generated successfully');
+          updateState((state) => state.copyWith(isLoading: false));
+          log('✅ QR generated successfully ${result.data.md5}');
           Get.toNamed(
             AppRoutes.makePayment,
             arguments: {
               'qrData': result.data.qr ?? '',
               // 'amount': amount,
+              'md5': result.data.md5 ?? '',
               'amount': 0.01,
               'currency': 'USD',
               'bookingId': bookingId,
@@ -156,6 +158,7 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
         }
       case Error<GenerateQrModel>():
         log('❌ QR generation error: ${result.error.displayMessage}');
+        updateState((state) => state.copyWith(isLoading: false));
         _showError(result.error.displayMessage);
         break;
     }

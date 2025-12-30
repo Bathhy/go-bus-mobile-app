@@ -61,10 +61,7 @@ class _SignUpViewState extends State<SignUpView> {
               SizedBox(height: XPadding.small),
               Text(
                 'Create an account to get started.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey.shade600,
-                ),
+                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
               ),
               SizedBox(height: XPadding.extralarge * 2),
 
@@ -113,9 +110,6 @@ class _SignUpViewState extends State<SignUpView> {
                 child: TextField(
                   controller: passwordController,
                   obscureText: !showPassword,
-                  inputFormatters: [
-                    LengthLimitingTextInputFormatter(8),
-                  ],
                   decoration: InputDecoration(
                     hintText: 'Password',
                     prefixIcon: Icon(Icons.lock_outline, color: Colors.grey),
@@ -167,7 +161,7 @@ class _SignUpViewState extends State<SignUpView> {
               SizedBox(height: XPadding.extralarge),
 
               // DIVIDER
-            /*  Row(
+              /*  Row(
                 children: [
                   Expanded(child: Divider(color: Colors.grey.shade300)),
                   Padding(

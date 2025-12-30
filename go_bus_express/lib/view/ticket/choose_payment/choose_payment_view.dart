@@ -10,6 +10,7 @@ import 'package:shared_package/design_system/x_widget/TextComponent.dart';
 import 'package:shared_package/design_system/x_widget/x_app_bar.dart';
 
 import '../../../core/di/app_di.dart';
+import '../../widget/x_loading_dialog.dart';
 
 class ChoosePaymentView extends StatefulWidget {
   const ChoosePaymentView({super.key});
@@ -20,6 +21,26 @@ class ChoosePaymentView extends StatefulWidget {
 
 class _ChoosePaymentViewState extends State<ChoosePaymentView> {
   final ChoosePaymentController controller = getIt<ChoosePaymentController>();
+  Worker? _stateWorker;
+
+  @override
+  void initState() {
+    super.initState();
+    // Listen to state changes using ever
+    _stateWorker = ever(controller.obs, (state) {
+      if (state.isLoading) {
+        XAppLoadingDialog.showAppDialog();
+      } else {
+        XAppLoadingDialog.hideAppDialog();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _stateWorker?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

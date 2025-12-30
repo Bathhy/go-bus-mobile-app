@@ -8,6 +8,8 @@ import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 import 'package:shared_package/design_system/x_widget/x_app_bar.dart';
 
+import '../../widget/x_loading_dialog.dart';
+
 class KHQRPaymentView extends StatefulWidget {
   const KHQRPaymentView({super.key});
 
@@ -17,6 +19,26 @@ class KHQRPaymentView extends StatefulWidget {
 
 class _KHQRPaymentViewState extends State<KHQRPaymentView> {
   final controller = getIt<KhQrController>();
+  Worker? _stateWorker;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _stateWorker = ever(controller.obs, (state) {
+      if (state.isLoading) {
+        XAppLoadingDialog.showAppDialog();
+      } else {
+        XAppLoadingDialog.hideAppDialog();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _stateWorker?.dispose();
+    super.dispose();
+  }
 
   void _showCancelPaymentDialog() {
     showDialog(
@@ -47,7 +69,7 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
               const SizedBox(height: 24),
 
               // Title
-               Text(
+              Text(
                 'Cancel Payment?'.tr,
                 style: TextStyle(
                   fontSize: 22,
@@ -60,7 +82,8 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
 
               // Message
               Text(
-                'Are you sure you want to leave?\nYour booking will be cancelled.'.tr,
+                'Are you sure you want to leave?\nYour booking will be cancelled.'
+                    .tr,
                 style: TextStyle(
                   fontSize: 15,
                   color: Colors.grey.shade600,
@@ -108,6 +131,7 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
                       height: 50,
                       child: ElevatedButton(
                         onPressed: () {
+                          Get.back();
                           controller.cancelBooking();
                         },
                         style: ElevatedButton.styleFrom(
@@ -119,7 +143,7 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
                           elevation: 0,
                         ),
                         child: Text(
-                          'OK'.tr,
+                          'ok'.tr,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -196,6 +220,7 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
                 height: 50,
                 child: ElevatedButton(
                   onPressed: () {
+                    Get.back();
                     controller.cancelBooking();
                   },
                   style: ElevatedButton.styleFrom(

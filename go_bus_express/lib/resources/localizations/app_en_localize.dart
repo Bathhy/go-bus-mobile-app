@@ -62,8 +62,10 @@ final Map<String, String> en = {
   "We are always here to help": "We are always here to help",
   "available_trips": "@count Available Trips",
   "Pay": "Pay \$@amount",
-  "Are you sure you want to logout from your account?":
-      "Are you sure you want to logout from your account?",
+  "logout": "Are you sure you want to logout from your account?",
   "payment_success_title": "🎉 Payment Successful!",
-  "payment_success_message": "Your booking #@bookingId payment of \$@amount @currency has been confirmed."
+  "payment_success_message":
+      "Your booking #@bookingId payment of \$@amount @currency has been confirmed.",
+  "select_route": "Select Route",
+  "ok": "Ok",
 };

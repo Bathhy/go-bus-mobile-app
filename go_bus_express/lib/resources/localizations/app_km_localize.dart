@@ -62,8 +62,10 @@ final Map<String, String> km = {
   "We are always here to help": "យើងតែងតែស្ថិតនៅទីនេះដើម្បីជួយអ្នក",
   "available_trips": "@count ជើងដំណើរ",
   "Pay": "បង់ប្រាក់ \$@amount",
-  "Are you sure you want to logout from your account?":
+  "logout":
       "តើអ្នកប្រាកដជាចង់ចេញពីគណនីរបស់អ្នកមែនទេ?",
   "payment_success_title": "🎉 ការទូទាត់បានជោគជ័យ!",
-  "payment_success_message": "ការទូទាត់សម្រាប់ការកក់លេខ #@bookingId ចំនួន \$@amount @currency របស់អ្នក ត្រូវបានបញ្ចប់រួចរាល់។"
+  "payment_success_message": "ការទូទាត់សម្រាប់ការកក់លេខ #@bookingId ចំនួន @amount @currency របស់អ្នក ត្រូវបានបញ្ចប់រួចរាល់។",
+  "select_route": "ជ្រើសរើសទិសដៅ",
+  "ok": "យល់ព្រម",
 };
