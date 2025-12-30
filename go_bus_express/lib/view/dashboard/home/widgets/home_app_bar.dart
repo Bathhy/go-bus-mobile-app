@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_bus_express/resources/app_images.dart';
 
 class HomeAppBar extends StatelessWidget {
   final VoidCallback? onTap;
@@ -13,29 +14,32 @@ class HomeAppBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Image.asset(
-            'assets/images/go_bus_logo.png',
-            height: 40,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.blue[700],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Text(
-                  'GoBus',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(15),
+            child: Image.asset(
+              AppImages.imgBus,
+              height: 40,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
                   ),
-                ),
-              );
-            },
+                  decoration: BoxDecoration(
+                    color: Colors.blue[700],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    'GoBus',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
           Row(
             children: [

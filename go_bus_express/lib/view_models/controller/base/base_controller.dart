@@ -7,6 +7,8 @@ abstract class BaseController<T> extends GetxController {
 
   T get state => _state.value;
 
+  Rx<T> get obs => _state;
+
   void emit(T newState) {
     _state.value = newState;
   }

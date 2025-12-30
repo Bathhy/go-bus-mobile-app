@@ -154,7 +154,7 @@ class _SelectSeatViewState extends State<SelectSeatView> {
             return XButton(
               height: 52,
               label: 'Confirm'.tr,
-              optionbutton: hasSelectedSeats ? 1 : 0,
+              optionbutton: 1,
               bgColor: hasSelectedSeats ? goBusPrimary : Colors.grey,
               onTap: hasSelectedSeats
                   ? () {

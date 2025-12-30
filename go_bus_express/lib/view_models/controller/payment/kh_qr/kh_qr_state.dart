@@ -13,6 +13,7 @@ class KhQrState extends BaseUiState {
   final String? transactionId;
   final int bookingId;
 
+
   KhQrState({
     super.isLoading = false,
     this.qrData = '',

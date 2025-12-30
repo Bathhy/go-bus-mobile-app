@@ -20,9 +20,6 @@ class BookingCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-        /*  gradient: LinearGradient(
-            colors: [Colors.blue[600]!, Colors.blue[700]!],
-          ),*/
           color: goBusPrimary,
           borderRadius: BorderRadius.circular(16),
         ),
