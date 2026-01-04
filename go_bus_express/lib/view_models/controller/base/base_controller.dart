@@ -15,6 +15,7 @@ abstract class BaseController<T> extends GetxController {
 
   void updateState(T Function(T state) reducer) {
     emit(reducer(_state.value));
+    update(); // Add this to notify GetBuilder widgets
   }
 }
 
