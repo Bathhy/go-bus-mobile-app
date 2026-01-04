@@ -24,7 +24,6 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage>
     with AutomaticKeepAliveClientMixin {
   final ProfileController controller = getIt<ProfileController>();
-  final HomeController homecontroller = getIt<HomeController>();
 
   @override
   bool get wantKeepAlive => false;
@@ -54,10 +53,10 @@ class _ProfilePageState extends State<ProfilePage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Obx(() {
-                      if (homecontroller.state.profileModel != null) {
+                      if (controller.state.profileModel != null) {
                         return UserProfileCard(
-                          name: homecontroller.state.profileModel!.fullName ?? "",
-                          email: homecontroller.state.profileModel!.email ?? "",
+                          name: controller.state.profileModel!.fullName ?? "",
+                          email: controller.state.profileModel!.email ?? "",
                         );
                       }
                       return const SizedBox.shrink();

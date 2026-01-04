@@ -75,21 +75,15 @@ Future<void> setupDependencyInjection() async {
     Get.put(controller);
     return controller;
   });
-  getIt.registerLazySingleton<HomeController>(() {
-    final controller = HomeController(
-      getIt<ProfileRepository>(),
-      getIt<LocalRepository>(),
-      getIt<RouteRepository>(),
-      getIt<HiveManagerRepository>(),
-      getIt<BookingRepository>(),
+  getIt.registerFactory<HomeController>(() {
+    final controller = Get.put(
+      HomeController(getIt(), getIt(), getIt(), getIt(), getIt()),
     );
-    Get.put(controller);
     return controller;
   });
-  getIt.registerLazySingleton<ProfileController>(() {
-    final controller = ProfileController(getIt<LocalRepository>());
-    Get.put(controller);
-    controller.onInit();
+  Get.put(HomeController(getIt(), getIt(), getIt(), getIt(), getIt()));
+  getIt.registerFactory<ProfileController>(() {
+    final controller = Get.put(ProfileController(getIt()));
     return controller;
   });
   getIt.registerFactory<SelectRouteController>(() {

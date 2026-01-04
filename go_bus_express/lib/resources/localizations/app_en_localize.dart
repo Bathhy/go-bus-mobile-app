@@ -112,4 +112,11 @@ final Map<String, String> en = {
   "select_route": "Select Route",
   "ok": "Ok",
   "qty": "Quantity",
+  "edit_profile": "Edit Profile",
+  "full_name": "Full Name",
+  "email": "Email",
+  "phone_number": "Phone Number",
+  "save": "Save",
+  'departure_time': 'Departure Time',
+  'arrival': 'Arrival',
 };

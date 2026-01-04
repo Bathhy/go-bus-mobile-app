@@ -21,18 +21,6 @@ class ProfileController extends BaseController<ProfileState> {
 
   ProfileController(this._localRepository) : super(ProfileState());
 
-  @override
-  void onInit() {
-    loadCurrentLanguage();
-    super.onInit();
-  }
-
-  @override
-  void onReady() {
-    loadCachedProfile();
-    super.onReady();
-  }
-
   void loadCurrentLanguage() {
     final language = _localRepository.getLanguage() ?? 'en';
     updateState((state) => state.copyWith(currentLanguage: language));
@@ -54,6 +42,7 @@ class ProfileController extends BaseController<ProfileState> {
 
   void refreshProfile() {
     loadCachedProfile();
+    loadCurrentLanguage();
     log('Profile refreshed from cache');
   }
 
@@ -68,22 +57,8 @@ class ProfileController extends BaseController<ProfileState> {
     return state.currentLanguage;
   }
 
-  void resetState() {
-    updateState((state) => ProfileState());
-    loadCurrentLanguage();
-    log('🔄 ProfileController state reset');
-  }
-
   void logout() {
     _localRepository.logout();
-
-    // Delete GetX controllers
-    Get.delete<HomeController>(force: true);
-    Get.delete<ProfileController>(force: true);
-
-    // Reset GetIt singleton controllers
-    resetSingletonControllers();
-
     Get.offAllNamed(AppRoutes.signIn);
   }
 }

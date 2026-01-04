@@ -32,13 +32,6 @@ class HomeController extends BaseController<HomeState> {
     this._bookingRepository,
   ) : super(HomeState());
 
-  @override
-  void onInit() {
-    super.onInit();
-    fetchProfile();
-    loadCachedRoutes();
-  }
-
   Future<void> fetchProfile() async {
     // Set loading
     updateState((state) => state.copyWith(isLoading: true));
@@ -51,7 +44,6 @@ class HomeController extends BaseController<HomeState> {
           (state) =>
               state.copyWith(isLoading: false, profileModel: result.data),
         );
-
         if (result.data != null) {
           final profileJson = jsonEncode(result.data!.toJson());
           await _localRepository.saveProfile(profileJson);
@@ -243,15 +235,12 @@ class HomeController extends BaseController<HomeState> {
     }
   }
 
-  Future<void> refreshData() async {
-    await Future.wait([
-      fetchProfile(),
-      fetchRoutes(forceRefresh: true),
-    ]);
+  Future<void> pullRefresh() async {
+    await Future.wait([fetchProfile(), fetchRoutes(forceRefresh: true)]);
   }
 
-  void resetState() {
-    updateState((state) => HomeState());
-    log('🔄 HomeController state reset');
+  void refreshProfile() {
+    fetchProfile();
+    log('Profile refreshed from cache');
   }
 }
