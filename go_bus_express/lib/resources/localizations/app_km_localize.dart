@@ -23,7 +23,7 @@ final Map<String, String> km = {
   "Net Price": "តម្លៃសរុប",
   "Note": "ចំណាំ",
   "Choose Payment Method": "ជ្រើសរើសវិធីសាស្ត្រទូទាត់",
-  "Scan to pay with any banking": "ស្កេនដើម្បីទូទាត់ដោយធនាគារណាមួយ",
+  "Scan to pay with any banking": "ស្កេនដើម្បីទូទាត់ជាមួយធនាគារណាមួយ",
   "Term & Conditions Agreement": "ការយល់ព្រមលើលក្ខខណ្ឌ",
   'Booked': 'បានកក់រួចហើយ',
   'Available': 'ទំនេរ',
@@ -111,4 +111,5 @@ final Map<String, String> km = {
   "payment_success_message": "ការទូទាត់សម្រាប់ការកក់លេខ #@bookingId ចំនួន @amount @currency របស់អ្នក ត្រូវបានបញ្ចប់រួចរាល់។",
   "select_route": "ជ្រើសរើសទិសដៅ",
   "ok": "យល់ព្រម",
+  "qty": "បរិមាណ",
 };

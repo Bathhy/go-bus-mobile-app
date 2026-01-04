@@ -11,7 +11,6 @@ abstract class RouteRepository {
   Future<XResult<RouteListResponseModel?>> fetchBusBySchedule(
     int id,
     String? departureDate,
-    String? returnDate,
   );
 
   Future<XResult<SeatLayoutModel?>> fetchBusSeat(int scheduleId, int busId);
@@ -45,13 +44,11 @@ class RouteRepositoryImpl implements RouteRepository {
   Future<XResult<RouteListResponseModel?>> fetchBusBySchedule(
     int id,
     String? departureDate,
-    String? returnDate,
   ) async {
     return xResultHandler(() async {
       final result = await api.fetchBusBySchedule(
         id,
         departureDate: departureDate,
-        returnDate: returnDate,
       );
       return result.data;
     });

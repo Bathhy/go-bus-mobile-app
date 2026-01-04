@@ -35,6 +35,7 @@ class KhQrController extends BaseController<KhQrState> {
   void onInit() {
     super.onInit();
     _initializeFromArguments();
+    _getLocalMd5();
     _startCountdownTimer();
     _startVerificationPolling();
   }
@@ -50,14 +51,12 @@ class KhQrController extends BaseController<KhQrState> {
     final amount = (args['amount'] as num?)?.toDouble() ?? 0.0;
     final currency = args['currency'] as String? ?? 'USD';
     final bookingId = args['bookingId'] as int? ?? 0;
-    final md5 = args['md5'] as String? ?? '';
     updateState(
       (state) => state.copyWith(
         qrData: qrData,
         amount: amount,
         currency: currency,
         bookingId: bookingId,
-        md5: md5,
       ),
     );
   }
@@ -89,13 +88,17 @@ class KhQrController extends BaseController<KhQrState> {
         {
           final payment = result.data.result;
           if (payment?.payment?.status == BakongPaymentStatusEnum.paid.status) {
-            updateState((state) => state.copyWith(isLoading: true));
+            // Mark as paid immediately to prevent duplicate calls
+            updateState((state) => state.copyWith(isPaid: true, isLoading: true));
+            
+            // Stop timers immediately
             _stopVerificationPolling();
             _stopCountdownTimer();
 
-            // Clear pending payment from Hive
+            // Clear pending payment from Hive && Clear Md5
             await _hiveManager.clearPendingPayment();
-
+            _clearLocalMd5();
+            
             // Show success notification
             _showPaymentSuccessNotification();
 
@@ -189,6 +192,7 @@ class KhQrController extends BaseController<KhQrState> {
         {
           updateState((state) => state.copyWith(isLoading: false));
           log('✅ Booking ${state.bookingId} canceled successfully');
+          _clearLocalMd5();
           await _hiveManager.clearPendingPayment();
           Get.offAllNamed(AppRoutes.mainNavigation);
         }
@@ -230,6 +234,14 @@ class KhQrController extends BaseController<KhQrState> {
       ),
     );
   }
+
+  // MARK - Get Local MD5
+  void _getLocalMd5() async {
+    final md5 = _localRepository.getMD5();
+    updateState((state) => state.copyWith(md5: md5));
+  }
+
+  void _clearLocalMd5() async => await _localRepository.removeMD5();
 
   @override
   void onClose() {

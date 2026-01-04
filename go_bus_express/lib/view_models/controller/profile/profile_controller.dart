@@ -3,10 +3,15 @@ import 'dart:developer';
 import 'dart:ui';
 
 import 'package:get/get.dart';
+import 'package:go_bus_express/core/di/app_di.dart';
+import 'package:go_bus_express/repository/profile_repository.dart';
 import 'package:go_bus_express/view_models/controller/base/base_controller.dart';
+import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
 import 'package:go_bus_express/view_models/controller/profile/profile_state.dart';
+import 'package:shared_package/network/x_result.dart';
 
 import '../../../core/storage/local_repository.dart';
+import '../../../models/body/update_profile_body.dart';
 import '../../../models/profile/profile_model.dart';
 import '../../../resources/localizations/app_localization.dart';
 import '../../../resources/routes/app_routes.dart';
@@ -18,9 +23,14 @@ class ProfileController extends BaseController<ProfileState> {
 
   @override
   void onInit() {
-    loadCachedProfile();
     loadCurrentLanguage();
     super.onInit();
+  }
+
+  @override
+  void onReady() {
+    loadCachedProfile();
+    super.onReady();
   }
 
   void loadCurrentLanguage() {
@@ -42,6 +52,11 @@ class ProfileController extends BaseController<ProfileState> {
     }
   }
 
+  void refreshProfile() {
+    loadCachedProfile();
+    log('Profile refreshed from cache');
+  }
+
   Future<void> changeLanguage(String languageCode) async {
     await AppLocalization.saveLanguage(languageCode);
     Get.updateLocale(Locale(languageCode));
@@ -53,13 +68,22 @@ class ProfileController extends BaseController<ProfileState> {
     return state.currentLanguage;
   }
 
-  Future<void> clearLanguage() async {
-    await AppLocalization.clearLanguage();
-    log('Language cleared, reverting to default');
+  void resetState() {
+    updateState((state) => ProfileState());
+    loadCurrentLanguage();
+    log('🔄 ProfileController state reset');
   }
 
   void logout() {
     _localRepository.logout();
+
+    // Delete GetX controllers
+    Get.delete<HomeController>(force: true);
+    Get.delete<ProfileController>(force: true);
+
+    // Reset GetIt singleton controllers
+    resetSingletonControllers();
+
     Get.offAllNamed(AppRoutes.signIn);
   }
 }

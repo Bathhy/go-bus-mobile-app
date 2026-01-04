@@ -31,6 +31,12 @@ class AppRoutes {
     selectSeat,
   );
 
+  static void goToEditProfile(String? fullName, String? email, String? phone) =>
+      Get.toNamed(
+        arguments: {"fullName": fullName, "email": email, "phone": phone},
+        editProfile,
+      );
+
   static final routes = [
     GetPage(name: choosePayment, page: () => const ChoosePaymentView()),
     GetPage(name: selectRoute, page: () => const SelectRouteView()),
@@ -41,7 +47,7 @@ class AppRoutes {
       name: paymentSuccess,
       page: () => const PaymentSuccessView(),
     ),
-    GetPage(name: mainNavigation, page: () => const MainNavigation()),
+    GetPage(name: mainNavigation, page: () => MainNavigation()),
     GetPage(name: signIn, page: () => const SignInView()),
     GetPage(name: signUp, page: () => const SignUpView()),
     GetPage(name: bookingHistory, page: () => const BookingHistoryView()),

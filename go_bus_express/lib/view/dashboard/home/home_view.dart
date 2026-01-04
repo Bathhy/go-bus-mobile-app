@@ -16,8 +16,12 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin {
   final HomeController homeController = getIt<HomeController>();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -217,38 +221,44 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
     return Scaffold(
       backgroundColor: Colors.grey[100],
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              HomeAppBar(
-                onTap: () => homeController.callPhone(),
-                onTapTelegram: () => homeController.openTelegram(),
-              ),
-              const SizedBox(height: 16),
-              Obx(() {
-                if (homeController.state.profileModel != null) {
-                  return UserProfileCard(
-                    name: homeController.state.profileModel!.fullName ?? "NA",
-                    email: homeController.state.profileModel!.email ?? "NA",
-                  );
-                }
-                return const SizedBox.shrink();
-              }),
-              const SizedBox(height: 16),
-              const BookingCard(),
-              const SizedBox(height: 16),
-              const PromotionsSection(),
-              const SizedBox(height: 16),
-              NeedHelpSection(
-                onTap: () => homeController.callPhone(),
-                onTapTelegram: () => homeController.openTelegram(),
-              ),
-              const SizedBox(height: 20),
-            ],
+        child: RefreshIndicator(
+          onRefresh: () => homeController.refreshData(),
+          color: const Color(0xFF4CAF50),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                HomeAppBar(
+                  onTap: () => homeController.callPhone(),
+                  onTapTelegram: () => homeController.openTelegram(),
+                ),
+                const SizedBox(height: 16),
+                Obx(() {
+                  if (homeController.state.profileModel != null) {
+                    return UserProfileCard(
+                      name: homeController.state.profileModel!.fullName ?? "NA",
+                      email: homeController.state.profileModel!.email ?? "NA",
+                    );
+                  }
+                  return const SizedBox.shrink();
+                }),
+                const SizedBox(height: 16),
+                const BookingCard(),
+                const SizedBox(height: 16),
+                const PromotionsSection(),
+                const SizedBox(height: 16),
+                NeedHelpSection(
+                  onTap: () => homeController.callPhone(),
+                  onTapTelegram: () => homeController.openTelegram(),
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),

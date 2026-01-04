@@ -4,10 +4,7 @@ import 'package:go_bus_express/models/body/verify_payment_body.dart';
 import 'package:go_bus_express/models/payment/generate_qr_model.dart';
 import 'package:go_bus_express/models/payment/verify_payment_model.dart';
 import 'package:retrofit/http.dart';
-import 'package:shared_package/network/base_response.dart';
 import 'package:go_bus_express/core/network/parse_error_logger.dart';
-import '../../models/booking/booking_model.dart';
-
 part 'payment_api.g.dart';
 
 @RestApi()

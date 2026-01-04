@@ -75,6 +75,11 @@ class SelectSeatController extends BaseController<SelectSeatState> {
   }
 
   bool isSeatBooked(String seatNumber) {
+    // If seat array is null or empty, no seats are booked
+    if (state.model?.seat == null || state.model!.seat!.isEmpty) {
+      return false;
+    }
+
     final seat = state.model?.seat?.firstWhere(
       (s) => s.seatNumber == seatNumber,
       orElse: () => Seat(),
@@ -83,11 +88,25 @@ class SelectSeatController extends BaseController<SelectSeatState> {
   }
 
   bool isSeatAvailable(String seatNumber) {
+    // If seat array is null or empty, all seats are available by default
+    if (state.model?.seat == null || state.model!.seat!.isEmpty) {
+      log('⚠️ Seat array is empty, all seats available');
+      return true;
+    }
+
     final seat = state.model?.seat?.firstWhere(
       (s) => s.seatNumber == seatNumber,
       orElse: () => Seat(),
     );
-    return seat?.status == SeatStatusEnum.available.status;
+
+    // Debug logging
+    log('Checking seat $seatNumber: id=${seat?.id}, status=${seat?.status}');
+    
+    // If seat not found in array, it's available
+    // If seat found, check its status
+    final isAvailable = seat?.status == SeatStatusEnum.available.status || seat?.id == null;
+    log('Seat $seatNumber isAvailable: $isAvailable');
+    return isAvailable;
   }
 
   void toggleSeat(String seatNumber) {

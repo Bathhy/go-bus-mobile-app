@@ -17,7 +17,7 @@ class HomeState {
 
   HomeState({
     this.isLoading = false,
-    this.profileModel,
+    this.profileModel = const ProfileModel(),
     this.routes = const [],
     this.isLoadingRoutes = false,
     this.selectedRouteId,
