@@ -61,17 +61,13 @@ class EditProfileController extends BaseController<EditProfileState> {
 
     switch (result) {
       case Success<ProfileModel?>():
-        // Update profile
-        updateState((state) => state.copyWith(isLoading: false));
-        log('Profile sscu: ${result.data?.fullName}');
         if (result.data != null) {
           final profileJson = jsonEncode(result.data!.toJson());
-
-          final cacheProfile = await _localRepository.saveProfile(profileJson);
-          log('Profile sscu: ${result.data?.fullName}');
-       /*   Future.delayed(Duration(seconds: 5), () {
+          await _localRepository.saveProfile(profileJson);
+          Future.delayed(Duration(seconds: 3), () {
+            updateState((state) => state.copyWith(isLoading: false));
             Get.back(result: true);
-          });*/
+          });
         }
       case Error<ProfileModel?>():
         updateState((state) => state.copyWith(isLoading: false));

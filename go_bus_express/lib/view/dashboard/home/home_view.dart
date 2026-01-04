@@ -4,6 +4,7 @@ import 'package:go_bus_express/core/di/app_di.dart';
 import 'package:go_bus_express/models/payment/pending_payment_model.dart';
 import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
 import 'package:shared_package/design_system/x_widget/user_profile_card.dart';
+import '../../widget/x_loading_dialog.dart';
 import 'widgets/home_app_bar.dart';
 import 'widgets/booking_card.dart';
 import 'widgets/promotions_section.dart';
@@ -21,7 +22,7 @@ class _HomePageState extends State<HomePage>
   final HomeController homeController = getIt<HomeController>();
 
   @override
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive => false;
 
   @override
   void initState() {
@@ -226,7 +227,7 @@ class _HomePageState extends State<HomePage>
       backgroundColor: Colors.grey[100],
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: () => homeController.refreshData(),
+          onRefresh: () => homeController.pullRefresh(),
           color: const Color(0xFF4CAF50),
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),

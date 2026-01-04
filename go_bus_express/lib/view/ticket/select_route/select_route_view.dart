@@ -212,7 +212,7 @@ class SelectRouteView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Departure Time',
+                    'departure_time'.tr,
                     style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                   ),
                   const SizedBox(height: 4),
@@ -232,7 +232,7 @@ class SelectRouteView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    'Arrival',
+                    'arrival'.tr,
                     style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                   ),
                   const SizedBox(height: 4),

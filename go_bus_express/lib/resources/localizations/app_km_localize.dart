@@ -69,4 +69,11 @@ final Map<String, String> km = {
   "select_route": "ជ្រើសរើសទិសដៅ",
   "ok": "យល់ព្រម",
   "qty": "បរិមាណ",
+  "edit_profile": "កែប្រូហ្វាយល៍",
+  "full_name": "ឈ្មោះពេញ",
+  "email": "អ៊ីមែល",
+  "phone_number": "លេខទូរស័ព្ទ",
+  "save": "រក្សាទុក",
+  'departure_time': 'ម៉ោងចេញដំណើរ',
+  'arrival': 'ម៉ោងទៅដល់',
 };
