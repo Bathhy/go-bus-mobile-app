@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:go_bus_express/core/di/app_di.dart';
+import 'package:go_bus_express/models/ticket/ticket_model.dart';
+import 'package:go_bus_express/view_models/controller/ticket/ticket_controller.dart';
 import 'ticket_detail_view.dart';
 
 class MyTicketView extends StatefulWidget {
@@ -11,11 +15,26 @@ class MyTicketView extends StatefulWidget {
 class _MyTicketViewState extends State<MyTicketView>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late TicketController _ticketController;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _ticketController = getIt<TicketController>();
+    
+    // Listen to tab changes to trigger API calls
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        final isUpcoming = _tabController.index == 0;
+        _ticketController.filterTickets(isUpcoming: isUpcoming);
+      }
+    });
+    
+    // Ensure the controller is initialized and fetch data
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _ticketController.onInit();
+    });
   }
 
   @override
@@ -32,18 +51,34 @@ class _MyTicketViewState extends State<MyTicketView>
         bottom: false,
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Ticket',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.w600,
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Row(
+                children: [
+                  const Expanded(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Ticket',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  IconButton(
+                    onPressed: () {
+                      // Refresh tickets
+                      _ticketController.onInit();
+                    },
+                    icon: const Icon(
+                      Icons.refresh,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             ),
             Expanded(
@@ -82,15 +117,54 @@ class _MyTicketViewState extends State<MyTicketView>
                       ),
                     ),
                     Expanded(
-                      child: TabBarView(
-                        controller: _tabController,
-                        children: [
-                          _buildTicketList(),
-                          _buildEmptyState(
-                            'No trip Ticket',
-                            'Book your trips and check here for your trips!',
-                          ),
-                        ],
+                      child: GetBuilder<TicketController>(
+                        init: _ticketController,
+                        builder: (controller) {
+                          final currentTickets = controller.getCurrentTickets();
+                          
+                          // Debug: Show total tickets count and current type
+                          print('🎫 Current tickets in UI: ${currentTickets.length}, type: ${controller.state.type}');
+                          
+                          // Show loading if no tickets yet
+                          if (controller.state.tickets.isEmpty) {
+                            return const Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CircularProgressIndicator(
+                                    color: Color(0xFF5B7FFF),
+                                  ),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    'Loading tickets...',
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                          
+                          return TabBarView(
+                            controller: _tabController,
+                            children: [
+                              // Upcoming tickets tab
+                              _buildCurrentTicketTab(
+                                controller,
+                                'No upcoming trips',
+                                'Your upcoming trips will appear here.',
+                              ),
+                              // Past tickets tab  
+                              _buildCurrentTicketTab(
+                                controller,
+                                'No past trips',
+                                'Your completed trips will appear here.',
+                              ),
+                            ],
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -104,50 +178,18 @@ class _MyTicketViewState extends State<MyTicketView>
     );
   }
 
-  Widget _buildTicketList() {
-    final tickets = [
-      {
-        'route': 'Phnom Penh - Kompong Cham',
-        'bookingId': 'BG254097745',
-        'date': '2025-10-25 (09:30AM)',
-        'busType': 'Luxury Coaster',
-        'busNumber': '(16)',
-        'seats': '1 Seats',
-      },
-      {
-        'route': 'Phnom Penh - Kompot',
-        'bookingId': 'BG254097746',
-        'date': '2025-10-07 (07:00AM)',
-        'busType': 'Luxury Coaster',
-        'busNumber': '(32)',
-        'seats': '2 Seats',
-      },
-      {
-        'route': 'Phnom Penh - Takeo',
-        'bookingId': 'BG254097747',
-        'date': '2025-10-25 (09:30AM)',
-        'busType': 'Luxury Coaster',
-        'busNumber': '(16)',
-        'seats': '1 Seats',
-      },
-      {
-        'route': 'Phnom Penh - Kompong Cham',
-        'bookingId': 'BG254097745',
-        'date': '2025-10-25 (09:30AM)',
-        'busType': 'Luxury Coaster',
-        'busNumber': '(16)',
-        'seats': '1 Seats',
-      },
-      {
-        'route': 'Phnom Penh - Kompot',
-        'bookingId': 'BG254097746',
-        'date': '2025-10-07 (07:00AM)',
-        'busType': 'Luxury Coaster',
-        'busNumber': '(32)',
-        'seats': '2 Seats',
-      },
-    ];
+  Widget _buildCurrentTicketTab(
+    TicketController controller,
+    String emptyTitle,
+    String emptySubtitle,
+  ) {
+    final tickets = controller.getCurrentTickets();
+    return tickets.isNotEmpty
+        ? _buildTicketList(tickets)
+        : _buildEmptyState(emptyTitle, emptySubtitle);
+  }
 
+  Widget _buildTicketList(List<Datum> tickets) {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: tickets.length,
@@ -157,7 +199,14 @@ class _MyTicketViewState extends State<MyTicketView>
     );
   }
 
-  Widget _buildTicketCard(Map<String, String> ticket) {
+  Widget _buildTicketCard(Datum ticket) {
+    // Extract route information (you might need to adjust this based on your actual data structure)
+    final routeText = _getRouteText(ticket);
+    final ticketId = ticket.booking?.id?.toString() ?? 'N/A';
+    final issueDate = _formatDate(ticket.issuedAt);
+    final busInfo = _getBusInfo(ticket);
+    final seatCount = ticket.booking?.seatCount?.toString() ?? '0';
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -194,7 +243,7 @@ class _MyTicketViewState extends State<MyTicketView>
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    ticket['route']!,
+                    routeText,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -207,25 +256,27 @@ class _MyTicketViewState extends State<MyTicketView>
             const SizedBox(height: 16),
             Row(
               children: [
-                const Icon(Icons.receipt_outlined, size: 16, color: Colors.grey),
+                const Icon(
+                  Icons.receipt_outlined,
+                  size: 16,
+                  color: Colors.grey,
+                ),
                 const SizedBox(width: 8),
                 Text(
-                  ticket['bookingId']!,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black54,
-                  ),
+                  '#$ticketId',
+                  style: const TextStyle(fontSize: 14, color: Colors.black54),
                 ),
                 const SizedBox(width: 20),
-                const Icon(Icons.calendar_today_outlined, size: 16, color: Colors.grey),
+                const Icon(
+                  Icons.calendar_today_outlined,
+                  size: 16,
+                  color: Colors.grey,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    ticket['date']!,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.black54,
-                    ),
+                    issueDate,
+                    style: const TextStyle(fontSize: 14, color: Colors.black54),
                   ),
                 ),
               ],
@@ -233,24 +284,26 @@ class _MyTicketViewState extends State<MyTicketView>
             const SizedBox(height: 12),
             Row(
               children: [
-                const Icon(Icons.airport_shuttle_outlined, size: 16, color: Colors.grey),
+                const Icon(
+                  Icons.airport_shuttle_outlined,
+                  size: 16,
+                  color: Colors.grey,
+                ),
                 const SizedBox(width: 8),
                 Text(
-                  '${ticket['busType']!} ${ticket['busNumber']!}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black54,
-                  ),
+                  busInfo,
+                  style: const TextStyle(fontSize: 14, color: Colors.black54),
                 ),
                 const SizedBox(width: 20),
-                const Icon(Icons.event_seat_outlined, size: 16, color: Colors.grey),
+                const Icon(
+                  Icons.event_seat_outlined,
+                  size: 16,
+                  color: Colors.grey,
+                ),
                 const SizedBox(width: 8),
                 Text(
-                  ticket['seats']!,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black54,
-                  ),
+                  '$seatCount seat${int.tryParse(seatCount) != 1 ? 's' : ''}',
+                  style: const TextStyle(fontSize: 14, color: Colors.black54),
                 ),
               ],
             ),
@@ -261,9 +314,10 @@ class _MyTicketViewState extends State<MyTicketView>
                   child: OutlinedButton.icon(
                     onPressed: () {
                       // Rate a schedule action
+                      _showRatingDialog(ticket);
                     },
-                    icon: const Icon(Icons.schedule, size: 16),
-                    label: const Text('Rate a schedule'),
+                    icon: const Icon(Icons.star_outline, size: 16),
+                    label: const Text('Rate Trip'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: const Color(0xFF00BCD4),
                       side: const BorderSide(color: Color(0xFF00BCD4)),
@@ -280,12 +334,13 @@ class _MyTicketViewState extends State<MyTicketView>
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const TicketDetailView(),
+                          builder: (context) =>
+                              TicketDetailView(ticket: ticket),
                         ),
                       );
                     },
                     icon: const Icon(Icons.info_outline, size: 16),
-                    label: const Text('See details'),
+                    label: const Text('See Details'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.grey,
                       side: const BorderSide(color: Colors.grey),
@@ -299,6 +354,54 @@ class _MyTicketViewState extends State<MyTicketView>
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  String _getRouteText(Datum ticket) {
+    // You might need to adjust this based on your actual route data structure
+    // For now, using a placeholder - you should replace this with actual route data
+    return 'Phnom Penh - Kompong Cham';
+  }
+
+  String _formatDate(DateTime? date) {
+    if (date == null) return 'N/A';
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  String _getBusInfo(Datum ticket) {
+    final busType = ticket.booking?.schedule?.bus?.busType ?? '';
+    final busNumber = ticket.booking?.schedule?.bus?.busNumber ?? '';
+
+    if (busType.isEmpty && busNumber.isEmpty) {
+      return 'Bus Info N/A';
+    }
+
+    return '$busType $busNumber'.trim();
+  }
+
+  void _showRatingDialog(Datum ticket) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Rate Your Trip'),
+        content: const Text('How was your experience with this trip?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // Implement rating logic here
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Thank you for your rating!')),
+              );
+            },
+            child: const Text('Rate'),
+          ),
+        ],
       ),
     );
   }
@@ -334,10 +437,7 @@ class _MyTicketViewState extends State<MyTicketView>
             const SizedBox(height: 8),
             Text(
               subtitle,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 14, color: Colors.grey),
               textAlign: TextAlign.center,
             ),
           ],
