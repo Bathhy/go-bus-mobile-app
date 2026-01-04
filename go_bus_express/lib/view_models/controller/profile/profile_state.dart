@@ -7,7 +7,7 @@ class ProfileState {
 
   ProfileState({
     this.isLoading = false,
-    this.profileModel,
+    this.profileModel = const ProfileModel(),
     this.currentLanguage = 'en',
   });
 

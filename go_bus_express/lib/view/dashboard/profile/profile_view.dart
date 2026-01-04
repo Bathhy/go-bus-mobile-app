@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/resources/app_images.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
+import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
 import 'package:go_bus_express/view_models/controller/profile/profile_controller.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
@@ -20,10 +21,17 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends State<ProfilePage>
+    with AutomaticKeepAliveClientMixin {
+  final ProfileController controller = getIt<ProfileController>();
+  final HomeController homecontroller = getIt<HomeController>();
+
+  @override
+  bool get wantKeepAlive => false;
+
   @override
   Widget build(BuildContext context) {
-    final ProfileController controller = getIt<ProfileController>();
+    super.build(context);
     return Scaffold(
       backgroundColor: primaryBgColor,
       appBar: AppBar(
@@ -46,10 +54,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Obx(() {
-                      if (controller.state.profileModel != null) {
+                      if (homecontroller.state.profileModel != null) {
                         return UserProfileCard(
-                          name: controller.state.profileModel!.fullName ?? "",
-                          email: controller.state.profileModel!.email ?? "",
+                          name: homecontroller.state.profileModel!.fullName ?? "",
+                          email: homecontroller.state.profileModel!.email ?? "",
                         );
                       }
                       return const SizedBox.shrink();
@@ -62,8 +70,19 @@ class _ProfilePageState extends State<ProfilePage> {
                       source: Icons.person_outline,
                       iconColor: Colors.orange,
                       title: 'Edit Profile'.tr,
-                      onTap: () {
-                        Get.toNamed(AppRoutes.editProfile);
+                      onTap: () async {
+                        final result = await Get.toNamed(
+                          AppRoutes.editProfile,
+                          arguments: {
+                            'fullName': controller.state.profileModel?.fullName,
+                            'email': controller.state.profileModel?.email,
+                            'phone': controller.state.profileModel?.phone,
+                          },
+                        );
+
+                        if (result == true || result != null) {
+                          controller.refreshProfile();
+                        }
                       },
                     ),
                     const SizedBox(height: 12),
@@ -77,7 +96,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         _showLanguageBottomSheet(context, controller);
                       },
                     ),
-                  /*  const SizedBox(height: 12),
+                    /*  const SizedBox(height: 12),
                     _buildMenuItem(
                       context: context,
                       imageType: ImageType.iconData,

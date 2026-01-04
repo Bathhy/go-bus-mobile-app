@@ -81,7 +81,7 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
                   '\$${state.unitPrice.toStringAsFixed(2)}',
                 ),
                 SizedBox(height: XPadding.medium),
-                _buildSummaryRow('Quantity'.tr, '${state.quantity}'),
+                _buildSummaryRow('qty'.tr, '${state.quantity}'),
                 SizedBox(height: XPadding.medium),
                 _buildSummaryRow(
                   'Discount'.tr,

@@ -28,9 +28,9 @@ class SelectRouteController extends BaseController<SelectRouteState> {
 
     final routeId = args['route_id'] as int?;
     final departureDate = args['departure_date'] as String?;
-    final returnDate = args['return_date'] as String?;
+    // final returnDate = args['return_date'] as String?;
 
-    if (routeId == null || departureDate == null || returnDate == null) {
+    if (routeId == null || departureDate == null) {
       log('❌ Missing required parameters');
       return;
     }
@@ -40,7 +40,7 @@ class SelectRouteController extends BaseController<SelectRouteState> {
       (state) => state.copyWith(
         routeId: routeId,
         departureDate: departureDate,
-        returnDate: returnDate,
+        returnDate: "",
         isLoading: true,
       ),
     );
@@ -49,7 +49,7 @@ class SelectRouteController extends BaseController<SelectRouteState> {
     fetchRouteByID(
       routeId: routeId,
       departureDate: departureDate,
-      returnDate: returnDate,
+      returnDate: "",
     );
   }
 
@@ -60,10 +60,9 @@ class SelectRouteController extends BaseController<SelectRouteState> {
   }) async {
     final result = await _repository.fetchBusBySchedule(
       routeId,
-      // departureDate,
+      departureDate,
       //
-      '2025-11-20',
-      '2026-01-20',
+      // '2025-11-20',
     );
 
     switch (result) {

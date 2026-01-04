@@ -68,4 +68,5 @@ final Map<String, String> en = {
       "Your booking #@bookingId payment of \$@amount @currency has been confirmed.",
   "select_route": "Select Route",
   "ok": "Ok",
+  "qty": "Quantity",
 };

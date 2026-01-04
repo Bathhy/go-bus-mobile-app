@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:go_bus_express/view_models/controller/editProfile/edit_profile_controller.dart';
+import 'package:shared_package/design_system/x_widget/AppImage.dart';
+
+import '../../core/di/app_di.dart';
+import '../../resources/app_images.dart';
 
 class EditProfileView extends StatefulWidget {
   const EditProfileView({super.key});
@@ -8,15 +14,20 @@ class EditProfileView extends StatefulWidget {
 }
 
 class _EditProfileViewState extends State<EditProfileView> {
-  final TextEditingController _nameController = TextEditingController(
-    text: 'សុប្រ័យ ស៊ុន',
-  );
-  final TextEditingController _emailController = TextEditingController(
-    text: 'goldammy24k@gmail.com',
-  );
-  final TextEditingController _phoneController = TextEditingController(
-    text: '23999888',
-  );
+  final EditProfileController _editController = getIt<EditProfileController>();
+
+  late final TextEditingController _nameController;
+  late final TextEditingController _emailController;
+  late final TextEditingController _phoneController;
+
+  @override
+  void initState() {
+    super.initState();
+    final profile = _editController.state.profileModel;
+    _nameController = TextEditingController(text: profile.fullName ?? '');
+    _emailController = TextEditingController(text: profile.email ?? '');
+    _phoneController = TextEditingController(text: profile.phoneNumber ?? '');
+  }
 
   @override
   void dispose() {
@@ -66,39 +77,14 @@ class _EditProfileViewState extends State<EditProfileView> {
                       ),
                       const SizedBox(height: 32),
                       Center(
-                        child: Stack(
-                          children: [
-                            CircleAvatar(
-                              radius: 60,
-                              backgroundColor: Colors.pink[300],
-                              child: const Icon(
-                                Icons.person,
-                                size: 60,
-                                color: Colors.white,
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: GestureDetector(
-                                onTap: () {
-                                  // Handle image picker
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.blue,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.edit,
-                                    color: Colors.white,
-                                    size: 20,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                        child: CircleAvatar(
+                          radius: 60,
+                          backgroundColor: Colors.pink[300],
+                          child: const Icon(
+                            Icons.person,
+                            size: 60,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 32),
@@ -124,8 +110,12 @@ class _EditProfileViewState extends State<EditProfileView> {
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
                 onPressed: () {
-                  // Handle save
-                  Navigator.pop(context);
+                  // Call update profile
+                  _editController.updateProfile(
+                    _emailController.text,
+                    _nameController.text,
+                    _phoneController.text,
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue[600],
@@ -224,16 +214,14 @@ class _EditProfileViewState extends State<EditProfileView> {
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: Colors.red[700],
-                        shape: BoxShape.circle,
+                    Center(
+                      child: AppSvgImage(
+                        path: AppImages.imgKhLang,
+                        height: 25,
+                        width: 25,
+                        defaultColor: true,
                       ),
-                      child: const Center(
-                        child: Icon(Icons.flag, color: Colors.white, size: 14),
-                      ),
+                      // child: Icon(Icons.flag, color: Colors.white, size: 14),
                     ),
                     const SizedBox(width: 8),
                     const Text(

@@ -75,6 +75,7 @@ mixin class BaseSharePreference {
     await removeValue(PreferencesKey.token);
     await removeValue(PreferencesKey.locale);
     await removeValue(PreferencesKey.isLogin);
+    await removeValue(PreferencesKey.profile);
   }
 
   Future<void> clearAll() async {

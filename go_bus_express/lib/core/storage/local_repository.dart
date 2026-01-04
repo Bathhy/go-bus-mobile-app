@@ -1,3 +1,5 @@
+import 'package:go_bus_express/resources/localizations/app_localization.dart';
+
 import 'base_share_preference.dart';
 
 class LocalRepository with BaseSharePreference {
@@ -61,6 +63,7 @@ class LocalRepository with BaseSharePreference {
 
   // Logout
   Future<void> logout() async {
+    await AppLocalization.clearLanguage();
     await logoutBox();
   }
 

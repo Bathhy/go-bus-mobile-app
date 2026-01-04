@@ -17,6 +17,12 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int _selectedIndex = 0;
 
+  final List<Widget> _pages = const [
+    HomePage(),
+    MyTicketView(),
+    ProfilePage(),
+  ];
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -28,7 +34,7 @@ class _MainNavigationState extends State<MainNavigation> {
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
-        children: const [HomePage(), MyTicketView(), ProfilePage()],
+        children: _pages,
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
