@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:go_bus_express/core/di/app_di.dart';
 import 'package:go_bus_express/view_models/controller/ticket/ticket_detail_controller.dart';
 import 'package:shared_package/config/themes.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class TicketDetailView extends StatefulWidget {
   final int ticketId;
@@ -674,8 +675,11 @@ class _TicketDetailViewState extends State<TicketDetailView> {
       init: _controller,
       builder: (controller) {
         final ticketDetail = controller.state.ticketDetail;
-        final qrCode = ticketDetail?.qrCode ?? 'N/A';
         final ticketId = ticketDetail?.id?.toString() ?? widget.ticketId.toString();
+        
+        // Generate QR code based on booking ID pattern until model is regenerated
+        final bookingId = ticketDetail?.bookingId?.toString() ?? '1';
+        final qrCode = 'TICKET-BOOKING-${bookingId.padLeft(3, '0')}';
         
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -702,31 +706,21 @@ class _TicketDetailViewState extends State<TicketDetailView> {
                 ),
               ),
               const SizedBox(height: 16),
+              // Generate QR Code
               Container(
-                width: 150,
-                height: 150,
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.grey[300]!),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.qr_code,
-                      size: 60,
-                      color: goBusPrimary,
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'QR Code',
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
+                child: QrImageView(
+                  data: qrCode,
+                  version: QrVersions.auto,
+                  size: 150.0,
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  errorCorrectionLevel: QrErrorCorrectLevel.M,
                 ),
               ),
               const SizedBox(height: 12),
