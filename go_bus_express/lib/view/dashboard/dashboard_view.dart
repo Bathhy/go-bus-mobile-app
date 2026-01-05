@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_bus_express/core/di/app_di.dart';
 import 'package:go_bus_express/resources/app_images.dart';
 import 'package:go_bus_express/view/dashboard/home/home_view.dart';
 import 'package:go_bus_express/view/dashboard/profile/profile_view.dart';
 import 'package:go_bus_express/view/dashboard/my_ticket/my_ticket_view.dart';
+import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
+import 'package:go_bus_express/view_models/controller/profile/profile_controller.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/x_widget/AppImage.dart';
 
@@ -15,31 +18,62 @@ class MainNavigation extends StatefulWidget {
 }
 
 class _MainNavigationState extends State<MainNavigation> {
+  final homeController = getIt<HomeController>();
+  final profileController = getIt<ProfileController>();
   int _selectedIndex = 0;
+
+  final List<Widget> _pages = const [HomePage(), MyTicketView(), ProfilePage()];
+
+  @override
+  void initState() {
+    _refetch();
+    super.initState();
+  }
+
+  void _refetch() {
+    homeController.fetchProfile();
+    homeController.loadCachedRoutes();
+
+    profileController.loadCachedProfile();
+    profileController.loadCurrentLanguage();
+  }
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+    _refreshCurrentTab(index);
   }
 
-  Widget _getCurrentPage() {
-    switch (_selectedIndex) {
+  void _refreshCurrentTab(int index) {
+    switch (index) {
       case 0:
-        return const HomePage();
+        // Home tab - refresh HomeController
+        try {
+          homeController.fetchProfile();
+          homeController.loadCachedRoutes();
+        } catch (e) {
+          // Controller not found
+        }
+        break;
       case 1:
-        return const MyTicketView();
+        // Ticket tab - add refresh logic if needed
+        break;
       case 2:
-        return const ProfilePage();
-      default:
-        return const HomePage();
+        try {
+          profileController.loadCachedProfile();
+          profileController.loadCurrentLanguage();
+        } catch (e) {
+          // Controller not found
+        }
+        break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _getCurrentPage(),
+      body: IndexedStack(index: _selectedIndex, children: _pages),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: goBusPrimary,

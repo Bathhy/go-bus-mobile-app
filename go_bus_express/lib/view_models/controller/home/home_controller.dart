@@ -24,18 +24,13 @@ class HomeController extends BaseController<HomeState> {
   final HiveManagerRepository _hiveRepository;
   final BookingRepository _bookingRepository;
 
-  HomeController(this._repository,
-      this._localRepository,
-      this._routeRepository,
-      this._hiveRepository,
-      this._bookingRepository,) : super(HomeState());
-
-  @override
-  void onInit() {
-    super.onInit();
-    fetchProfile();
-    loadCachedRoutes();
-  }
+  HomeController(
+    this._repository,
+    this._localRepository,
+    this._routeRepository,
+    this._hiveRepository,
+    this._bookingRepository,
+  ) : super(HomeState());
 
   Future<void> fetchProfile() async {
     // Set loading
@@ -44,18 +39,17 @@ class HomeController extends BaseController<HomeState> {
 
     switch (result) {
       case Success<ProfileModel?>():
-      // Update profile
+        // Update profile
         updateState(
-              (state) =>
+          (state) =>
               state.copyWith(isLoading: false, profileModel: result.data),
         );
-
         if (result.data != null) {
           final profileJson = jsonEncode(result.data!.toJson());
           await _localRepository.saveProfile(profileJson);
         }
       case Error<ProfileModel?>():
-      // Error
+        // Error
         if (result.error.statusCode == 403) {
           logout();
         }
@@ -93,7 +87,7 @@ class HomeController extends BaseController<HomeState> {
     switch (result) {
       case Success<List<AllRouteModel>>():
         updateState(
-              (state) =>
+          (state) =>
               state.copyWith(isLoadingRoutes: false, routes: result.data),
         );
 
@@ -104,9 +98,9 @@ class HomeController extends BaseController<HomeState> {
         await _localRepository.saveRoutes(routesJson);
 
         log('✅ Routes fetched successfully: ${result.data.length} routes');
-    // for (var route in result.data) {
-    //   log('  📍 Route ${route.id}: ${route.origin} → ${route.destination} (${route.distanceKm}km, ${route.durationMinutes}min)');
-    // }
+      // for (var route in result.data) {
+      //   log('  📍 Route ${route.id}: ${route.origin} → ${route.destination} (${route.distanceKm}km, ${route.durationMinutes}min)');
+      // }
       case Error<List<AllRouteModel>>():
         updateState((state) => state.copyWith(isLoadingRoutes: false));
         log('❌ Routes error: ${result.error}');
@@ -115,19 +109,16 @@ class HomeController extends BaseController<HomeState> {
 
   void selectRoute(AllRouteModel route) {
     updateState(
-          (state) =>
-          state.copyWith(
-            selectedRouteId: route.id,
-            selectedRouteOrigin: route.origin,
-            selectedRouteDestination: route.destination,
-          ),
+      (state) => state.copyWith(
+        selectedRouteId: route.id,
+        selectedRouteOrigin: route.origin,
+        selectedRouteDestination: route.destination,
+      ),
     );
   }
 
   Map<String, dynamic>? getSearchParams() {
-    if (state.selectedRouteId == null ||
-        state.departureDate == null ||
-        state.returnDate == null) {
+    if (state.selectedRouteId == null || state.departureDate == null) {
       log('❌ Missing required search parameters');
       return null;
     }
@@ -135,8 +126,12 @@ class HomeController extends BaseController<HomeState> {
     final params = {
       'route_id': state.selectedRouteId,
       'departure_date': state.departureDate!.toIso8601String().split('T')[0],
-      'return_date': state.returnDate!.toIso8601String().split('T')[0],
     };
+
+    // Add return_date only if it's provided
+    if (state.returnDate != null) {
+      params['return_date'] = state.returnDate!.toIso8601String().split('T')[0];
+    }
 
     log('✅ Search params: $params');
     return params;
@@ -238,5 +233,14 @@ class HomeController extends BaseController<HomeState> {
         snackPosition: SnackPosition.BOTTOM,
       );
     }
+  }
+
+  Future<void> pullRefresh() async {
+    await Future.wait([fetchProfile(), fetchRoutes(forceRefresh: true)]);
+  }
+
+  void refreshProfile() {
+    fetchProfile();
+    log('Profile refreshed from cache');
   }
 }

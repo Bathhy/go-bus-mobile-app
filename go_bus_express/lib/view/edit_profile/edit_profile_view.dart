@@ -1,4 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:go_bus_express/view_models/controller/editProfile/edit_profile_controller.dart';
+import 'package:shared_package/config/themes.dart';
+import 'package:shared_package/design_system/x_widget/AppImage.dart';
+
+import '../../core/di/app_di.dart';
+import '../../resources/app_images.dart';
+import '../widget/x_loading_dialog.dart';
 
 class EditProfileView extends StatefulWidget {
   const EditProfileView({super.key});
@@ -8,15 +16,30 @@ class EditProfileView extends StatefulWidget {
 }
 
 class _EditProfileViewState extends State<EditProfileView> {
-  final TextEditingController _nameController = TextEditingController(
-    text: 'សុប្រ័យ ស៊ុន',
-  );
-  final TextEditingController _emailController = TextEditingController(
-    text: 'goldammy24k@gmail.com',
-  );
-  final TextEditingController _phoneController = TextEditingController(
-    text: '23999888',
-  );
+  final EditProfileController _editController = getIt<EditProfileController>();
+
+  late final TextEditingController _nameController;
+  late final TextEditingController _emailController;
+  late final TextEditingController _phoneController;
+  Worker? _stateWorker;
+
+  @override
+  void initState() {
+    super.initState();
+    final profile = _editController.state.profileModel;
+    _nameController = TextEditingController(text: profile.fullName);
+    _emailController = TextEditingController(text: profile.email);
+    _phoneController = TextEditingController(text: profile.phoneNumber);
+
+    //MARK - Global Loading
+    _stateWorker = ever(_editController.obs, (state) {
+      if (state.isLoading) {
+        XAppLoadingDialog.showAppDialog();
+      } else {
+        XAppLoadingDialog.hideAppDialog();
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -30,122 +53,97 @@ class _EditProfileViewState extends State<EditProfileView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () => Navigator.pop(context),
-                            child: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[200],
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.arrow_back, size: 24),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          const Text(
-                            'Edit Profile',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 32),
-                      Center(
-                        child: Stack(
+      body: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
                           children: [
-                            CircleAvatar(
-                              radius: 60,
-                              backgroundColor: Colors.pink[300],
-                              child: const Icon(
-                                Icons.person,
-                                size: 60,
-                                color: Colors.white,
-                              ),
+                            GestureDetector(
+                              onTap: () => Get.back(),
+                              child: const Icon(Icons.arrow_back_ios, size: 24),
                             ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: GestureDetector(
-                                onTap: () {
-                                  // Handle image picker
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.blue,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.edit,
-                                    color: Colors.white,
-                                    size: 20,
-                                  ),
-                                ),
+                            const SizedBox(width: 16),
+                            Text(
+                              'Edit Profile'.tr,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
                               ),
                             ),
                           ],
                         ),
-                      ),
-                      const SizedBox(height: 32),
-                      _buildInputField(
-                        label: 'FULL NAME',
-                        controller: _nameController,
-                      ),
-                      const SizedBox(height: 20),
-                      _buildInputField(
-                        label: 'EMAIL',
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      const SizedBox(height: 20),
-                      _buildPhoneField(),
-                      const SizedBox(height: 40),
-                    ],
+                        const SizedBox(height: 32),
+                        Center(
+                          child: CircleAvatar(
+                            radius: 60,
+                            backgroundColor: Colors.pink[300],
+                            child: const Icon(
+                              Icons.person,
+                              size: 60,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                        _buildInputField(
+                          label: 'full_name'.tr,
+                          controller: _nameController,
+                        ),
+                        const SizedBox(height: 20),
+                        _buildInputField(
+                          label: 'email'.tr,
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                        ),
+                        const SizedBox(height: 20),
+                        _buildPhoneField(),
+                        const SizedBox(height: 40),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  // Handle save
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[600],
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(double.infinity, 56),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Call update profile
+                    _editController.updateProfile(
+                      _emailController.text,
+                      _nameController.text,
+                      _phoneController.text,
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: goBusPrimary,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 56),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
-                ),
-                child: const Text(
-                  'SAVE',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
+                  child: Text(
+                    'save'.tr,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -194,7 +192,7 @@ class _EditProfileViewState extends State<EditProfileView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'PHONE NUMBER',
+          'phone_number'.tr,
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
@@ -224,16 +222,14 @@ class _EditProfileViewState extends State<EditProfileView> {
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: Colors.red[700],
-                        shape: BoxShape.circle,
+                    Center(
+                      child: AppSvgImage(
+                        path: AppImages.imgKhLang,
+                        height: 25,
+                        width: 25,
+                        defaultColor: true,
                       ),
-                      child: const Center(
-                        child: Icon(Icons.flag, color: Colors.white, size: 14),
-                      ),
+                      // child: Icon(Icons.flag, color: Colors.white, size: 14),
                     ),
                     const SizedBox(width: 8),
                     const Text(

@@ -15,6 +15,7 @@ import 'package:go_bus_express/repository/profile_repository.dart';
 import 'package:go_bus_express/repository/route_repository.dart';
 import 'package:go_bus_express/repository/ticket_repository.dart';
 import 'package:go_bus_express/view_models/controller/auth/AuthController.dart';
+import 'package:go_bus_express/view_models/controller/editProfile/edit_profile_controller.dart';
 import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
 import 'package:go_bus_express/view_models/controller/payment/choose_payment_controller.dart';
 import 'package:go_bus_express/view_models/controller/payment/kh_qr/kh_qr_controller.dart';
@@ -32,6 +33,7 @@ final getIt = GetIt.instance;
 
 Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<LocalRepository>(() => LocalRepository());
+
 
   // Initialize and register HiveManagerRepository
   final hiveManager = HiveManagerRepository();
@@ -72,6 +74,7 @@ Future<void> setupDependencyInjection() async {
   );
 
 
+
   // Controller
   getIt.registerFactory<SplashController>(() {
     final controller = SplashController(getIt());
@@ -84,20 +87,14 @@ Future<void> setupDependencyInjection() async {
     return controller;
   });
   getIt.registerFactory<HomeController>(() {
-    final controller = HomeController(
-      getIt<ProfileRepository>(),
-      getIt<LocalRepository>(),
-      getIt<RouteRepository>(),
-      getIt<HiveManagerRepository>(),
-      getIt<BookingRepository>(),
+    final controller = Get.put(
+      HomeController(getIt(), getIt(), getIt(), getIt(), getIt()),
     );
-    Get.put(controller);
     return controller;
   });
+  Get.put(HomeController(getIt(), getIt(), getIt(), getIt(), getIt()));
   getIt.registerFactory<ProfileController>(() {
-    final controller = ProfileController(getIt<LocalRepository>());
-    Get.put(controller);
-    controller.onInit();
+    final controller = Get.put(ProfileController(getIt()));
     return controller;
   });
   getIt.registerFactory<SelectRouteController>(() {
@@ -120,7 +117,69 @@ Future<void> setupDependencyInjection() async {
     Get.put(controller);
     return controller;
   });
+
+  getIt.registerFactory<EditProfileController>(() {
+    final controller = EditProfileController(getIt(), getIt());
+    Get.put(controller);
+    return controller;
+  });
+
   getIt.registerFactory<TicketController>(() {
+    final controller = TicketController(getIt());
+    Get.put(controller);
+    return controller;
+  });
+  getIt.registerFactory<TicketDetailController>(() {
+    final controller = TicketDetailController(getIt());
+    Get.put(controller);
+    return controller;
+  });
+}
+
+void resetSingletonControllers() {
+  // Unregister old singletons
+  if (getIt.isRegistered<HomeController>()) {
+    getIt.unregister<HomeController>();
+  }
+  if (getIt.isRegistered<ProfileController>()) {
+    getIt.unregister<ProfileController>();
+  }
+
+  // Re-register fresh singletons
+  getIt.registerLazySingleton<HomeController>(() {
+    final controller = HomeController(
+      getIt<ProfileRepository>(),
+      getIt<LocalRepository>(),
+      getIt<RouteRepository>(),
+      getIt<HiveManagerRepository>(),
+      getIt<BookingRepository>(),
+    );
+    Get.put(controller);
+    controller.onInit();
+    return controller;
+  });
+
+  getIt.registerLazySingleton<ProfileController>(() {
+    final controller = ProfileController(getIt<LocalRepository>());
+    Get.put(controller);
+    controller.onInit();
+    controller.onReady();
+    return controller;
+  });
+  getIt.registerFactory<TicketController>(() {
+    final controller = TicketController(getIt());
+    Get.put(controller);
+    return controller;
+  });
+  getIt.registerFactory<TicketDetailController>(() {
+    final controller = TicketDetailController(getIt());
+    Get.put(controller);
+    return controller;
+  });
+  getIt.registerFactory<BookingRepository>(
+    () => BookingRepositoryImpl(getIt(), getIt()),
+  );
+    getIt.registerFactory<TicketController>(() {
     final controller = TicketController(getIt());
     Get.put(controller);
     return controller;

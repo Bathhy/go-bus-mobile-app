@@ -4,6 +4,7 @@ import 'package:go_bus_express/core/di/app_di.dart';
 import 'package:go_bus_express/models/payment/pending_payment_model.dart';
 import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
 import 'package:shared_package/design_system/x_widget/user_profile_card.dart';
+import '../../widget/x_loading_dialog.dart';
 import 'widgets/home_app_bar.dart';
 import 'widgets/booking_card.dart';
 import 'widgets/promotions_section.dart';
@@ -16,8 +17,12 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin {
   final HomeController homeController = getIt<HomeController>();
+
+  @override
+  bool get wantKeepAlive => false;
 
   @override
   void initState() {
@@ -217,38 +222,44 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
     return Scaffold(
       backgroundColor: Colors.grey[100],
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              HomeAppBar(
-                onTap: () => homeController.callPhone(),
-                onTapTelegram: () => homeController.openTelegram(),
-              ),
-              const SizedBox(height: 16),
-              Obx(() {
-                if (homeController.state.profileModel != null) {
-                  return UserProfileCard(
-                    name: homeController.state.profileModel!.fullName ?? "NA",
-                    email: homeController.state.profileModel!.email ?? "NA",
-                  );
-                }
-                return const SizedBox.shrink();
-              }),
-              const SizedBox(height: 16),
-              const BookingCard(),
-              const SizedBox(height: 16),
-              const PromotionsSection(),
-              const SizedBox(height: 16),
-              NeedHelpSection(
-                onTap: () => homeController.callPhone(),
-                onTapTelegram: () => homeController.openTelegram(),
-              ),
-              const SizedBox(height: 20),
-            ],
+        child: RefreshIndicator(
+          onRefresh: () => homeController.pullRefresh(),
+          color: const Color(0xFF4CAF50),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                HomeAppBar(
+                  onTap: () => homeController.callPhone(),
+                  onTapTelegram: () => homeController.openTelegram(),
+                ),
+                const SizedBox(height: 16),
+                Obx(() {
+                  if (homeController.state.profileModel != null) {
+                    return UserProfileCard(
+                      name: homeController.state.profileModel!.fullName ?? "NA",
+                      email: homeController.state.profileModel!.email ?? "NA",
+                    );
+                  }
+                  return const SizedBox.shrink();
+                }),
+                const SizedBox(height: 16),
+                const BookingCard(),
+                const SizedBox(height: 16),
+                const PromotionsSection(),
+                const SizedBox(height: 16),
+                NeedHelpSection(
+                  onTap: () => homeController.callPhone(),
+                  onTapTelegram: () => homeController.openTelegram(),
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),

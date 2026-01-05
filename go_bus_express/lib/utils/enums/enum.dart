@@ -9,7 +9,7 @@ enum PaymentStatusEnum {
 }
 
 enum SeatStatusEnum {
-  unavailable("UNAVAILABLE"),
+  unavailable("BOOKED"),
   available("AVAILABLE");
 
   final String status;

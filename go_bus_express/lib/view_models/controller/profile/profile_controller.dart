@@ -3,10 +3,15 @@ import 'dart:developer';
 import 'dart:ui';
 
 import 'package:get/get.dart';
+import 'package:go_bus_express/core/di/app_di.dart';
+import 'package:go_bus_express/repository/profile_repository.dart';
 import 'package:go_bus_express/view_models/controller/base/base_controller.dart';
+import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
 import 'package:go_bus_express/view_models/controller/profile/profile_state.dart';
+import 'package:shared_package/network/x_result.dart';
 
 import '../../../core/storage/local_repository.dart';
+import '../../../models/body/update_profile_body.dart';
 import '../../../models/profile/profile_model.dart';
 import '../../../resources/localizations/app_localization.dart';
 import '../../../resources/routes/app_routes.dart';
@@ -15,13 +20,6 @@ class ProfileController extends BaseController<ProfileState> {
   final LocalRepository _localRepository;
 
   ProfileController(this._localRepository) : super(ProfileState());
-
-  @override
-  void onInit() {
-    loadCachedProfile();
-    loadCurrentLanguage();
-    super.onInit();
-  }
 
   void loadCurrentLanguage() {
     final language = _localRepository.getLanguage() ?? 'en';
@@ -42,6 +40,12 @@ class ProfileController extends BaseController<ProfileState> {
     }
   }
 
+  void refreshProfile() {
+    loadCachedProfile();
+    loadCurrentLanguage();
+    log('Profile refreshed from cache');
+  }
+
   Future<void> changeLanguage(String languageCode) async {
     await AppLocalization.saveLanguage(languageCode);
     Get.updateLocale(Locale(languageCode));
@@ -51,11 +55,6 @@ class ProfileController extends BaseController<ProfileState> {
 
   String getCurrentLanguage() {
     return state.currentLanguage;
-  }
-
-  Future<void> clearLanguage() async {
-    await AppLocalization.clearLanguage();
-    log('Language cleared, reverting to default');
   }
 
   void logout() {

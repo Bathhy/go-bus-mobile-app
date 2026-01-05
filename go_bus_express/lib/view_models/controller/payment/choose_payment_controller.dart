@@ -130,6 +130,7 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
     switch (result) {
       case Success<GenerateQrModel>():
         {
+          await _localRepository.saveMD5(result.data.md5 ?? '');
           // Save pending payment to Hive
           final pendingPayment = PendingPaymentModel(
             bookingId: bookingId,

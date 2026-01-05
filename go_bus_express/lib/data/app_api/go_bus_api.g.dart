@@ -51,13 +51,9 @@ class _GoBusApi implements GoBusApi {
   Future<BaseResponse<RouteListResponseModel>> fetchBusBySchedule(
     int destinationId, {
     String? departureDate,
-    String? returnDate,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{
-      r'departureDate': departureDate,
-      r'returnDate': returnDate,
-    };
+    final queryParameters = <String, dynamic>{r'departureDate': departureDate};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
@@ -179,6 +175,39 @@ class _GoBusApi implements GoBusApi {
                   )
                   .toList()
             : List.empty(),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<BaseResponse<ProfileModel>> updateProfile({
+    required UpdateProfileBody body,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    _data.addAll(body.toJson());
+    final _options = _setStreamType<BaseResponse<ProfileModel>>(
+      Options(method: 'PUT', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/profile/updateProfile',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late BaseResponse<ProfileModel> _value;
+    try {
+      _value = BaseResponse<ProfileModel>.fromJson(
+        _result.data!,
+        (json) => ProfileModel.fromJson(json as Map<String, dynamic>),
       );
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);

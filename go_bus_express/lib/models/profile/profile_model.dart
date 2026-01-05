@@ -8,12 +8,14 @@ class ProfileModel {
   final String? fullName;
   final String? email;
   final String? image;
+  final String? phone;
 
   const ProfileModel({
     this.id,
     this.fullName,
     this.email,
     this.image,
+    this.phone,
   });
 
   ProfileModel copyWith({

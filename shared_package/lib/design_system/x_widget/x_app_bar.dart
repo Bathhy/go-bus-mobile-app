@@ -22,7 +22,7 @@ class XAppBar extends StatelessWidget {
       backgroundColor: goBusPrimary,
       centerTitle: isCenter,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: Colors.white),
+        icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
         onPressed: onBackPressed,
       ),
       title: Column(
