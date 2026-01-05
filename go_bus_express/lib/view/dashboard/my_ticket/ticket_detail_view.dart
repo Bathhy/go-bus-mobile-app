@@ -1,46 +1,233 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:go_bus_express/core/di/app_di.dart';
+import 'package:go_bus_express/view_models/controller/ticket/ticket_detail_controller.dart';
+import 'package:shared_package/config/themes.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class TicketDetailView extends StatefulWidget {
-  const TicketDetailView({super.key});
+  final int ticketId;
+  
+  const TicketDetailView({super.key, required this.ticketId});
 
   @override
   State<TicketDetailView> createState() => _TicketDetailViewState();
 }
 
 class _TicketDetailViewState extends State<TicketDetailView> {
+  late TicketDetailController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = getIt<TicketDetailController>();
+    
+    // Register controller with GetX if not already registered
+    if (!Get.isRegistered<TicketDetailController>()) {
+      Get.put(_controller);
+    }
+    
+    // Fetch ticket details when view loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _controller.fetchTicketDetail(ticketId: widget.ticketId);
+    });
+  }
+
+  @override
+  void dispose() {
+    // Clean up controller if we registered it
+    if (Get.isRegistered<TicketDetailController>()) {
+      Get.delete<TicketDetailController>();
+    }
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      body: Column(
-        children: [
-          _buildHeader(),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).padding.bottom + 16,
+      body: GetBuilder<TicketDetailController>(
+        init: _controller,
+        builder: (controller) {
+          // Show loading state
+          if (controller.state.isLoading) {
+            return _buildLoadingState();
+          }
+
+          // Show error state
+          if (controller.state.error != null) {
+            return _buildErrorState(controller.state.error!);
+          }
+
+          // Show ticket details
+          return Column(
+            children: [
+              _buildHeader(controller),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).padding.bottom + 16,
+                  ),
+                  child: Column(
+                    children: [
+                      _buildTicketCard(controller),
+                      _buildQRCodeSection(),
+                      _buildPriceSection(controller),
+                    ],
+                  ),
+                ),
               ),
-              child: Column(
-                children: [
-                  _buildTicketCard(),
-                  _buildPriceSection(),
-                ],
-              ),
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       ),
-      // bottomNavigationBar: _buildBottomNav(),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildLoadingState() {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header with back button
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.black),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  const Text(
+                    'Ticket Details',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Loading indicator
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(color: goBusPrimary),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Loading ticket details...',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorState(String error) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header with back button
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.black),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  const Text(
+                    'Ticket Details',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Error state
+            Expanded(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: Colors.red.shade400,
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Failed to load ticket details',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        error,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton(
+                        onPressed: () {
+                          _controller.fetchTicketDetail(ticketId: widget.ticketId);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: goBusPrimary,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(TicketDetailController controller) {
+    final ticketDetail = controller.state.ticketDetail;
+    final ticketId = ticketDetail?.id?.toString() ?? widget.ticketId.toString();
+    final bookingId = ticketDetail?.bookingId?.toString() ?? 'N/A';
+    final issueDate = ticketDetail?.issuedAt;
+    final formattedDate = issueDate != null 
+        ? '${issueDate.day} ${_getMonthName(issueDate.month)} ${issueDate.year}'
+        : 'N/A';
+    
+    final routeInfo = controller.getRouteInfo();
+    
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF85B3E1), Color(0xFF6B9FD8)],
+          colors: [goBusPrimary, goBusPrimary],
         ),
       ),
       child: SafeArea(
@@ -59,25 +246,32 @@ class _TicketDetailViewState extends State<TicketDetailView> {
                   const Spacer(),
                 ],
               ),
-              const Text(
-                'Phnom Penh - Kompong Cham',
-                style: TextStyle(
+              Text(
+                routeInfo,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                '8033-65978-3',
-                style: TextStyle(
+              Text(
+                'Ticket #$ticketId',
+                style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 14,
                 ),
               ),
-              const Text(
-                '(#) 12 Sep 2025 [09:15 AM]',
-                style: TextStyle(
+              Text(
+                'Booking #$bookingId',
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14,
+                ),
+              ),
+              Text(
+                'Issued: $formattedDate',
+                style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 14,
                 ),
@@ -90,7 +284,56 @@ class _TicketDetailViewState extends State<TicketDetailView> {
     );
   }
 
-  Widget _buildTicketCard() {
+  String _getMonthName(int month) {
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    return months[month - 1];
+  }
+
+  String _formatTravelDate(DateTime? date) {
+    if (date == null) return 'N/A';
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  String _formatStatus(String status) {
+    // Capitalize first letter and format status
+    if (status.isEmpty) return 'N/A';
+    return status[0].toUpperCase() + status.substring(1).toLowerCase();
+  }
+
+  // TODO: Replace these methods with actual passenger data from API
+  String _getPassengerName() => 'Thong Vathana'; // Should come from user data
+  String _getPassengerEmail() => 'thongvathana22@gmail.com'; // Should come from user data
+
+  Widget _buildTicketCard(TicketDetailController controller) {
+    final ticketDetail = controller.state.ticketDetail;
+    final booking = ticketDetail?.booking;
+    final schedule = booking?.schedule;
+    final bus = schedule?.bus;
+    final route = bus?.route;
+    
+    final busInfo = controller.getBusInfo();
+    final travelDate = _formatTravelDate(schedule?.departureDate);
+    final bookingId = booking?.id?.toString() ?? 'N/A';
+    final paymentStatus = _formatStatus(booking?.paymentStatus ?? 'N/A');
+    final bookingStatus = _formatStatus(booking?.bookingStatus ?? 'N/A');
+    
+    // Get departure and arrival times from schedule
+    final departureTime = schedule?.departureTime ?? 'N/A';
+    final arrivalTime = schedule?.arrivalTime != null 
+        ? '${schedule!.arrivalTime!.hour.toString().padLeft(2, '0')}:${schedule.arrivalTime!.minute.toString().padLeft(2, '0')}'
+        : 'N/A';
+    
+    // Additional information from API
+    final distance = route?.distanceKm != null ? '${route!.distanceKm} km' : 'N/A';
+    final duration = route?.durationMinutes != null 
+        ? '${(route!.durationMinutes! / 60).floor()}h ${route.durationMinutes! % 60}m' 
+        : 'N/A';
+    final totalSeats = bus?.totalSeats?.toString() ?? 'N/A';
+    final schedulePrice = schedule?.price?.toString() ?? 'N/A';
+    
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -106,42 +349,172 @@ class _TicketDetailViewState extends State<TicketDetailView> {
       ),
       child: Column(
         children: [
-          _buildInfoRow('ប្រភេទសេវា', 'Luxury Coaster (16)'),
+          _buildInfoRow('Service Type', busInfo),
           _buildDivider(),
-          _buildInfoRow('ថ្ងៃធ្វើដំណើរ', '2025-12-20'),
+          _buildInfoRow('Travel Date', travelDate),
           _buildDivider(),
-          _buildInfoRow('លេខកូដកក់', 'CAMR-UHELQHXIRWXM'),
+          _buildInfoRow('Booking Code', bookingId),
           _buildDivider(),
-          _buildInfoRow('លេខអាសនៈ', '0987654321'),
+          _buildInfoRow('Departure Time', departureTime),
           _buildDivider(),
-          _buildInfoRow('ទូទាត់', 'ABA'),
+          _buildInfoRow('Arrival Time', arrivalTime),
+          _buildDivider(),
+          _buildInfoRow('Distance', distance),
+          _buildDivider(),
+          _buildInfoRow('Duration', duration),
+          _buildDivider(),
+          _buildInfoRow('Total Seats', totalSeats),
+          _buildDivider(),
+          _buildInfoRow('Schedule Price', '\$ $schedulePrice'),
+          _buildDivider(),
+          _buildStatusRow('Payment Status', paymentStatus , booking?.paymentStatus),
+          _buildDivider(),
+          _buildStatusRow('Booking Status', bookingStatus, booking?.bookingStatus),
           _buildDivider(),
           _buildLocationSection(
-            'ទីតាំងឡើងដំបូង',
-            'Channa Pich VIP (09:15 AM)',
-            'Chvicha Oue E (St 78), Phnom Penh, Cambodia',
+            'Departure Location',
+            _getDepartureInfo(controller),
+            _getDepartureAddress(controller),
           ),
           _buildDivider(),
           _buildLocationSection(
-            'ទីតាំងចុះ',
-            'Kompong Cham VIP (09:15 AM)',
-            'Kompong Cham',
+            'Arrival Location',
+            _getArrivalInfo(controller),
+            _getArrivalAddress(controller),
           ),
           _buildDivider(),
-          _buildInfoRow('ឈ្មោះ', 'Thong Vathana'),
+          // TODO: Get passenger info from API when available
+          _buildInfoRow('Passenger Name', _getPassengerName()),
           _buildDivider(),
-          _buildInfoRow('ភេទ', 'Male'),
-          _buildDivider(),
-          _buildInfoRow('លេខទូរស័ព្ទ', '012 345 678'),
-          _buildDivider(),
-          _buildInfoRow('សញ្ជាតិ', 'Cambodia'),
-          _buildDivider(),
-          _buildInfoRow('អាយុ', '21'),
-          _buildDivider(),
-          _buildInfoRow('លេខកៅអី', '11'),
+          _buildInfoRow('Email', _getPassengerEmail()),
         ],
       ),
     );
+  }
+
+  Widget _buildPriceSection(TicketDetailController controller) {
+    final ticketDetail = controller.state.ticketDetail;
+    final booking = ticketDetail?.booking;
+    final schedule = booking?.schedule;
+    
+    final totalAmount = booking?.totalAmount?.toString() ?? '0';
+    final schedulePrice = schedule?.price?.toString() ?? '0';
+    
+    // Calculate discount (if schedule price is different from total amount)
+    final schedulePriceNum = schedule?.price ?? 0;
+    final totalAmountNum = booking?.totalAmount ?? 0;
+    final discount = schedulePriceNum > totalAmountNum ? (schedulePriceNum - totalAmountNum).toString() : '0';
+    
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Schedule Price',
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 14,
+                ),
+              ),
+              Text(
+                '\$ $schedulePrice',
+                style: TextStyle(
+                  color: goBusPrimary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Discount',
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 14,
+                ),
+              ),
+              Text(
+                '\$ $discount',
+                style: TextStyle(
+                  color: discount != '0' ? Colors.green : goBusPrimary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Divider(color: Color(0xFFE0E0E0)),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Total Amount',
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                '\$ $totalAmount',
+                style: TextStyle(
+                  color: goBusPrimary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Updated helper methods to use controller data
+  String _getDepartureInfo(TicketDetailController controller) {
+    final route = controller.state.ticketDetail?.booking?.schedule?.bus?.route;
+    final departureTime = controller.state.ticketDetail?.booking?.schedule?.departureTime ?? 'N/A';
+    return '${route?.origin ?? 'Departure'} ($departureTime)';
+  }
+  
+  String _getDepartureAddress(TicketDetailController controller) {
+    final route = controller.state.ticketDetail?.booking?.schedule?.bus?.route;
+    return route?.origin ?? 'Departure location not available';
+  }
+  
+  String _getArrivalInfo(TicketDetailController controller) {
+    final route = controller.state.ticketDetail?.booking?.schedule?.bus?.route;
+    final schedule = controller.state.ticketDetail?.booking?.schedule;
+    final arrivalTime = schedule?.arrivalTime != null 
+        ? '${schedule!.arrivalTime!.hour.toString().padLeft(2, '0')}:${schedule.arrivalTime!.minute.toString().padLeft(2, '0')}'
+        : 'N/A';
+    return '${route?.destination ?? 'Arrival'} ($arrivalTime)';
+  }
+  
+  String _getArrivalAddress(TicketDetailController controller) {
+    final route = controller.state.ticketDetail?.booking?.schedule?.bus?.route;
+    return route?.destination ?? 'Arrival location not available';
   }
 
   Widget _buildInfoRow(String label, String value) {
@@ -176,6 +549,66 @@ class _TicketDetailViewState extends State<TicketDetailView> {
     );
   }
 
+  Widget _buildStatusRow(String label, String value, String? rawStatus) {
+    Color statusColor = Colors.black87;
+    
+    // Color code based on status
+    if (rawStatus != null) {
+      switch (rawStatus.toLowerCase()) {
+        case 'paid':
+        case 'confirmed':
+        case 'completed':
+          statusColor = Colors.green;
+          break;
+        case 'pending':
+        case 'processing':
+          statusColor = Colors.orange;
+          break;
+        case 'cancelled':
+        case 'failed':
+          statusColor = Colors.red;
+          break;
+      }
+    }
+    
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Colors.black54,
+                fontSize: 14,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: statusColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                value,
+                style: TextStyle(
+                  color: statusColor,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildLocationSection(String title, String time, String location) {
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -198,11 +631,11 @@ class _TicketDetailViewState extends State<TicketDetailView> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF5B7FFF),
+                  color: goBusPrimary,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Text(
-                  'មើលផែនទី',
+                  'View Map',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 12,
@@ -237,117 +670,89 @@ class _TicketDetailViewState extends State<TicketDetailView> {
     return const Divider(height: 1, color: Color(0xFFE0E0E0));
   }
 
-  Widget _buildPriceSection() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: const Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'តម្លៃ',
-                style: TextStyle(
-                  color: Colors.black87,
-                  fontSize: 14,
-                ),
-              ),
-              Text(
-                '\$ 18.00',
-                style: TextStyle(
-                  color: Color(0xFF5B7FFF),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
+  Widget _buildQRCodeSection() {
+    return GetBuilder<TicketDetailController>(
+      init: _controller,
+      builder: (controller) {
+        final ticketDetail = controller.state.ticketDetail;
+        final ticketId = ticketDetail?.id?.toString() ?? widget.ticketId.toString();
+        
+        // Generate QR code based on booking ID pattern until model is regenerated
+        final bookingId = ticketDetail?.bookingId?.toString() ?? '1';
+        final qrCode = 'TICKET-BOOKING-${bookingId.padLeft(3, '0')}';
+        
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
               ),
             ],
           ),
-          SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Column(
             children: [
-              Text(
-                'ការបញ្ចុះតម្លៃ',
+              const Text(
+                'Ticket QR Code',
                 style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
                   color: Colors.black87,
-                  fontSize: 14,
                 ),
               ),
-              Text(
-                '\$ 6.50',
-                style: TextStyle(
-                  color: Color(0xFF5B7FFF),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+              const SizedBox(height: 16),
+              // Generate QR Code
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey[300]!),
                 ),
+                child: QrImageView(
+                  data: qrCode,
+                  version: QrVersions.auto,
+                  size: 150.0,
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  errorCorrectionLevel: QrErrorCorrectLevel.M,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'QR Code: $qrCode',
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.black54,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Ticket ID: $ticketId',
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.black54,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Show this QR code to the driver',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.black54,
+                ),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
-          SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'សរុបចុងក្រោយ',
-                style: TextStyle(
-                  color: Colors.black87,
-                  fontSize: 14,
-                ),
-              ),
-              Text(
-                '\$ 17.50',
-                style: TextStyle(
-                  color: Color(0xFF5B7FFF),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
-
-  // Widget _buildBottomNav() {
-  //   return BottomNavigationBar(
-  //     type: BottomNavigationBarType.fixed,
-  //     backgroundColor: const Color(0xFF5B7FFF),
-  //     selectedItemColor: Colors.white,
-  //     unselectedItemColor: Colors.white70,
-  //     currentIndex: 1,
-  //     selectedFontSize: 12,
-  //     unselectedFontSize: 12,
-  //     items: const [
-  //       BottomNavigationBarItem(
-  //         icon: Icon(Icons.home_outlined),
-  //         label: 'Home',
-  //       ),
-  //       BottomNavigationBarItem(
-  //         icon: Icon(Icons.confirmation_number_outlined),
-  //         label: 'Ticket',
-  //       ),
-  //       BottomNavigationBarItem(
-  //         icon: Icon(Icons.receipt_long_outlined),
-  //         label: 'Trips',
-  //       ),
-  //       BottomNavigationBarItem(
-  //         icon: Icon(Icons.person_outline),
-  //         label: 'Profile',
-  //       ),
-  //     ],
-  //   );
-  // }
 }

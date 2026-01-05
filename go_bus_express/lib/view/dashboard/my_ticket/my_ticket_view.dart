@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:go_bus_express/core/di/app_di.dart';
+import 'package:go_bus_express/models/ticket/ticket_model.dart';
+import 'package:go_bus_express/view_models/controller/ticket/ticket_controller.dart';
+import 'package:shared_package/config/themes.dart';
 import 'ticket_detail_view.dart';
 
 class MyTicketView extends StatefulWidget {
@@ -11,11 +16,26 @@ class MyTicketView extends StatefulWidget {
 class _MyTicketViewState extends State<MyTicketView>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late TicketController _ticketController;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _ticketController = getIt<TicketController>();
+    
+    // Listen to tab changes to trigger API calls
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        final isUpcoming = _tabController.index == 0;
+        _ticketController.filterTickets(isUpcoming: isUpcoming);
+      }
+    });
+    
+    // Ensure the controller is initialized and fetch data
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _ticketController.onInit();
+    });
   }
 
   @override
@@ -27,23 +47,39 @@ class _MyTicketViewState extends State<MyTicketView>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF5B7FFF),
+      backgroundColor: goBusPrimary,
       body: SafeArea(
         bottom: false,
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Ticket',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.w600,
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Row(
+                children: [
+                  const Expanded(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Ticket',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  IconButton(
+                    onPressed: () {
+                      // Refresh tickets
+                      _ticketController.onInit();
+                    },
+                    icon: const Icon(
+                      Icons.refresh,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             ),
             Expanded(
@@ -67,14 +103,29 @@ class _MyTicketViewState extends State<MyTicketView>
                       ),
                       child: TabBar(
                         controller: _tabController,
-                        labelColor: const Color(0xFF5B7FFF),
+                        labelColor: goBusPrimary,
                         unselectedLabelColor: Colors.grey,
-                        indicatorColor: const Color(0xFF5B7FFF),
-                        indicatorWeight: 3,
+                        indicatorColor: goBusPrimary,
+                        indicatorWeight: 4,
+                        indicatorSize: TabBarIndicatorSize.label,
+                        indicator: UnderlineTabIndicator(
+                          borderSide: BorderSide(
+                            width: 4.0,
+                            color: goBusPrimary,
+                          ),
+                          insets: const EdgeInsets.symmetric(horizontal: 0),
+                        ),
                         labelStyle: const TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.3,
                         ),
+                        unselectedLabelStyle: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: -0.3,
+                        ),
+                        dividerColor: Colors.transparent,
                         tabs: const [
                           Tab(text: 'Upcoming'),
                           Tab(text: 'Past'),
@@ -82,15 +133,55 @@ class _MyTicketViewState extends State<MyTicketView>
                       ),
                     ),
                     Expanded(
-                      child: TabBarView(
-                        controller: _tabController,
-                        children: [
-                          _buildTicketList(),
-                          _buildEmptyState(
-                            'No trip Ticket',
-                            'Book your trips and check here for your trips!',
-                          ),
-                        ],
+                      child: GetBuilder<TicketController>(
+                        init: _ticketController,
+                        builder: (controller) {
+                          final currentTickets = controller.getCurrentTickets();
+                          
+                          // Debug: Show total tickets count and current type
+                          print('🎫 Current tickets in UI: ${currentTickets.length}, type: ${controller.state.type}');
+                          
+                          // Show loading if no tickets yet
+                          if (controller.state.tickets.isEmpty) {
+                            return const Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CircularProgressIndicator(
+                                    color: goBusPrimary,
+                                    strokeWidth: 3,
+                                  ),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    'Loading tickets...',
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                          
+                          return TabBarView(
+                            controller: _tabController,
+                            children: [
+                              // Upcoming tickets tab
+                              _buildCurrentTicketTab(
+                                controller,
+                                'No upcoming trips',
+                                'Your upcoming trips will appear here.',
+                              ),
+                              // Past tickets tab  
+                              _buildCurrentTicketTab(
+                                controller,
+                                'No past trips',
+                                'Your completed trips will appear here.',
+                              ),
+                            ],
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -104,50 +195,18 @@ class _MyTicketViewState extends State<MyTicketView>
     );
   }
 
-  Widget _buildTicketList() {
-    final tickets = [
-      {
-        'route': 'Phnom Penh - Kompong Cham',
-        'bookingId': 'BG254097745',
-        'date': '2025-10-25 (09:30AM)',
-        'busType': 'Luxury Coaster',
-        'busNumber': '(16)',
-        'seats': '1 Seats',
-      },
-      {
-        'route': 'Phnom Penh - Kompot',
-        'bookingId': 'BG254097746',
-        'date': '2025-10-07 (07:00AM)',
-        'busType': 'Luxury Coaster',
-        'busNumber': '(32)',
-        'seats': '2 Seats',
-      },
-      {
-        'route': 'Phnom Penh - Takeo',
-        'bookingId': 'BG254097747',
-        'date': '2025-10-25 (09:30AM)',
-        'busType': 'Luxury Coaster',
-        'busNumber': '(16)',
-        'seats': '1 Seats',
-      },
-      {
-        'route': 'Phnom Penh - Kompong Cham',
-        'bookingId': 'BG254097745',
-        'date': '2025-10-25 (09:30AM)',
-        'busType': 'Luxury Coaster',
-        'busNumber': '(16)',
-        'seats': '1 Seats',
-      },
-      {
-        'route': 'Phnom Penh - Kompot',
-        'bookingId': 'BG254097746',
-        'date': '2025-10-07 (07:00AM)',
-        'busType': 'Luxury Coaster',
-        'busNumber': '(32)',
-        'seats': '2 Seats',
-      },
-    ];
+  Widget _buildCurrentTicketTab(
+    TicketController controller,
+    String emptyTitle,
+    String emptySubtitle,
+  ) {
+    final tickets = controller.getCurrentTickets();
+    return tickets.isNotEmpty
+        ? _buildTicketList(tickets)
+        : _buildEmptyState(emptyTitle, emptySubtitle);
+  }
 
+  Widget _buildTicketList(List<Datum> tickets) {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: tickets.length,
@@ -157,151 +216,191 @@ class _MyTicketViewState extends State<MyTicketView>
     );
   }
 
-  Widget _buildTicketCard(Map<String, String> ticket) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 2),
+  Widget _buildTicketCard(Datum ticket) {
+    // Extract route information (you might need to adjust this based on your actual data structure)
+    final routeText = _getRouteText(ticket);
+    final ticketId = ticket.booking?.id?.toString() ?? 'N/A';
+    final issueDate = _formatDate(ticket.issuedAt);
+    final busInfo = _getBusInfo(ticket);
+    final seatCount = ticket.booking?.seatCount?.toString() ?? '0';
+
+    return GestureDetector(
+      onTap: () {
+        if (ticket.id != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TicketDetailView(ticketId: ticket.id!),
+            ),
+          );
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Colors.grey.shade300,
+            width: 1,
           ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF5B7FFF).withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.directions_bus,
-                    color: Color(0xFF5B7FFF),
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    ticket['route']!,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black87,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 12,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: goBusPrimary.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.directions_bus,
+                      color: goBusPrimary,
+                      size: 20,
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                const Icon(Icons.receipt_outlined, size: 16, color: Colors.grey),
-                const SizedBox(width: 8),
-                Text(
-                  ticket['bookingId']!,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black54,
-                  ),
-                ),
-                const SizedBox(width: 20),
-                const Icon(Icons.calendar_today_outlined, size: 16, color: Colors.grey),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    ticket['date']!,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.black54,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                const Icon(Icons.airport_shuttle_outlined, size: 16, color: Colors.grey),
-                const SizedBox(width: 8),
-                Text(
-                  '${ticket['busType']!} ${ticket['busNumber']!}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black54,
-                  ),
-                ),
-                const SizedBox(width: 20),
-                const Icon(Icons.event_seat_outlined, size: 16, color: Colors.grey),
-                const SizedBox(width: 8),
-                Text(
-                  ticket['seats']!,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.black54,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      // Rate a schedule action
-                    },
-                    icon: const Icon(Icons.schedule, size: 16),
-                    label: const Text('Rate a schedule'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF00BCD4),
-                      side: const BorderSide(color: Color(0xFF00BCD4)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      routeText,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black87,
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.receipt_outlined,
+                    size: 16,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '#$ticketId',
+                    style: const TextStyle(fontSize: 14, color: Colors.black54),
+                  ),
+                  const SizedBox(width: 20),
+                  const Icon(
+                    Icons.calendar_today_outlined,
+                    size: 16,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      issueDate,
+                      style: const TextStyle(fontSize: 14, color: Colors.black54),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.airport_shuttle_outlined,
+                    size: 16,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    busInfo,
+                    style: const TextStyle(fontSize: 14, color: Colors.black54),
+                  ),
+                  const SizedBox(width: 20),
+                  const Icon(
+                    Icons.event_seat_outlined,
+                    size: 16,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '$seatCount seat${int.tryParse(seatCount) != 1 ? 's' : ''}',
+                    style: const TextStyle(fontSize: 14, color: Colors.black54),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    if (ticket.id != null) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const TicketDetailView(),
+                          builder: (context) => TicketDetailView(ticketId: ticket.id!),
                         ),
                       );
-                    },
-                    icon: const Icon(Icons.info_outline, size: 16),
-                    label: const Text('See details'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.grey,
-                      side: const BorderSide(color: Colors.grey),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                    }
+                  },
+                  icon: const Icon(Icons.info_outline, size: 16),
+                  label: const Text('See Details'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.grey,
+                    side: const BorderSide(color: Colors.grey),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+
+  String _getRouteText(Datum ticket) {
+    final route = ticket.booking?.schedule?.bus?.route;
+    final origin = route?.origin;
+    final destination = route?.destination;
+    
+    if (origin != null && destination != null) {
+      return '$origin - $destination';
+    }
+    
+    // Fallback if route data is not available
+    return 'Route information not available';
+  }
+
+  String _formatDate(DateTime? date) {
+    if (date == null) return 'N/A';
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  String _getBusInfo(Datum ticket) {
+    final busType = ticket.booking?.schedule?.bus?.busType ?? '';
+    final busNumber = ticket.booking?.schedule?.bus?.busNumber ?? '';
+
+    if (busType.isEmpty && busNumber.isEmpty) {
+      return 'Bus Info N/A';
+    }
+
+    return '$busType $busNumber'.trim();
+  }
+
 
   Widget _buildEmptyState(String title, String subtitle) {
     return Container(
@@ -315,10 +414,10 @@ class _MyTicketViewState extends State<MyTicketView>
               width: 240,
               height: 180,
               errorBuilder: (context, error, stackTrace) {
-                return const Icon(
+                return Icon(
                   Icons.luggage_outlined,
                   size: 80,
-                  color: Colors.grey,
+                  color: goBusPrimary,
                 );
               },
             ),
@@ -334,10 +433,7 @@ class _MyTicketViewState extends State<MyTicketView>
             const SizedBox(height: 8),
             Text(
               subtitle,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 14, color: Colors.grey),
               textAlign: TextAlign.center,
             ),
           ],
@@ -345,34 +441,4 @@ class _MyTicketViewState extends State<MyTicketView>
       ),
     );
   }
-
-  // Widget _buildBottomNav() {
-  //   return BottomNavigationBar(
-  //     type: BottomNavigationBarType.fixed,
-  //     backgroundColor: const Color(0xFF5B7FFF),
-  //     selectedItemColor: Colors.white,
-  //     unselectedItemColor: Colors.white70,
-  //     currentIndex: 1,
-  //     selectedFontSize: 12,
-  //     unselectedFontSize: 12,
-  //     items: const [
-  //       BottomNavigationBarItem(
-  //         icon: Icon(Icons.home_outlined),
-  //         label: 'Home',
-  //       ),
-  //       BottomNavigationBarItem(
-  //         icon: Icon(Icons.confirmation_number_outlined),
-  //         label: 'Ticket',
-  //       ),
-  //       BottomNavigationBarItem(
-  //         icon: Icon(Icons.local_shipping_outlined),
-  //         label: 'Tracking',
-  //       ),
-  //       BottomNavigationBarItem(
-  //         icon: Icon(Icons.person_outline),
-  //         label: 'Profile',
-  //       ),
-  //     ],
-  //   );
-  // }
 }
