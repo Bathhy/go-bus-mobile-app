@@ -6,12 +6,14 @@ part 'ticket_detail_model.g.dart';
 class TicketDetailModel {
     int? id;
     int? bookingId;
+    String? qrCode;
     DateTime? issuedAt;
     Booking? booking;
 
     TicketDetailModel({
         this.id,
         this.bookingId,
+        this.qrCode,
         this.issuedAt,
         this.booking,
     });
