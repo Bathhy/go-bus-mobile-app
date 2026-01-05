@@ -23,6 +23,7 @@ import 'package:go_bus_express/view_models/controller/route/select_route/select_
 import 'package:go_bus_express/view_models/controller/route/select_seat/select_seat_controller.dart';
 import 'package:go_bus_express/view_models/controller/splash/SplashController.dart';
 import 'package:go_bus_express/view_models/controller/ticket/ticket_controller.dart';
+import 'package:go_bus_express/view_models/controller/ticket/ticket_detail_controller.dart';
 
 import '../../data/network/dio_service.dart';
 import '../../data/network/payment_dio_service.dart';
@@ -69,6 +70,7 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<TicketRepository>(
     () => TicketRepositoryImpl(getIt()),
   );
+
 
   // Controller
   getIt.registerFactory<SplashController>(() {
@@ -120,6 +122,11 @@ Future<void> setupDependencyInjection() async {
   });
   getIt.registerFactory<TicketController>(() {
     final controller = TicketController(getIt());
+    Get.put(controller);
+    return controller;
+  });
+  getIt.registerFactory<TicketDetailController>(() {
+    final controller = TicketDetailController(getIt());
     Get.put(controller);
     return controller;
   });

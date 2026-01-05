@@ -70,11 +70,25 @@ Map<String, dynamic> _$ScheduleToJson(Schedule instance) => <String, dynamic>{
 Bus _$BusFromJson(Map<String, dynamic> json) => Bus(
   busType: json['busType'] as String?,
   busNumber: json['busNumber'] as String?,
+  route: json['route'] == null
+      ? null
+      : Route.fromJson(json['route'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$BusToJson(Bus instance) => <String, dynamic>{
   'busType': instance.busType,
   'busNumber': instance.busNumber,
+  'route': instance.route,
+};
+
+Route _$RouteFromJson(Map<String, dynamic> json) => Route(
+  origin: json['origin'] as String?,
+  destination: json['destination'] as String?,
+);
+
+Map<String, dynamic> _$RouteToJson(Route instance) => <String, dynamic>{
+  'origin': instance.origin,
+  'destination': instance.destination,
 };
 
 User _$UserFromJson(Map<String, dynamic> json) => User(

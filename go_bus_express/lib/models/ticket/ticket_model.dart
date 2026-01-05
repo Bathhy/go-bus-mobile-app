@@ -67,13 +67,27 @@ class Schedule {
 class Bus {
   String? busType;
   String? busNumber;
+  Route? route;
 
-  Bus({this.busType, this.busNumber});
+  Bus({this.busType, this.busNumber, this.route});
 
   factory Bus.fromJson(Map<String, dynamic> json) =>
       _$BusFromJson(json);
 
   Map<String, dynamic> toJson() => _$BusToJson(this);
+}
+
+@JsonSerializable()
+class Route {
+  String? origin;
+  String? destination;
+
+  Route({this.origin, this.destination});
+
+  factory Route.fromJson(Map<String, dynamic> json) =>
+      _$RouteFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RouteToJson(this);
 }
 
 @JsonSerializable()
