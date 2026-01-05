@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:go_bus_express/core/di/app_di.dart';
 import 'package:go_bus_express/models/ticket/ticket_model.dart';
 import 'package:go_bus_express/view_models/controller/ticket/ticket_controller.dart';
+import 'package:shared_package/config/themes.dart';
 import 'ticket_detail_view.dart';
 
 class MyTicketView extends StatefulWidget {
@@ -46,7 +47,7 @@ class _MyTicketViewState extends State<MyTicketView>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF5B7FFF),
+      backgroundColor: goBusPrimary,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -102,14 +103,29 @@ class _MyTicketViewState extends State<MyTicketView>
                       ),
                       child: TabBar(
                         controller: _tabController,
-                        labelColor: const Color(0xFF5B7FFF),
+                        labelColor: goBusPrimary,
                         unselectedLabelColor: Colors.grey,
-                        indicatorColor: const Color(0xFF5B7FFF),
-                        indicatorWeight: 3,
+                        indicatorColor: goBusPrimary,
+                        indicatorWeight: 4,
+                        indicatorSize: TabBarIndicatorSize.label,
+                        indicator: UnderlineTabIndicator(
+                          borderSide: BorderSide(
+                            width: 4.0,
+                            color: goBusPrimary,
+                          ),
+                          insets: const EdgeInsets.symmetric(horizontal: 0),
+                        ),
                         labelStyle: const TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.3,
                         ),
+                        unselectedLabelStyle: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: -0.3,
+                        ),
+                        dividerColor: Colors.transparent,
                         tabs: const [
                           Tab(text: 'Upcoming'),
                           Tab(text: 'Past'),
@@ -132,7 +148,8 @@ class _MyTicketViewState extends State<MyTicketView>
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   CircularProgressIndicator(
-                                    color: Color(0xFF5B7FFF),
+                                    color: goBusPrimary,
+                                    strokeWidth: 3,
                                   ),
                                   SizedBox(height: 16),
                                   Text(
@@ -207,161 +224,165 @@ class _MyTicketViewState extends State<MyTicketView>
     final busInfo = _getBusInfo(ticket);
     final seatCount = ticket.booking?.seatCount?.toString() ?? '0';
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 12,
-            offset: const Offset(0, 2),
+    return GestureDetector(
+      onTap: () {
+        if (ticket.id != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TicketDetailView(ticketId: ticket.id!),
+            ),
+          );
+        }
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Colors.grey.shade300,
+            width: 1,
           ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF5B7FFF).withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.directions_bus,
-                    color: Color(0xFF5B7FFF),
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    routeText,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black87,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 12,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: goBusPrimary.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.directions_bus,
+                      color: goBusPrimary,
+                      size: 20,
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                const Icon(
-                  Icons.receipt_outlined,
-                  size: 16,
-                  color: Colors.grey,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '#$ticketId',
-                  style: const TextStyle(fontSize: 14, color: Colors.black54),
-                ),
-                const SizedBox(width: 20),
-                const Icon(
-                  Icons.calendar_today_outlined,
-                  size: 16,
-                  color: Colors.grey,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    issueDate,
-                    style: const TextStyle(fontSize: 14, color: Colors.black54),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                const Icon(
-                  Icons.airport_shuttle_outlined,
-                  size: 16,
-                  color: Colors.grey,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  busInfo,
-                  style: const TextStyle(fontSize: 14, color: Colors.black54),
-                ),
-                const SizedBox(width: 20),
-                const Icon(
-                  Icons.event_seat_outlined,
-                  size: 16,
-                  color: Colors.grey,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '$seatCount seat${int.tryParse(seatCount) != 1 ? 's' : ''}',
-                  style: const TextStyle(fontSize: 14, color: Colors.black54),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      // Rate a schedule action
-                      _showRatingDialog(ticket);
-                    },
-                    icon: const Icon(Icons.star_outline, size: 16),
-                    label: const Text('Rate Trip'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF00BCD4),
-                      side: const BorderSide(color: Color(0xFF00BCD4)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      routeText,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black87,
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.receipt_outlined,
+                    size: 16,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '#$ticketId',
+                    style: const TextStyle(fontSize: 14, color: Colors.black54),
+                  ),
+                  const SizedBox(width: 20),
+                  const Icon(
+                    Icons.calendar_today_outlined,
+                    size: 16,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      issueDate,
+                      style: const TextStyle(fontSize: 14, color: Colors.black54),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.airport_shuttle_outlined,
+                    size: 16,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    busInfo,
+                    style: const TextStyle(fontSize: 14, color: Colors.black54),
+                  ),
+                  const SizedBox(width: 20),
+                  const Icon(
+                    Icons.event_seat_outlined,
+                    size: 16,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '$seatCount seat${int.tryParse(seatCount) != 1 ? 's' : ''}',
+                    style: const TextStyle(fontSize: 14, color: Colors.black54),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    if (ticket.id != null) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              TicketDetailView(ticket: ticket),
+                          builder: (context) => TicketDetailView(ticketId: ticket.id!),
                         ),
                       );
-                    },
-                    icon: const Icon(Icons.info_outline, size: 16),
-                    label: const Text('See Details'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.grey,
-                      side: const BorderSide(color: Colors.grey),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                    }
+                  },
+                  icon: const Icon(Icons.info_outline, size: 16),
+                  label: const Text('See Details'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.grey,
+                    side: const BorderSide(color: Colors.grey),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   String _getRouteText(Datum ticket) {
-    // You might need to adjust this based on your actual route data structure
-    // For now, using a placeholder - you should replace this with actual route data
-    return 'Phnom Penh - Kompong Cham';
+    final route = ticket.booking?.schedule?.bus?.route;
+    final origin = route?.origin;
+    final destination = route?.destination;
+    
+    if (origin != null && destination != null) {
+      return '$origin - $destination';
+    }
+    
+    // Fallback if route data is not available
+    return 'Route information not available';
   }
 
   String _formatDate(DateTime? date) {
@@ -380,31 +401,6 @@ class _MyTicketViewState extends State<MyTicketView>
     return '$busType $busNumber'.trim();
   }
 
-  void _showRatingDialog(Datum ticket) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Rate Your Trip'),
-        content: const Text('How was your experience with this trip?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // Implement rating logic here
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Thank you for your rating!')),
-              );
-            },
-            child: const Text('Rate'),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildEmptyState(String title, String subtitle) {
     return Container(
@@ -418,10 +414,10 @@ class _MyTicketViewState extends State<MyTicketView>
               width: 240,
               height: 180,
               errorBuilder: (context, error, stackTrace) {
-                return const Icon(
+                return Icon(
                   Icons.luggage_outlined,
                   size: 80,
-                  color: Colors.grey,
+                  color: goBusPrimary,
                 );
               },
             ),
@@ -445,34 +441,4 @@ class _MyTicketViewState extends State<MyTicketView>
       ),
     );
   }
-
-  // Widget _buildBottomNav() {
-  //   return BottomNavigationBar(
-  //     type: BottomNavigationBarType.fixed,
-  //     backgroundColor: const Color(0xFF5B7FFF),
-  //     selectedItemColor: Colors.white,
-  //     unselectedItemColor: Colors.white70,
-  //     currentIndex: 1,
-  //     selectedFontSize: 12,
-  //     unselectedFontSize: 12,
-  //     items: const [
-  //       BottomNavigationBarItem(
-  //         icon: Icon(Icons.home_outlined),
-  //         label: 'Home',
-  //       ),
-  //       BottomNavigationBarItem(
-  //         icon: Icon(Icons.confirmation_number_outlined),
-  //         label: 'Ticket',
-  //       ),
-  //       BottomNavigationBarItem(
-  //         icon: Icon(Icons.local_shipping_outlined),
-  //         label: 'Tracking',
-  //       ),
-  //       BottomNavigationBarItem(
-  //         icon: Icon(Icons.person_outline),
-  //         label: 'Profile',
-  //       ),
-  //     ],
-  //   );
-  // }
 }
