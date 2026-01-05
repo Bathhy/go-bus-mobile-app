@@ -1,23 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/di/app_di.dart';
-import 'package:go_bus_express/models/ticket/ticket_detail_model.dart';
 import 'package:go_bus_express/view_models/controller/ticket/ticket_detail_controller.dart';
 import 'package:shared_package/config/themes.dart';
 
-/// Ticket Detail View - Shows comprehensive ticket information
-/// 
-/// Current Status:
-/// ✅ Uses TicketDetailController for API data fetching
-/// ✅ Displays real ticket detail information from API
-/// ✅ Proper error handling and loading states
-/// 
-/// Features:
-/// - Fetches detailed ticket information by ID
-/// - Shows route, schedule, bus, and booking information
-/// - Displays pricing details
-/// - QR code section for ticket validation
-/// - Proper loading and error states
 class TicketDetailView extends StatefulWidget {
   final int ticketId;
   
@@ -226,7 +212,8 @@ class _TicketDetailViewState extends State<TicketDetailView> {
 
   Widget _buildHeader(TicketDetailController controller) {
     final ticketDetail = controller.state.ticketDetail;
-    final ticketId = ticketDetail?.booking?.id?.toString() ?? widget.ticketId.toString();
+    final ticketId = ticketDetail?.id?.toString() ?? widget.ticketId.toString();
+    final bookingId = ticketDetail?.bookingId?.toString() ?? 'N/A';
     final issueDate = ticketDetail?.issuedAt;
     final formattedDate = issueDate != null 
         ? '${issueDate.day} ${_getMonthName(issueDate.month)} ${issueDate.year}'
@@ -235,11 +222,11 @@ class _TicketDetailViewState extends State<TicketDetailView> {
     final routeInfo = controller.getRouteInfo();
     
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF85B3E1), Color(0xFF6B9FD8)],
+          colors: [goBusPrimary, goBusPrimary],
         ),
       ),
       child: SafeArea(
@@ -269,6 +256,13 @@ class _TicketDetailViewState extends State<TicketDetailView> {
               const SizedBox(height: 8),
               Text(
                 'Ticket #$ticketId',
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14,
+                ),
+              ),
+              Text(
+                'Booking #$bookingId',
                 style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 14,
@@ -310,16 +304,17 @@ class _TicketDetailViewState extends State<TicketDetailView> {
 
   // TODO: Replace these methods with actual passenger data from API
   String _getPassengerName() => 'Thong Vathana'; // Should come from user data
-  String _getPassengerPhone() => '012 345 678';
+  String _getPassengerEmail() => 'thongvathana22@gmail.com'; // Should come from user data
 
   Widget _buildTicketCard(TicketDetailController controller) {
     final ticketDetail = controller.state.ticketDetail;
     final booking = ticketDetail?.booking;
     final schedule = booking?.schedule;
     final bus = schedule?.bus;
+    final route = bus?.route;
     
     final busInfo = controller.getBusInfo();
-    final travelDate = _formatTravelDate(ticketDetail?.issuedAt);
+    final travelDate = _formatTravelDate(schedule?.departureDate);
     final bookingId = booking?.id?.toString() ?? 'N/A';
     final paymentStatus = _formatStatus(booking?.paymentStatus ?? 'N/A');
     final bookingStatus = _formatStatus(booking?.bookingStatus ?? 'N/A');
@@ -329,6 +324,14 @@ class _TicketDetailViewState extends State<TicketDetailView> {
     final arrivalTime = schedule?.arrivalTime != null 
         ? '${schedule!.arrivalTime!.hour.toString().padLeft(2, '0')}:${schedule.arrivalTime!.minute.toString().padLeft(2, '0')}'
         : 'N/A';
+    
+    // Additional information from API
+    final distance = route?.distanceKm != null ? '${route!.distanceKm} km' : 'N/A';
+    final duration = route?.durationMinutes != null 
+        ? '${(route!.durationMinutes! / 60).floor()}h ${route.durationMinutes! % 60}m' 
+        : 'N/A';
+    final totalSeats = bus?.totalSeats?.toString() ?? 'N/A';
+    final schedulePrice = schedule?.price?.toString() ?? 'N/A';
     
     return Container(
       margin: const EdgeInsets.all(16),
@@ -355,6 +358,14 @@ class _TicketDetailViewState extends State<TicketDetailView> {
           _buildDivider(),
           _buildInfoRow('Arrival Time', arrivalTime),
           _buildDivider(),
+          _buildInfoRow('Distance', distance),
+          _buildDivider(),
+          _buildInfoRow('Duration', duration),
+          _buildDivider(),
+          _buildInfoRow('Total Seats', totalSeats),
+          _buildDivider(),
+          _buildInfoRow('Schedule Price', '\$ $schedulePrice'),
+          _buildDivider(),
           _buildStatusRow('Payment Status', paymentStatus , booking?.paymentStatus),
           _buildDivider(),
           _buildStatusRow('Booking Status', bookingStatus, booking?.bookingStatus),
@@ -374,14 +385,24 @@ class _TicketDetailViewState extends State<TicketDetailView> {
           // TODO: Get passenger info from API when available
           _buildInfoRow('Passenger Name', _getPassengerName()),
           _buildDivider(),
-          _buildInfoRow('Phone Number', _getPassengerPhone()),
+          _buildInfoRow('Email', _getPassengerEmail()),
         ],
       ),
     );
   }
 
   Widget _buildPriceSection(TicketDetailController controller) {
-    final pricing = controller.getPricingInfo();
+    final ticketDetail = controller.state.ticketDetail;
+    final booking = ticketDetail?.booking;
+    final schedule = booking?.schedule;
+    
+    final totalAmount = booking?.totalAmount?.toString() ?? '0';
+    final schedulePrice = schedule?.price?.toString() ?? '0';
+    
+    // Calculate discount (if schedule price is different from total amount)
+    final schedulePriceNum = schedule?.price ?? 0;
+    final totalAmountNum = booking?.totalAmount ?? 0;
+    final discount = schedulePriceNum > totalAmountNum ? (schedulePriceNum - totalAmountNum).toString() : '0';
     
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -403,14 +424,14 @@ class _TicketDetailViewState extends State<TicketDetailView> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                'Price',
+                'Schedule Price',
                 style: TextStyle(
                   color: Colors.black87,
                   fontSize: 14,
                 ),
               ),
               Text(
-                '\$ ${pricing['price']}',
+                '\$ $schedulePrice',
                 style: TextStyle(
                   color: goBusPrimary,
                   fontSize: 14,
@@ -431,9 +452,9 @@ class _TicketDetailViewState extends State<TicketDetailView> {
                 ),
               ),
               Text(
-                '\$ ${pricing['discount']}',
+                '\$ $discount',
                 style: TextStyle(
-                  color: goBusPrimary,
+                  color: discount != '0' ? Colors.green : goBusPrimary,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
@@ -455,7 +476,7 @@ class _TicketDetailViewState extends State<TicketDetailView> {
                 ),
               ),
               Text(
-                '\$ ${pricing['total']}',
+                '\$ $totalAmount',
                 style: TextStyle(
                   color: goBusPrimary,
                   fontSize: 16,
@@ -649,79 +670,95 @@ class _TicketDetailViewState extends State<TicketDetailView> {
   }
 
   Widget _buildQRCodeSection() {
-    final ticketId = widget.ticketId.toString();
-    
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+    return GetBuilder<TicketDetailController>(
+      init: _controller,
+      builder: (controller) {
+        final ticketDetail = controller.state.ticketDetail;
+        final qrCode = ticketDetail?.qrCode ?? 'N/A';
+        final ticketId = ticketDetail?.id?.toString() ?? widget.ticketId.toString();
+        
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          const Text(
-            'Ticket QR Code',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Container(
-            width: 150,
-            height: 150,
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey[300]!),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.qr_code,
-                  size: 60,
-                  color: goBusPrimary,
+          child: Column(
+            children: [
+              const Text(
+                'Ticket QR Code',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
                 ),
-                const SizedBox(height: 8),
-                const Text(
-                  'QR Code',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12,
-                  ),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                width: 150,
+                height: 150,
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey[300]!),
                 ),
-              ],
-            ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.qr_code,
+                      size: 60,
+                      color: goBusPrimary,
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'QR Code',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'QR Code: $qrCode',
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.black54,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Ticket ID: $ticketId',
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.black54,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Show this QR code to the driver',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.black54,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
-          Text(
-            'Ticket ID: $ticketId',
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.black54,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Show this QR code to the driver',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.black54,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
