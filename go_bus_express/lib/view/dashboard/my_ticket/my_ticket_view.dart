@@ -126,9 +126,9 @@ class _MyTicketViewState extends State<MyTicketView>
                           letterSpacing: -0.3,
                         ),
                         dividerColor: Colors.transparent,
-                        tabs: const [
-                          Tab(text: 'Upcoming'),
-                          Tab(text: 'Past'),
+                        tabs: [
+                          Tab(text: 'upcoming'.tr),
+                          Tab(text: 'past'.tr),
                         ],
                       ),
                     ),
@@ -143,7 +143,7 @@ class _MyTicketViewState extends State<MyTicketView>
                           
                           // Show loading if no tickets yet
                           if (controller.state.tickets.isEmpty) {
-                            return const Center(
+                            return Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -153,7 +153,7 @@ class _MyTicketViewState extends State<MyTicketView>
                                   ),
                                   SizedBox(height: 16),
                                   Text(
-                                    'Loading tickets...',
+                                    'loading_tickets'.tr,
                                     style: TextStyle(
                                       color: Colors.grey,
                                       fontSize: 16,
@@ -170,14 +170,14 @@ class _MyTicketViewState extends State<MyTicketView>
                               // Upcoming tickets tab
                               _buildCurrentTicketTab(
                                 controller,
-                                'No upcoming trips',
-                                'Your upcoming trips will appear here.',
+                                'no_upcoming_trips'.tr,
+                                'upcoming_trips_description'.tr,
                               ),
                               // Past tickets tab  
                               _buildCurrentTicketTab(
                                 controller,
-                                'No past trips',
-                                'Your completed trips will appear here.',
+                                'no_past_trips'.tr,
+                                'past_trips_description'.tr,
                               ),
                             ],
                           );
@@ -334,7 +334,7 @@ class _MyTicketViewState extends State<MyTicketView>
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '$seatCount seat${int.tryParse(seatCount) != 1 ? 's' : ''}',
+                    '$seatCount ${'seat'.tr}${int.tryParse(seatCount) != 1 ? 's' : ''}',
                     style: const TextStyle(fontSize: 14, color: Colors.black54),
                   ),
                 ],
@@ -354,7 +354,7 @@ class _MyTicketViewState extends State<MyTicketView>
                     }
                   },
                   icon: const Icon(Icons.info_outline, size: 16),
-                  label: const Text('See Details'),
+                  label: Text('see_details'.tr),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.grey,
                     side: const BorderSide(color: Colors.grey),
@@ -382,7 +382,7 @@ class _MyTicketViewState extends State<MyTicketView>
     }
     
     // Fallback if route data is not available
-    return 'Route information not available';
+    return 'route_not_available'.tr;
   }
 
   String _formatDate(DateTime? date) {
@@ -395,7 +395,7 @@ class _MyTicketViewState extends State<MyTicketView>
     final busNumber = ticket.booking?.schedule?.bus?.busNumber ?? '';
 
     if (busType.isEmpty && busNumber.isEmpty) {
-      return 'Bus Info N/A';
+      return 'bus_info_not_available'.tr;
     }
 
     return '$busType $busNumber'.trim();
