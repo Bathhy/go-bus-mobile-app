@@ -17,6 +17,23 @@ class TicketDetailView extends StatefulWidget {
 class _TicketDetailViewState extends State<TicketDetailView> {
   late TicketDetailController _controller;
 
+  // Helper method for safe translation
+  String _translate(String key, {String? fallback}) {
+    try {
+      // Check if Get.locale is available
+      if (Get.locale == null) {
+        return fallback ?? key;
+      }
+      
+      final translated = key.tr;
+      // If translation returns the same key, it means translation failed
+      return translated != key ? translated : (fallback ?? key);
+    } catch (e) {
+      debugPrint('Translation error for key "$key": $e');
+      return fallback ?? key;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -98,8 +115,8 @@ class _TicketDetailViewState extends State<TicketDetailView> {
                     icon: const Icon(Icons.arrow_back, color: Colors.black),
                     onPressed: () => Navigator.pop(context),
                   ),
-                  const Text(
-                    'Ticket Details',
+                  Text(
+                    _translate('ticket_details', fallback: 'Ticket Details'),
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
@@ -116,8 +133,8 @@ class _TicketDetailViewState extends State<TicketDetailView> {
                   children: [
                     CircularProgressIndicator(color: goBusPrimary),
                     const SizedBox(height: 16),
-                    const Text(
-                      'Loading ticket details...',
+                    Text(
+                      _translate('loading_ticket_details', fallback: 'Loading ticket details...'),
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: 16,
@@ -148,8 +165,8 @@ class _TicketDetailViewState extends State<TicketDetailView> {
                     icon: const Icon(Icons.arrow_back, color: Colors.black),
                     onPressed: () => Navigator.pop(context),
                   ),
-                  const Text(
-                    'Ticket Details',
+                  Text(
+                    _translate('ticket_details', fallback: 'Ticket Details'),
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
@@ -172,8 +189,8 @@ class _TicketDetailViewState extends State<TicketDetailView> {
                         color: Colors.red.shade400,
                       ),
                       const SizedBox(height: 16),
-                      const Text(
-                        'Failed to load ticket details',
+                      Text(
+                        _translate('failed_to_load_ticket', fallback: 'Failed to load ticket details'),
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -198,7 +215,7 @@ class _TicketDetailViewState extends State<TicketDetailView> {
                           backgroundColor: goBusPrimary,
                           foregroundColor: Colors.white,
                         ),
-                        child: const Text('Retry'),
+                        child: Text(_translate('retry', fallback: 'Retry')),
                       ),
                     ],
                   ),
@@ -349,44 +366,44 @@ class _TicketDetailViewState extends State<TicketDetailView> {
       ),
       child: Column(
         children: [
-          _buildInfoRow('Service Type', busInfo),
+          _buildInfoRow(_translate('service_type', fallback: 'Service Type'), busInfo),
           _buildDivider(),
-          _buildInfoRow('Travel Date', travelDate),
+          _buildInfoRow(_translate('travel_date', fallback: 'Travel Date'), travelDate),
           _buildDivider(),
-          _buildInfoRow('Booking Code', bookingId),
+          _buildInfoRow(_translate('booking_code', fallback: 'Booking Code'), bookingId),
           _buildDivider(),
-          _buildInfoRow('Departure Time', departureTime),
+          _buildInfoRow(_translate('departure_time', fallback: 'Departure Time'), departureTime),
           _buildDivider(),
-          _buildInfoRow('Arrival Time', arrivalTime),
+          _buildInfoRow(_translate('arrival_time', fallback: 'Arrival Time'), arrivalTime),
           _buildDivider(),
-          _buildInfoRow('Distance', distance),
+          _buildInfoRow(_translate('distance', fallback: 'Distance'), distance),
           _buildDivider(),
-          _buildInfoRow('Duration', duration),
+          _buildInfoRow(_translate('duration', fallback: 'Duration'), duration),
           _buildDivider(),
-          _buildInfoRow('Total Seats', totalSeats),
+          _buildInfoRow(_translate('total_seats', fallback: 'Total Seats'), totalSeats),
           _buildDivider(),
-          _buildInfoRow('Schedule Price', '\$ $schedulePrice'),
+          _buildInfoRow(_translate('schedule_price', fallback: 'Schedule Price'), '\$ $schedulePrice'),
           _buildDivider(),
-          _buildStatusRow('Payment Status', paymentStatus , booking?.paymentStatus),
+          _buildStatusRow(_translate('payment_status', fallback: 'Payment Status'), paymentStatus , booking?.paymentStatus),
           _buildDivider(),
-          _buildStatusRow('Booking Status', bookingStatus, booking?.bookingStatus),
+          _buildStatusRow(_translate('booking_status', fallback: 'Booking Status'), bookingStatus, booking?.bookingStatus),
           _buildDivider(),
           _buildLocationSection(
-            'Departure Location',
+            _translate('departure_location', fallback: 'Departure Location'),
             _getDepartureInfo(controller),
             _getDepartureAddress(controller),
           ),
           _buildDivider(),
           _buildLocationSection(
-            'Arrival Location',
+            _translate('arrival_location', fallback: 'Arrival Location'),
             _getArrivalInfo(controller),
             _getArrivalAddress(controller),
           ),
           _buildDivider(),
           // TODO: Get passenger info from API when available
-          _buildInfoRow('Passenger Name', _getPassengerName()),
+          _buildInfoRow(_translate('passenger_name', fallback: 'Passenger Name'), _getPassengerName()),
           _buildDivider(),
-          _buildInfoRow('Email', _getPassengerEmail()),
+          _buildInfoRow(_translate('email', fallback: 'Email'), _getPassengerEmail()),
         ],
       ),
     );
@@ -424,8 +441,8 @@ class _TicketDetailViewState extends State<TicketDetailView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Schedule Price',
+              Text(
+                _translate('schedule_price', fallback: 'Schedule Price'),
                 style: TextStyle(
                   color: Colors.black87,
                   fontSize: 14,
@@ -445,8 +462,8 @@ class _TicketDetailViewState extends State<TicketDetailView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Discount',
+              Text(
+                _translate('Discount', fallback: 'Discount'),
                 style: TextStyle(
                   color: Colors.black87,
                   fontSize: 14,
@@ -468,8 +485,8 @@ class _TicketDetailViewState extends State<TicketDetailView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Total Amount',
+              Text(
+                _translate('total_amount', fallback: 'Total Amount'),
                 style: TextStyle(
                   color: Colors.black87,
                   fontSize: 14,
@@ -500,7 +517,7 @@ class _TicketDetailViewState extends State<TicketDetailView> {
   
   String _getDepartureAddress(TicketDetailController controller) {
     final route = controller.state.ticketDetail?.booking?.schedule?.bus?.route;
-    return route?.origin ?? 'Departure location not available';
+    return route?.origin ?? _translate('departure_location_not_available', fallback: 'Departure location not available');
   }
   
   String _getArrivalInfo(TicketDetailController controller) {
@@ -514,7 +531,7 @@ class _TicketDetailViewState extends State<TicketDetailView> {
   
   String _getArrivalAddress(TicketDetailController controller) {
     final route = controller.state.ticketDetail?.booking?.schedule?.bus?.route;
-    return route?.destination ?? 'Arrival location not available';
+    return route?.destination ?? _translate('arrival_location_not_available', fallback: 'Arrival location not available');
   }
 
   Widget _buildInfoRow(String label, String value) {
@@ -634,8 +651,8 @@ class _TicketDetailViewState extends State<TicketDetailView> {
                   color: goBusPrimary,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Text(
-                  'View Map',
+                child: Text(
+                  _translate('view_map', fallback: 'View Map'),
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 12,
@@ -697,8 +714,8 @@ class _TicketDetailViewState extends State<TicketDetailView> {
           ),
           child: Column(
             children: [
-              const Text(
-                'Ticket QR Code',
+              Text(
+                _translate('ticket_qr_code', fallback: 'Ticket QR Code'),
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -725,7 +742,7 @@ class _TicketDetailViewState extends State<TicketDetailView> {
               ),
               const SizedBox(height: 12),
               Text(
-                'QR Code: $qrCode',
+                '${_translate('qr_code', fallback: 'QR Code')}: $qrCode',
                 style: const TextStyle(
                   fontSize: 12,
                   color: Colors.black54,
@@ -734,15 +751,15 @@ class _TicketDetailViewState extends State<TicketDetailView> {
               ),
               const SizedBox(height: 4),
               Text(
-                'Ticket ID: $ticketId',
+                '${_translate('ticket_id', fallback: 'Ticket ID')}: $ticketId',
                 style: const TextStyle(
                   fontSize: 12,
                   color: Colors.black54,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Show this QR code to the driver',
+              Text(
+                _translate('show_qr_to_driver', fallback: 'Show this QR code to the driver'),
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.black54,
