@@ -14,14 +14,37 @@ class MyTicketView extends StatefulWidget {
 }
 
 class _MyTicketViewState extends State<MyTicketView>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late TabController _tabController;
   late TicketController _ticketController;
+  late AnimationController _refreshAnimationController;
+  bool _isRefreshing = false;
+
+  // Helper method for safe translation
+  String _translate(String key, {String? fallback}) {
+    try {
+      // Check if Get.locale is available
+      if (Get.locale == null) {
+        return fallback ?? key;
+      }
+      
+      final translated = key.tr;
+      // If translation returns the same key, it means translation failed
+      return translated != key ? translated : (fallback ?? key);
+    } catch (e) {
+      debugPrint('Translation error for key "$key": $e');
+      return fallback ?? key;
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _refreshAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
     _ticketController = getIt<TicketController>();
     
     // Listen to tab changes to trigger API calls
@@ -41,7 +64,38 @@ class _MyTicketViewState extends State<MyTicketView>
   @override
   void dispose() {
     _tabController.dispose();
+    _refreshAnimationController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleRefresh() async {
+    if (_isRefreshing) return; // Prevent multiple simultaneous refreshes
+    
+    setState(() {
+      _isRefreshing = true;
+    });
+    
+    // Start the rotation animation
+    _refreshAnimationController.repeat();
+    
+    try {
+      // Refresh tickets using the current tab state
+      final isUpcoming = _tabController.index == 0;
+      await _ticketController.filterTickets(isUpcoming: isUpcoming);
+      
+      // Wait a minimum time to show the animation (optional)
+      await Future.delayed(const Duration(milliseconds: 500));
+    } finally {
+      // Stop the animation and reset state
+      _refreshAnimationController.stop();
+      _refreshAnimationController.reset();
+      
+      if (mounted) {
+        setState(() {
+          _isRefreshing = false;
+        });
+      }
+    }
   }
 
   @override
@@ -54,31 +108,50 @@ class _MyTicketViewState extends State<MyTicketView>
           children: [
             Padding(
               padding: const EdgeInsets.all(20.0),
-              child: Row(
+              child: Column(
                 children: [
-                  const Expanded(
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Ticket',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.w600,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            _translate('Ticket', fallback: 'Ticket'),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 28,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                      AnimatedBuilder(
+                        animation: _refreshAnimationController,
+                        builder: (context, child) {
+                          return IconButton(
+                            onPressed: _isRefreshing ? null : _handleRefresh,
+                            icon: Transform.rotate(
+                              angle: _refreshAnimationController.value * 2 * 3.14159,
+                              child: Icon(
+                                Icons.refresh,
+                                color: _isRefreshing ? Colors.white70 : Colors.white,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    onPressed: () {
-                      // Refresh tickets
-                      _ticketController.onInit();
-                    },
-                    icon: const Icon(
-                      Icons.refresh,
-                      color: Colors.white,
+                  // Show loading indicator when refreshing
+                  if (_isRefreshing)
+                    Container(
+                      margin: const EdgeInsets.only(top: 8),
+                      child: LinearProgressIndicator(
+                        backgroundColor: Colors.white.withOpacity(0.3),
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        minHeight: 2,
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -126,9 +199,9 @@ class _MyTicketViewState extends State<MyTicketView>
                           letterSpacing: -0.3,
                         ),
                         dividerColor: Colors.transparent,
-                        tabs: const [
-                          Tab(text: 'Upcoming'),
-                          Tab(text: 'Past'),
+                        tabs: [
+                          Tab(text: 'upcoming'.tr),
+                          Tab(text: 'past'.tr),
                         ],
                       ),
                     ),
@@ -143,7 +216,7 @@ class _MyTicketViewState extends State<MyTicketView>
                           
                           // Show loading if no tickets yet
                           if (controller.state.tickets.isEmpty) {
-                            return const Center(
+                            return Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -153,7 +226,7 @@ class _MyTicketViewState extends State<MyTicketView>
                                   ),
                                   SizedBox(height: 16),
                                   Text(
-                                    'Loading tickets...',
+                                    'loading_tickets'.tr,
                                     style: TextStyle(
                                       color: Colors.grey,
                                       fontSize: 16,
@@ -170,14 +243,14 @@ class _MyTicketViewState extends State<MyTicketView>
                               // Upcoming tickets tab
                               _buildCurrentTicketTab(
                                 controller,
-                                'No upcoming trips',
-                                'Your upcoming trips will appear here.',
+                                'no_upcoming_trips'.tr,
+                                'upcoming_trips_description'.tr,
                               ),
                               // Past tickets tab  
                               _buildCurrentTicketTab(
                                 controller,
-                                'No past trips',
-                                'Your completed trips will appear here.',
+                                'no_past_trips'.tr,
+                                'past_trips_description'.tr,
                               ),
                             ],
                           );
@@ -334,7 +407,7 @@ class _MyTicketViewState extends State<MyTicketView>
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '$seatCount seat${int.tryParse(seatCount) != 1 ? 's' : ''}',
+                    '$seatCount ${'seat'.tr}${int.tryParse(seatCount) != 1 ? 's' : ''}',
                     style: const TextStyle(fontSize: 14, color: Colors.black54),
                   ),
                 ],
@@ -354,7 +427,7 @@ class _MyTicketViewState extends State<MyTicketView>
                     }
                   },
                   icon: const Icon(Icons.info_outline, size: 16),
-                  label: const Text('See Details'),
+                  label: Text('see_details'.tr),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.grey,
                     side: const BorderSide(color: Colors.grey),
@@ -382,7 +455,7 @@ class _MyTicketViewState extends State<MyTicketView>
     }
     
     // Fallback if route data is not available
-    return 'Route information not available';
+    return 'route_not_available'.tr;
   }
 
   String _formatDate(DateTime? date) {
@@ -395,7 +468,7 @@ class _MyTicketViewState extends State<MyTicketView>
     final busNumber = ticket.booking?.schedule?.bus?.busNumber ?? '';
 
     if (busType.isEmpty && busNumber.isEmpty) {
-      return 'Bus Info N/A';
+      return 'bus_info_not_available'.tr;
     }
 
     return '$busType $busNumber'.trim();
