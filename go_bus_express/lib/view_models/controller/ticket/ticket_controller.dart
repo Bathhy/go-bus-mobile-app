@@ -19,6 +19,8 @@ class TicketController extends BaseController<TicketState> {
   }
 
   void _fetchTickets() async {
+    // Set loading state before fetching
+    updateState((state) => state.copyWith(isLoading: true));
     await _fetchTicketsWithType(state.type);
   }
 
@@ -37,8 +39,8 @@ class TicketController extends BaseController<TicketState> {
 
     log('🔄 Filtering tickets with API call - type: $newType');
 
-    // Update state with new type
-    updateState((state) => state.copyWith(type: newType));
+    // Update state with new type and set loading
+    updateState((state) => state.copyWith(type: newType, isLoading: true));
 
     // Fetch tickets with new type
     await _fetchTicketsWithType(newType);
@@ -59,18 +61,34 @@ class TicketController extends BaseController<TicketState> {
           if (ticketModel != null) {
             final ticketDataItems = ticketModel.data ?? [];
             log('📊 Total ticket data items: ${ticketDataItems.length}');
-            updateState((state) => state.copyWith(tickets: [ticketModel]));
+            updateState((state) => state.copyWith(
+              tickets: [ticketModel], 
+              isLoading: false,
+            ));
           } else {
             log('⚠️ Received null ticket model');
-            updateState((state) => state.copyWith(tickets: []));
+            updateState((state) => state.copyWith(
+              tickets: [], 
+              isLoading: false,
+            ));
           }
           break;
         case Error<TicketModel?>():
           log('❌ Error fetching tickets: ${result.error.displayMessage}');
+          // Clear tickets when there's an error to prevent showing stale data
+          updateState((state) => state.copyWith(
+            tickets: [], 
+            isLoading: false,
+          ));
           break;
       }
     } catch (e) {
       log('💥 Exception in _fetchTicketsWithType: $e');
+      // Clear tickets when there's an exception to prevent showing stale data
+      updateState((state) => state.copyWith(
+        tickets: [], 
+        isLoading: false,
+      ));
     }
   }
 
