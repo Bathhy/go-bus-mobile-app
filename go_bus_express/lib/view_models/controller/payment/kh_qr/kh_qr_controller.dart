@@ -25,7 +25,8 @@ class KhQrController extends BaseController<KhQrState> {
   Timer? _verificationTimer;
 
   static const int _verificationIntervalSeconds = 5; // Poll every 5 seconds
-  static const int _maxRetries = 36; // 36 * 5 = 180 seconds (3 minutes)
+  static const int _paymentTimeoutSeconds = 60; // Payment timeout duration
+  static const int _maxRetries = 12; // 12 * 5 = 60 seconds (1 minute)
   int _retryCount = 0;
 
   KhQrController(this._bookingRepo, this._localRepository, this._hiveManager)
@@ -36,6 +37,7 @@ class KhQrController extends BaseController<KhQrState> {
     super.onInit();
     _initializeFromArguments();
     _getLocalMd5();
+    _calculateRemainingTime();
     _startCountdownTimer();
     _startVerificationPolling();
   }
@@ -51,14 +53,47 @@ class KhQrController extends BaseController<KhQrState> {
     final amount = (args['amount'] as num?)?.toDouble() ?? 0.0;
     final currency = args['currency'] as String? ?? 'USD';
     final bookingId = args['bookingId'] as int? ?? 0;
+    final createdAt = args['createdAt'] as DateTime?;
+    
     updateState(
       (state) => state.copyWith(
         qrData: qrData,
         amount: amount,
         currency: currency,
         bookingId: bookingId,
+        createdAt: createdAt,
       ),
     );
+  }
+
+  void _calculateRemainingTime() {
+    if (state.createdAt == null) {
+      // New payment, use configured timeout
+      log('🆕 New payment session - starting with $_paymentTimeoutSeconds seconds');
+      updateState((state) => state.copyWith(remainingSeconds: _paymentTimeoutSeconds));
+      return;
+    }
+
+    // Calculate elapsed time since payment was created
+    final now = DateTime.now();
+    final elapsed = now.difference(state.createdAt!);
+    final elapsedSeconds = elapsed.inSeconds;
+    
+    // Calculate remaining time using configured timeout
+    final remaining = _paymentTimeoutSeconds - elapsedSeconds;
+
+    if (remaining <= 0) {
+      // Payment already expired
+      log('⏰ Payment expired (elapsed: ${elapsed.inMinutes}m ${elapsed.inSeconds % 60}s)');
+      updateState((state) => state.copyWith(
+        remainingSeconds: 0,
+        isExpired: true,
+      ));
+    } else {
+      // Update with actual remaining time
+      log('⏱️ Resuming payment with $remaining seconds remaining (elapsed: ${elapsed.inMinutes}m ${elapsed.inSeconds % 60}s)');
+      updateState((state) => state.copyWith(remainingSeconds: remaining));
+    }
   }
 
   // MARK: API Call - Verify Payment

@@ -26,8 +26,10 @@ class _MainNavigationState extends State<MainNavigation> {
 
   @override
   void initState() {
-    _refetch();
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _refetch();
+    });
   }
 
   void _refetch() {

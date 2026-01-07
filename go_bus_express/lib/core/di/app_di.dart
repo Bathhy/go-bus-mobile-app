@@ -7,11 +7,13 @@ import 'package:go_bus_express/data/app_api/go_bus_api.dart';
 import 'package:go_bus_express/data/auth/auth_api.dart';
 import 'package:go_bus_express/data/booking/booking_api.dart';
 import 'package:go_bus_express/data/payment/payment_api.dart';
+import 'package:go_bus_express/data/ticket/ticket_api.dart';
 import 'package:go_bus_express/repository/auth_repository.dart';
 import 'package:go_bus_express/repository/booking_repository.dart';
 import 'package:go_bus_express/repository/hive_manager_repository.dart';
 import 'package:go_bus_express/repository/profile_repository.dart';
 import 'package:go_bus_express/repository/route_repository.dart';
+import 'package:go_bus_express/repository/ticket_repository.dart';
 import 'package:go_bus_express/view_models/controller/auth/AuthController.dart';
 import 'package:go_bus_express/view_models/controller/editProfile/edit_profile_controller.dart';
 import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
@@ -21,6 +23,8 @@ import 'package:go_bus_express/view_models/controller/profile/profile_controller
 import 'package:go_bus_express/view_models/controller/route/select_route/select_route_controller.dart';
 import 'package:go_bus_express/view_models/controller/route/select_seat/select_seat_controller.dart';
 import 'package:go_bus_express/view_models/controller/splash/SplashController.dart';
+import 'package:go_bus_express/view_models/controller/ticket/ticket_controller.dart';
+import 'package:go_bus_express/view_models/controller/ticket/ticket_detail_controller.dart';
 
 import '../../data/network/dio_service.dart';
 import '../../data/network/payment_dio_service.dart';
@@ -29,6 +33,7 @@ final getIt = GetIt.instance;
 
 Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<LocalRepository>(() => LocalRepository());
+
 
   // Initialize and register HiveManagerRepository
   final hiveManager = HiveManagerRepository();
@@ -42,6 +47,7 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<AuthApi>(() => AuthApi(getIt<Dio>()));
   getIt.registerLazySingleton<GoBusApi>(() => GoBusApi(getIt<Dio>()));
   getIt.registerLazySingleton<BookingApi>(() => BookingApi(getIt<Dio>()));
+  getIt.registerLazySingleton<TicketApi>(() => TicketApi(getIt<Dio>()));
 
   // Network - Payment API Service
   final paymentDioService = PaymentDioService(getIt());
@@ -63,6 +69,11 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<BookingRepository>(
     () => BookingRepositoryImpl(getIt(), getIt()),
   );
+  getIt.registerLazySingleton<TicketRepository>(
+    () => TicketRepositoryImpl(getIt<TicketApi>()),
+  );
+
+
 
   // Controller
   getIt.registerFactory<SplashController>(() {
@@ -109,6 +120,17 @@ Future<void> setupDependencyInjection() async {
 
   getIt.registerFactory<EditProfileController>(() {
     final controller = EditProfileController(getIt(), getIt());
+    Get.put(controller);
+    return controller;
+  });
+
+  getIt.registerFactory<TicketController>(() {
+    final controller = TicketController(getIt());
+    Get.put(controller);
+    return controller;
+  });
+  getIt.registerFactory<TicketDetailController>(() {
+    final controller = TicketDetailController(getIt());
     Get.put(controller);
     return controller;
   });

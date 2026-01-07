@@ -30,7 +30,7 @@ class Booking {
     int? userId;
     int? scheduleId;
     String? bookingStatus;
-    int? totalAmount;
+    double? totalAmount;
     dynamic promoId;
     String? paymentStatus;
     DateTime? createdAt;
@@ -57,7 +57,7 @@ class Booking {
 class Schedule {
     int? id;
     int? busId;
-    int? price;
+    double? price;
     DateTime? departureDate;
     DateTime? arrivalTime;
     String? departureTime;

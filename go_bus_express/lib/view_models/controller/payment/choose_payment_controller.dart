@@ -86,9 +86,7 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
   }
 
   bool canProceedToPayment() {
-    return state.agreedToTerms &&
-        state.selectedPaymentMethod != null &&
-        state.selectedSeats.isNotEmpty;
+    return state.agreedToTerms && state.selectedSeats.isNotEmpty;
   }
 
   void createBooking() async {
@@ -131,6 +129,8 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
       case Success<GenerateQrModel>():
         {
           await _localRepository.saveMD5(result.data.md5 ?? '');
+          final now = DateTime.now();
+          
           // Save pending payment to Hive
           final pendingPayment = PendingPaymentModel(
             bookingId: bookingId,
@@ -138,22 +138,21 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
             currency: 'USD',
             qrData: result.data.qr ?? '',
             md5: result.data.md5 ?? '',
-            createdAt: DateTime.now(),
+            createdAt: now,
             direction: state.direction,
             selectedSeats: state.selectedSeats,
           );
           await _hiveManager.savePendingPayment(pendingPayment);
-          updateState((state) => state.copyWith(isLoading: false));
-          log('✅ QR generated successfully ${result.data.md5}');
+            updateState((state) => state.copyWith(isLoading: false));
           Get.toNamed(
             AppRoutes.makePayment,
             arguments: {
               'qrData': result.data.qr ?? '',
-              // 'amount': amount,
               'md5': result.data.md5 ?? '',
               'amount': 0.01,
               'currency': 'USD',
               'bookingId': bookingId,
+              'createdAt': now,
             },
           );
         }

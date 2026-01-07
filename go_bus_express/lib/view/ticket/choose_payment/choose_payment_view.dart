@@ -106,7 +106,6 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
                   'KHQR',
                   'KHQR',
                   'Scan to pay with any banking'.tr,
-                  state.selectedPaymentMethod == 'KHQR',
                 ),
                 SizedBox(height: XPadding.medium),
 
@@ -192,12 +191,7 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
     );
   }
 
-  Widget _buildPaymentOption(
-    String id,
-    String title,
-    String subtitle,
-    bool isSelected,
-  ) {
+  Widget _buildPaymentOption(String id, String title, String subtitle) {
     return GestureDetector(
       onTap: () => controller.selectPaymentMethod(id),
       child: Container(
@@ -205,10 +199,7 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? goBusPrimary : Colors.grey.shade300,
-            width: isSelected ? 2 : 1,
-          ),
+          border: Border.all(color: Colors.grey.shade300, width: 1),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
@@ -242,8 +233,6 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
                 ],
               ),
             ),
-            if (isSelected)
-              Icon(Icons.check_circle, color: goBusPrimary, size: 24),
           ],
         ),
       ),

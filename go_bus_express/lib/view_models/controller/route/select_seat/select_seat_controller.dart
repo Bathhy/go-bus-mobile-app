@@ -20,11 +20,13 @@ class SelectSeatController extends BaseController<SelectSeatState> {
     _initializeFromArguments();
   }
 
+  // MARK - Init Value from Route Argument
+
   void _initializeFromArguments() {
     final args = Get.arguments as Map<String, dynamic>?;
 
     if (args == null) {
-      log('❌ No arguments passed to SelectSeatController');
+      log('No arguments passed to SelectSeatController');
       return;
     }
 
@@ -49,19 +51,17 @@ class SelectSeatController extends BaseController<SelectSeatState> {
       ),
     );
     fetchBusSeat(busId ?? 0);
-    log(
-      '✅ Seat selection initialized: $origin → $destination, Price: \$$unitPrice',
-    );
   }
 
+  // MARK - Fetch Seat
+
   Future<void> fetchBusSeat(int busId) async {
-    // Set loading
     updateState((state) => state.copyWith(isLoading: true));
+
     final result = await _repository.fetchBusSeat(state.scheduleId, busId);
     switch (result) {
       case Success<SeatLayoutModel?>():
         {
-          log("Bus layout and seat info loaded successfully");
           updateState(
             (state) => state.copyWith(isLoading: false, model: result.data),
           );
@@ -74,6 +74,7 @@ class SelectSeatController extends BaseController<SelectSeatState> {
     }
   }
 
+  // MARK - Function Check Seat Unavailable
   bool isSeatBooked(String seatNumber) {
     // If seat array is null or empty, no seats are booked
     if (state.model?.seat == null || state.model!.seat!.isEmpty) {
@@ -87,10 +88,11 @@ class SelectSeatController extends BaseController<SelectSeatState> {
     return seat?.status == SeatStatusEnum.unavailable.status;
   }
 
+  //  MARK - Function Check Seat Available
   bool isSeatAvailable(String seatNumber) {
     // If seat array is null or empty, all seats are available by default
     if (state.model?.seat == null || state.model!.seat!.isEmpty) {
-      log('⚠️ Seat array is empty, all seats available');
+      log(' Seat array is empty, all seats available');
       return true;
     }
 
@@ -99,13 +101,10 @@ class SelectSeatController extends BaseController<SelectSeatState> {
       orElse: () => Seat(),
     );
 
-    // Debug logging
-    log('Checking seat $seatNumber: id=${seat?.id}, status=${seat?.status}');
-    
     // If seat not found in array, it's available
     // If seat found, check its status
-    final isAvailable = seat?.status == SeatStatusEnum.available.status || seat?.id == null;
-    log('Seat $seatNumber isAvailable: $isAvailable');
+    final isAvailable =
+        seat?.status == SeatStatusEnum.available.status || seat?.id == null;
     return isAvailable;
   }
 
@@ -139,11 +138,8 @@ class SelectSeatController extends BaseController<SelectSeatState> {
         selectedSeatIds: currentSeatIds,
       ),
     );
-
-    log('Selected seats: $currentSeats, IDs: $currentSeatIds');
   }
 
-  bool isSeatSelected(String seatNumber) {
-    return state.selectedSeats.contains(seatNumber);
-  }
+  bool isSeatSelected(String seatNumber) =>
+      state.selectedSeats.contains(seatNumber);
 }

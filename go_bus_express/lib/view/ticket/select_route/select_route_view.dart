@@ -17,7 +17,7 @@ class SelectRouteView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final SelectRouteController controller = getIt<SelectRouteController>();
-
+    final uiState = controller.state;
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: PreferredSize(
@@ -34,7 +34,7 @@ class SelectRouteView extends StatelessWidget {
       ),
       body: Obx(
         () => controller.state.isLoading
-            ? Center(child: CircularProgressIndicator(color: goBusPrimary))
+            ? _buildSkeletonLoader()
             : Column(
                 children: [
                   _buildTripInfo(controller),
@@ -49,76 +49,86 @@ class SelectRouteView extends StatelessWidget {
                               ),
                             ),
                           )
-                        : ListView.separated(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: XPadding.extralarge,
+                        : RefreshIndicator(
+                            color: goBusPrimary,
+                            onRefresh: () => controller.fetchRouteByID(
+                              routeId: uiState.routeId,
+                              departureDate: uiState.departureDate,
+                              returnDate: "",
                             ),
-                            itemCount:
-                                controller.state.model?.schedules?.length ?? 0,
-                            separatorBuilder: (context, index) =>
-                                SizedBox(height: XPadding.small),
-                            itemBuilder: (context, index) {
-                              final model = controller.state.model?.schedules
-                                  ?.elementAt(index);
+                            backgroundColor: white,
+                            child: ListView.separated(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: XPadding.extralarge,
+                              ),
+                              itemCount:
+                                  controller.state.model?.schedules?.length ??
+                                  0,
+                              separatorBuilder: (context, index) =>
+                                  SizedBox(height: XPadding.small),
+                              itemBuilder: (context, index) {
+                                final model = controller.state.model?.schedules
+                                    ?.elementAt(index);
 
-                              // Format departure time from ISO 8601
-                              String formattedDepartureTime = 'N/A';
-                              if (model?.departureTime != null) {
-                                try {
-                                  final dt = DateTime.parse(
-                                    model!.departureTime!,
-                                  );
-                                  formattedDepartureTime = DateFormat(
-                                    'HH:mm',
-                                  ).format(dt);
-                                } catch (e) {
-                                  formattedDepartureTime =
-                                      model?.departureTime ?? 'N/A';
+                                // Format departure time from ISO 8601
+                                String formattedDepartureTime = 'N/A';
+                                if (model?.departureTime != null) {
+                                  try {
+                                    final dt = DateTime.parse(
+                                      model!.departureTime!,
+                                    );
+                                    formattedDepartureTime = DateFormat(
+                                      'HH:mm',
+                                    ).format(dt);
+                                  } catch (e) {
+                                    formattedDepartureTime =
+                                        model?.departureTime ?? 'N/A';
+                                  }
                                 }
-                              }
 
-                              // Format arrival time from ISO 8601
-                              String formattedArrivalTime = 'N/A';
-                              if (model?.arrivalTime != null) {
-                                try {
-                                  final dt = DateTime.parse(
-                                    model!.arrivalTime!,
-                                  );
-                                  formattedArrivalTime = DateFormat(
-                                    'HH:mm',
-                                  ).format(dt);
-                                } catch (e) {
-                                  formattedArrivalTime =
-                                      model?.arrivalTime ?? 'N/A';
+                                // Format arrival time from ISO 8601
+                                String formattedArrivalTime = 'N/A';
+                                if (model?.arrivalTime != null) {
+                                  try {
+                                    final dt = DateTime.parse(
+                                      model!.arrivalTime!,
+                                    );
+                                    formattedArrivalTime = DateFormat(
+                                      'HH:mm',
+                                    ).format(dt);
+                                  } catch (e) {
+                                    formattedArrivalTime =
+                                        model?.arrivalTime ?? 'N/A';
+                                  }
                                 }
-                              }
 
-                              return _buildBusCard(
-                                scheduleId: model?.id,
-                                departDate: controller.state.departureDate,
-                                routeModel: controller.state.model?.route,
-                                budId: model?.busId,
-                                departureTime: formattedDepartureTime,
-                                arrivalTime: formattedArrivalTime,
-                                duration: minutesToHours(
-                                  controller
-                                          .state
-                                          .model
-                                          ?.route
-                                          ?.durationMinutes ??
-                                      0,
-                                ).toString(),
-                                price:
-                                    '\$${model?.price?.toStringAsFixed(2) ?? '0.00'}',
-                                availableSeats:
-                                    '${model?.bus?.availableSeats ?? 0}/${model?.bus?.totalSeats ?? 0} Seats',
-                                departureLocation:
-                                    'Boarding: ${controller.state.model?.route?.origin ?? 'N/A'}',
-                                arrivalLocation:
-                                    'Drop-off: ${controller.state.model?.route?.destination ?? 'N/A'}',
-                                busType: model?.bus?.busType ?? 'Bus',
-                              );
-                            },
+                                return _buildBusCard(
+                                  scheduleId: model?.id,
+                                  departDate: controller.state.departureDate,
+                                  routeModel: controller.state.model?.route,
+                                  budId: model?.busId,
+                                  departureTime: formattedDepartureTime,
+                                  arrivalTime: formattedArrivalTime,
+                                  duration: minutesToHours(
+                                    controller
+                                            .state
+                                            .model
+                                            ?.route
+                                            ?.durationMinutes ??
+                                        0,
+                                  ).toString(),
+                                  price:
+                                      '\$${model?.price?.toStringAsFixed(2) ?? '0.00'}',
+                                  availableSeats:
+                                      '${model?.bus?.availableSeats ?? 0}/${model?.bus?.totalSeats ?? 0} ${'seats'.tr}',
+                                  departureLocation:
+                                      '${'boarding'.tr}: ${controller.state.model?.route?.origin ?? 'N/A'}',
+                                  arrivalLocation:
+                                      '${'drop_off'.tr}: ${controller.state.model?.route?.destination ?? 'N/A'}',
+                                  busType: model?.bus?.busType ?? 'bus'.tr,
+                                );
+                              },
+                            ),
                           ),
                   ),
                   SizedBox(height: 40),
@@ -357,6 +367,142 @@ class SelectRouteView extends StatelessWidget {
             style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSkeletonLoader() {
+    return Column(
+      children: [
+        _buildSkeletonTripInfo(),
+        Expanded(
+          child: ListView.separated(
+            padding: EdgeInsets.symmetric(horizontal: XPadding.extralarge),
+            itemCount: 3,
+            separatorBuilder: (context, index) => SizedBox(height: XPadding.small),
+            itemBuilder: (context, index) => _buildSkeletonBusCard(),
+          ),
+        ),
+        SizedBox(height: 40),
+      ],
+    );
+  }
+
+  // MARK - Skeleton Trip Info
+  Widget _buildSkeletonTripInfo() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              _buildShimmerBox(width: 16, height: 16, radius: 8),
+              SizedBox(width: 4),
+              _buildShimmerBox(width: 80, height: 14, radius: 4),
+            ],
+          ),
+          _buildShimmerBox(width: 100, height: 14, radius: 4),
+        ],
+      ),
+    );
+  }
+
+  // MARK - Skeleton Route Card
+  Widget _buildSkeletonBusCard() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade300),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade200,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              _buildShimmerBox(width: 24, height: 24, radius: 4),
+              const SizedBox(width: 12),
+              _buildShimmerBox(width: 60, height: 15, radius: 4),
+              const Spacer(),
+              _buildShimmerBox(width: 80, height: 12, radius: 4),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildShimmerBox(width: 80, height: 12, radius: 4),
+                  const SizedBox(height: 4),
+                  _buildShimmerBox(width: 50, height: 18, radius: 4),
+                ],
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  children: [
+                    _buildShimmerBox(width: double.infinity, height: 2, radius: 1),
+                    const SizedBox(height: 4),
+                    _buildShimmerBox(width: 40, height: 12, radius: 4),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  _buildShimmerBox(width: 80, height: 12, radius: 4),
+                  const SizedBox(height: 4),
+                  _buildShimmerBox(width: 50, height: 18, radius: 4),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildShimmerBox(width: 120, height: 12, radius: 4),
+              _buildShimmerBox(width: 120, height: 12, radius: 4),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(height: 1, color: Colors.grey.shade300),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildShimmerBox(width: 60, height: 15, radius: 4),
+              _buildShimmerBox(width: 100, height: 40, radius: 8),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerBox({
+    required double width,
+    required double height,
+    double radius = 4,
+  }) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade300,
+        borderRadius: BorderRadius.circular(radius),
       ),
     );
   }

@@ -49,10 +49,7 @@ class _SelectSeatViewState extends State<SelectSeatView> {
 
         if (layout == null || layout.isEmpty) {
           return Center(
-            child: XTextMedium(
-              label: 'No seat layout available',
-              colortext: Colors.grey,
-            ),
+            child: XTextMedium(label: 'no_seat'.tr, colortext: Colors.grey),
           );
         }
 
