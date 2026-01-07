@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/di/app_di.dart';
 import 'package:go_bus_express/models/ticket/ticket_model.dart';
+import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:go_bus_express/view_models/controller/ticket/ticket_controller.dart';
 import 'package:shared_package/config/themes.dart';
 import 'ticket_detail_view.dart';
@@ -207,6 +208,7 @@ class _MyTicketViewState extends State<MyTicketView>
     final expectedType = isUpcoming ? "coming" : "pass";
     final currentType = controller.state.type;
     final tickets = controller.getCurrentTickets();
+    final user = controller.state.user;
     final isLoading = controller.state.isLoading;
 
     // Debug logging
@@ -228,23 +230,23 @@ class _MyTicketViewState extends State<MyTicketView>
       onRefresh: _handleRefresh,
       color: goBusPrimary,
       child: tickets.isNotEmpty
-          ? _buildTicketList(tickets)
+          ? _buildTicketList(tickets, user)
           : _buildEmptyState(emptyTitle, emptySubtitle),
     );
   }
 
-  Widget _buildTicketList(List<Datum> tickets) {
+  Widget _buildTicketList(List<Datum> tickets, User user) {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: tickets.length,
       itemBuilder: (context, index) {
-        return _buildTicketCard(tickets[index]);
+        return _buildTicketCard(tickets[index], user);
       },
     );
   }
 
-  Widget _buildTicketCard(Datum ticket) {
+  Widget _buildTicketCard(Datum ticket, User user) {
     // Extract route information (you might need to adjust this based on your actual data structure)
     final routeText = _getRouteText(ticket);
     final ticketId = ticket.booking?.id?.toString() ?? 'N/A';
@@ -255,11 +257,13 @@ class _MyTicketViewState extends State<MyTicketView>
     return GestureDetector(
       onTap: () {
         if (ticket.id != null) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => TicketDetailView(ticketId: ticket.id!),
-            ),
+          Get.toNamed(
+            AppRoutes.detailTicket,
+            arguments: {
+              "ticketId": ticket.id!,
+              "passengerName": user.fullName,
+              "email": user.email,
+            },
           );
         }
       },
@@ -373,12 +377,10 @@ class _MyTicketViewState extends State<MyTicketView>
                 child: OutlinedButton.icon(
                   onPressed: () {
                     if (ticket.id != null) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              TicketDetailView(ticketId: ticket.id!),
-                        ),
+                      AppRoutes.goToTicketDetail(
+                        ticketId: ticket.id!,
+                        passengerName: user.fullName,
+                        email: user.email,
                       );
                     }
                   },

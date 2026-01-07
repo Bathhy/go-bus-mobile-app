@@ -1,10 +1,10 @@
+import 'package:go_bus_express/core/base/base_ui_state.dart';
 import 'package:go_bus_express/models/profile/profile_model.dart';
 import 'package:go_bus_express/models/route/detail_route_model.dart';
 
 import '../../../models/home/all_route_model.dart';
 
-class HomeState {
-  final bool isLoading;
+class HomeState extends BaseUiState {
   final ProfileModel? profileModel;
   final List<AllRouteModel> routes;
   final bool isLoadingRoutes;
@@ -16,7 +16,7 @@ class HomeState {
   final DateTime? returnDate;
 
   HomeState({
-    this.isLoading = false,
+    super.isLoading = false,
     this.profileModel = const ProfileModel(),
     this.routes = const [],
     this.isLoadingRoutes = false,

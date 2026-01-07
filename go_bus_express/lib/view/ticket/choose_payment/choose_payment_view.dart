@@ -50,7 +50,7 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: XAppBar(
           title: 'Choose Payment'.tr,
-          onBackPressed: () => Navigator.of(context).pop(),
+          onBackPressed: () => Get.back(),
         ),
       ),
       body: Obx(() {
@@ -102,11 +102,7 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
                 ),
                 SizedBox(height: XPadding.large),
 
-                _buildPaymentOption(
-                  'KHQR',
-                  'KHQR',
-                  'Scan to pay with any banking'.tr,
-                ),
+                _buildPaymentOption('KHQR', 'Scan to pay with any banking'.tr),
                 SizedBox(height: XPadding.medium),
 
                 // Terms checkbox
@@ -157,7 +153,7 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
               label: 'Pay'.trParams({
                 'amount': state.totalPrice.toStringAsFixed(2),
               }),
-              optionbutton: canProceed ? 1 : 0,
+              optionbutton: 1,
               bgColor: canProceed ? goBusPrimary : Colors.grey,
               onTap: canProceed ? () => controller.createBooking() : null,
             ),
@@ -191,50 +187,43 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
     );
   }
 
-  Widget _buildPaymentOption(String id, String title, String subtitle) {
-    return GestureDetector(
-      onTap: () => controller.selectPaymentMethod(id),
-      child: Container(
-        padding: EdgeInsets.all(XPadding.large),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade300, width: 1),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 4,
-              offset: Offset(0, 2),
+  Widget _buildPaymentOption(String title, String subtitle) {
+    return Container(
+      padding: EdgeInsets.all(XPadding.large),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset(AppImages.imgBakong, width: 40, height: 40),
+          ),
+          SizedBox(width: XPadding.large),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                XTextMedium(
+                  label: title,
+                  colortext: black,
+                  fontWeight: FontWeight.bold,
+                ),
+                SizedBox(height: 4),
+                XTextSmall(label: subtitle, colortext: Colors.grey.shade600),
+              ],
             ),
-          ],
-        ),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                id == 'KHQR' ? AppImages.imgBakong : AppImages.imgBakong,
-                width: 40,
-                height: 40,
-              ),
-            ),
-            SizedBox(width: XPadding.large),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  XTextMedium(
-                    label: title,
-                    colortext: black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  SizedBox(height: 4),
-                  XTextSmall(label: subtitle, colortext: Colors.grey.shade600),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

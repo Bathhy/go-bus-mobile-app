@@ -21,6 +21,7 @@ class KHQRPaymentView extends StatefulWidget {
 class _KHQRPaymentViewState extends State<KHQRPaymentView> {
   final controller = getIt<KhQrController>();
   Worker? _stateWorker;
+  Worker? _expiryWorker;
 
   @override
   void initState() {
@@ -32,11 +33,26 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
         XAppLoadingDialog.hideAppDialog();
       }
     });
+
+    // Handle expiry in initState to show dialog only once
+    _expiryWorker = ever(controller.obs, (state) {
+      if (state.isExpired) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            XDialog.showTimeoutDialog(
+              context,
+              () => controller.cancelBooking(),
+            );
+          }
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
     _stateWorker?.dispose();
+    _expiryWorker?.dispose();
     super.dispose();
   }
 
@@ -170,18 +186,7 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
           child: Obx(() {
-            final state = controller.state;
-
-            // Show timeout dialog when expired
-            if (state.isExpired) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                XDialog.showTimeoutDialog(
-                  context,
-                  () => controller.cancelBooking(),
-                );
-              });
-            }
-
+            // Timeout dialog is now handled in initState via worker
             return Column(
               children: [
                 XAppBar(

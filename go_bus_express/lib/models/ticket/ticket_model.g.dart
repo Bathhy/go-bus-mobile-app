@@ -94,9 +94,11 @@ Map<String, dynamic> _$RouteToJson(Route instance) => <String, dynamic>{
 User _$UserFromJson(Map<String, dynamic> json) => User(
   id: (json['id'] as num?)?.toInt(),
   fullName: json['fullName'] as String?,
+  email: json['email'] as String?,
 );
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
   'id': instance.id,
   'fullName': instance.fullName,
+  'email': instance.email,
 };

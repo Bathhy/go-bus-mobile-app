@@ -27,7 +27,7 @@ class SelectRouteView extends StatelessWidget {
             title:
                 '${controller.state.model?.route?.origin.orDefault("Origin")} → ${controller.state.model?.route?.destination.orDefault("Destination")}',
             subTitle:
-                '${controller.state.departureDate.orDefault("N/A")} → ${controller.state.returnDate.orDefault("N/A")}',
+                '${controller.state.departureDate.orDefault("N/A")}',
             onBackPressed: () => Get.back(),
           ),
         ),
@@ -69,23 +69,6 @@ class SelectRouteView extends StatelessWidget {
                               itemBuilder: (context, index) {
                                 final model = controller.state.model?.schedules
                                     ?.elementAt(index);
-
-                                // Format departure time from ISO 8601
-                                String formattedDepartureTime = 'N/A';
-                                if (model?.departureTime != null) {
-                                  try {
-                                    final dt = DateTime.parse(
-                                      model!.departureTime!,
-                                    );
-                                    formattedDepartureTime = DateFormat(
-                                      'HH:mm',
-                                    ).format(dt);
-                                  } catch (e) {
-                                    formattedDepartureTime =
-                                        model?.departureTime ?? 'N/A';
-                                  }
-                                }
-
                                 // Format arrival time from ISO 8601
                                 String formattedArrivalTime = 'N/A';
                                 if (model?.arrivalTime != null) {
@@ -107,7 +90,11 @@ class SelectRouteView extends StatelessWidget {
                                   departDate: controller.state.departureDate,
                                   routeModel: controller.state.model?.route,
                                   budId: model?.busId,
-                                  departureTime: formattedDepartureTime,
+                                  departureTime:
+                                      model?.departureTime
+                                          ?.formattedTime()
+                                          .orDefault("N/A") ??
+                                      "",
                                   arrivalTime: formattedArrivalTime,
                                   duration: minutesToHours(
                                     controller
@@ -379,7 +366,8 @@ class SelectRouteView extends StatelessWidget {
           child: ListView.separated(
             padding: EdgeInsets.symmetric(horizontal: XPadding.extralarge),
             itemCount: 3,
-            separatorBuilder: (context, index) => SizedBox(height: XPadding.small),
+            separatorBuilder: (context, index) =>
+                SizedBox(height: XPadding.small),
             itemBuilder: (context, index) => _buildSkeletonBusCard(),
           ),
         ),
@@ -452,7 +440,11 @@ class SelectRouteView extends StatelessWidget {
               Expanded(
                 child: Column(
                   children: [
-                    _buildShimmerBox(width: double.infinity, height: 2, radius: 1),
+                    _buildShimmerBox(
+                      width: double.infinity,
+                      height: 2,
+                      radius: 1,
+                    ),
                     const SizedBox(height: 4),
                     _buildShimmerBox(width: 40, height: 12, radius: 4),
                   ],
