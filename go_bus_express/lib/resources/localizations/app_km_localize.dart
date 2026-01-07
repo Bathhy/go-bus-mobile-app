@@ -92,6 +92,9 @@ final Map<String, String> km = {
   'total_amount': 'ចំនួនទឹកប្រាក់សរុប',
   'departure_location_not_available': 'មិនមានទីតាំងចេញដំណើរ',
   'arrival_location_not_available': 'មិនមានទីតាំងទៅដល់',
+  'ticket_number': 'សំបុត្រលេខ #',
+  'booking_number': 'លេខកក់ #',
+  'issued': 'ចេញផ្សាយ:',
   "Pay Now": "បង់ប្រាក់ឥឡូវនេះ",
   "Would you like to continue or cancel this payment?":
       "តើអ្នកចង់បន្ត ឬលុបចោលការទូទាត់នេះ?",
