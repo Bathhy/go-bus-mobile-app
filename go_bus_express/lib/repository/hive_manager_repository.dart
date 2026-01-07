@@ -51,13 +51,6 @@ class HiveManagerRepository {
   bool hasPendingPayment() {
     final payment = getPendingPayment();
     if (payment == null) return false;
-    
-    // Check if expired
-    if (payment.isExpired()) {
-      clearPendingPayment();
-      return false;
-    }
-    
     return true;
   }
 

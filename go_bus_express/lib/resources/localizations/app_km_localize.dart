@@ -114,9 +114,12 @@ final Map<String, String> km = {
   "qty": "បរិមាណ",
   "edit_profile": "កែប្រូហ្វាយល៍",
   "full_name": "ឈ្មោះពេញ",
-  "email": "អ៊ីមែល",
   "phone_number": "លេខទូរស័ព្ទ",
   "save": "រក្សាទុក",
-  'departure_time': 'ម៉ោងចេញដំណើរ',
   'arrival': 'ម៉ោងទៅដល់',
+  "seats": "កៅអី",
+  "boarding": "ទីតាំងឡើង",
+  "drop_off": "ទីតាំងចុះ",
+  "bus": "រថយន្ត",
+  "no_seat": "មិនមានកៅអីនោះទេ"
 };

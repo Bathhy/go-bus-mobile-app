@@ -12,7 +12,7 @@ class KhQrState extends BaseUiState {
   final String? paymentStatus;
   final String? transactionId;
   final int bookingId;
-
+  final DateTime? createdAt;
 
   KhQrState({
     super.isLoading = false,
@@ -27,6 +27,7 @@ class KhQrState extends BaseUiState {
     this.transactionId,
     this.md5 = '',
     this.bookingId = 0,
+    this.createdAt,
   });
 
   KhQrState copyWith({
@@ -42,6 +43,7 @@ class KhQrState extends BaseUiState {
     String? transactionId,
     String? md5,
     int? bookingId,
+    DateTime? createdAt,
   }) {
     return KhQrState(
       isLoading: isLoading ?? this.isLoading,
@@ -56,6 +58,7 @@ class KhQrState extends BaseUiState {
       transactionId: transactionId ?? this.transactionId,
       md5: md5 ?? this.md5,
       bookingId: bookingId ?? this.bookingId,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 }

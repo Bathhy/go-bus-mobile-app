@@ -38,41 +38,42 @@ class BookingCard extends StatelessWidget {
             const SizedBox(height: 12),
             Obx(() {
               final selectedCountry = homeController.state.selectedCountry;
-              return GestureDetector(
-                onTap: () => CountrySelectionDialog.show(homeController),
-                child: _buildDirectionRow(
-                  selectedCountry,
-                  Icons.public,
-                ),
-              );
+              return _buildDirectionRow(selectedCountry, Icons.public);
             }),
             const SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
-                  child: Obx(() => GestureDetector(
-                        onTap: () => _selectDepartureDate(context, homeController),
-                        child: _buildDatePicker(
-                          'Departure Date'.tr,
-                          homeController.state.departureDate != null
-                              ? DateFormat('yyyy-MM-dd')
-                                  .format(homeController.state.departureDate!)
-                              : 'Select Date'.tr,
-                        ),
-                      )),
+                  child: Obx(
+                    () => GestureDetector(
+                      onTap: () =>
+                          _selectDepartureDate(context, homeController),
+                      child: _buildDatePicker(
+                        'Departure Date'.tr,
+                        homeController.state.departureDate != null
+                            ? DateFormat(
+                                'yyyy-MM-dd',
+                              ).format(homeController.state.departureDate!)
+                            : 'Select Date'.tr,
+                      ),
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: Obx(() => GestureDetector(
-                        onTap: () => _selectReturnDate(context, homeController),
-                        child: _buildDatePicker(
-                          'Return Date'.tr,
-                          homeController.state.returnDate != null
-                              ? DateFormat('yyyy-MM-dd')
-                                  .format(homeController.state.returnDate!)
-                              : 'Select Date'.tr,
-                        ),
-                      )),
+                  child: Obx(
+                    () => GestureDetector(
+                      onTap: () => _selectReturnDate(context, homeController),
+                      child: _buildDatePicker(
+                        'Return Date'.tr,
+                        homeController.state.returnDate != null
+                            ? DateFormat(
+                                'yyyy-MM-dd',
+                              ).format(homeController.state.returnDate!)
+                            : 'Select Date'.tr,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -87,7 +88,7 @@ class BookingCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(24),
                 ),
               ),
-              child:  Text(
+              child: Text(
                 'Search'.tr,
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
@@ -176,7 +177,7 @@ class BookingCard extends StatelessWidget {
 
     if (picked != null) {
       controller.selectDepartureDate(picked);
-      
+
       // If return date is before departure date, clear it
       if (controller.state.returnDate != null &&
           controller.state.returnDate!.isBefore(picked)) {
@@ -189,10 +190,11 @@ class BookingCard extends StatelessWidget {
     BuildContext context,
     HomeController controller,
   ) async {
-    final DateTime initialDate = controller.state.returnDate ??
+    final DateTime initialDate =
+        controller.state.returnDate ??
         controller.state.departureDate ??
         DateTime.now();
-    
+
     final DateTime firstDate = controller.state.departureDate ?? DateTime.now();
 
     final DateTime? picked = await showDatePicker(
@@ -221,12 +223,12 @@ class BookingCard extends StatelessWidget {
 
   void _handleSearch(BuildContext context, HomeController controller) {
     final params = controller.getSearchParams();
-    
+
     if (params == null) {
       // Show error message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:  Text('Please select route, departure and return dates'.tr),
+          content: Text('Please select route, departure and return dates'.tr),
           backgroundColor: Colors.red[700],
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -238,9 +240,6 @@ class BookingCard extends StatelessWidget {
     }
 
     // Navigate with parameters
-    Get.toNamed(
-      AppRoutes.selectRoute,
-      arguments: params,
-    );
+    Get.toNamed(AppRoutes.selectRoute, arguments: params);
   }
 }

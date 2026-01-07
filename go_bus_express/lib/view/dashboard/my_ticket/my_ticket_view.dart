@@ -17,9 +17,7 @@ class _MyTicketViewState extends State<MyTicketView>
     with TickerProviderStateMixin {
   late TabController _tabController;
   late TicketController _ticketController;
-  late AnimationController _refreshAnimationController;
   late AnimationController _skeletonAnimationController;
-  bool _isRefreshing = false;
 
   // Helper method for safe translation
   String _translate(String key, {String? fallback}) {
@@ -28,7 +26,7 @@ class _MyTicketViewState extends State<MyTicketView>
       if (Get.locale == null) {
         return fallback ?? key;
       }
-      
+
       final translated = key.tr;
       // If translation returns the same key, it means translation failed
       return translated != key ? translated : (fallback ?? key);
@@ -42,19 +40,15 @@ class _MyTicketViewState extends State<MyTicketView>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _refreshAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
-      vsync: this,
-    );
     _skeletonAnimationController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-    _ticketController = getIt<TicketController>();
-    
+    _ticketController = Get.put(getIt<TicketController>());
+
     // Start skeleton animation
     _skeletonAnimationController.repeat();
-    
+
     // Listen to tab changes to trigger API calls
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
@@ -62,7 +56,7 @@ class _MyTicketViewState extends State<MyTicketView>
         _ticketController.filterTickets(isUpcoming: isUpcoming);
       }
     });
-    
+
     // Ensure the controller is initialized and fetch data
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _ticketController.onInit();
@@ -72,39 +66,14 @@ class _MyTicketViewState extends State<MyTicketView>
   @override
   void dispose() {
     _tabController.dispose();
-    _refreshAnimationController.dispose();
     _skeletonAnimationController.dispose();
     super.dispose();
   }
 
   Future<void> _handleRefresh() async {
-    if (_isRefreshing) return; // Prevent multiple simultaneous refreshes
-    
-    setState(() {
-      _isRefreshing = true;
-    });
-    
-    // Start the rotation animation
-    _refreshAnimationController.repeat();
-    
-    try {
-      // Refresh tickets using the current tab state
-      final isUpcoming = _tabController.index == 0;
-      await _ticketController.filterTickets(isUpcoming: isUpcoming);
-      
-      // Wait a minimum time to show the animation (optional)
-      await Future.delayed(const Duration(milliseconds: 500));
-    } finally {
-      // Stop the animation and reset state
-      _refreshAnimationController.stop();
-      _refreshAnimationController.reset();
-      
-      if (mounted) {
-        setState(() {
-          _isRefreshing = false;
-        });
-      }
-    }
+    // Refresh tickets using the current tab state
+    final isUpcoming = _tabController.index == 0;
+    await _ticketController.filterTickets(isUpcoming: isUpcoming);
   }
 
   @override
@@ -117,51 +86,16 @@ class _MyTicketViewState extends State<MyTicketView>
           children: [
             Padding(
               padding: const EdgeInsets.all(20.0),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            _translate('Ticket', fallback: 'Ticket'),
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 28,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                      AnimatedBuilder(
-                        animation: _refreshAnimationController,
-                        builder: (context, child) {
-                          return IconButton(
-                            onPressed: _isRefreshing ? null : _handleRefresh,
-                            icon: Transform.rotate(
-                              angle: _refreshAnimationController.value * 2 * 3.14159,
-                              child: Icon(
-                                Icons.refresh,
-                                color: _isRefreshing ? Colors.white70 : Colors.white,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  _translate('Ticket', fallback: 'Ticket'),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w600,
                   ),
-                  // Show loading indicator when refreshing
-                  if (_isRefreshing)
-                    Container(
-                      margin: const EdgeInsets.only(top: 8),
-                      child: LinearProgressIndicator(
-                        backgroundColor: Colors.white.withOpacity(0.3),
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        minHeight: 2,
-                      ),
-                    ),
-                ],
+                ),
               ),
             ),
             Expanded(
@@ -219,15 +153,18 @@ class _MyTicketViewState extends State<MyTicketView>
                         init: _ticketController,
                         builder: (controller) {
                           final currentTickets = controller.getCurrentTickets();
-                          
+
                           // Debug: Show total tickets count and current type
-                          print('🎫 Current tickets in UI: ${currentTickets.length}, type: ${controller.state.type}');
-                          
+                          print(
+                            '🎫 Current tickets in UI: ${currentTickets.length}, type: ${controller.state.type}',
+                          );
+
                           // Show loading if no tickets yet AND it's the initial load
-                          if (controller.state.tickets.isEmpty && controller.state.isLoading) {
+                          if (controller.state.tickets.isEmpty &&
+                              controller.state.isLoading) {
                             return _buildSkeletonLoading();
                           }
-                          
+
                           return TabBarView(
                             controller: _tabController,
                             children: [
@@ -238,7 +175,7 @@ class _MyTicketViewState extends State<MyTicketView>
                                 'upcoming_trips_description'.tr,
                                 isUpcoming: true,
                               ),
-                              // Past tickets tab  
+                              // Past tickets tab
                               _buildCurrentTicketTab(
                                 controller,
                                 'no_past_trips'.tr,
@@ -271,25 +208,35 @@ class _MyTicketViewState extends State<MyTicketView>
     final currentType = controller.state.type;
     final tickets = controller.getCurrentTickets();
     final isLoading = controller.state.isLoading;
-    
+
     // Debug logging
-    print('🔍 Tab check - Expected: $expectedType, Current: $currentType, Tickets: ${tickets.length}, Loading: $isLoading');
-    
+    print(
+      '🔍 Tab check - Expected: $expectedType, Current: $currentType, Tickets: ${tickets.length}, Loading: $isLoading',
+    );
+
     // Show loading skeleton if we're loading or waiting for the correct type's data
     if (isLoading || currentType != expectedType) {
-      print('⏳ Loading or waiting for $expectedType data, current type is $currentType');
+      print(
+        '⏳ Loading or waiting for $expectedType data, current type is $currentType',
+      );
       return _buildSkeletonLoading();
     }
-    
-    // Only show tickets if we have data for the current type
-    return tickets.isNotEmpty
-        ? _buildTicketList(tickets)
-        : _buildEmptyState(emptyTitle, emptySubtitle);
+
+    // Wrap content with RefreshIndicator
+    return RefreshIndicator(
+      backgroundColor: white,
+      onRefresh: _handleRefresh,
+      color: goBusPrimary,
+      child: tickets.isNotEmpty
+          ? _buildTicketList(tickets)
+          : _buildEmptyState(emptyTitle, emptySubtitle),
+    );
   }
 
   Widget _buildTicketList(List<Datum> tickets) {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
+      physics: const AlwaysScrollableScrollPhysics(),
       itemCount: tickets.length,
       itemBuilder: (context, index) {
         return _buildTicketCard(tickets[index]);
@@ -321,10 +268,7 @@ class _MyTicketViewState extends State<MyTicketView>
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.grey.shade300,
-            width: 1,
-          ),
+          border: Border.all(color: Colors.grey.shade300, width: 1),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.06),
@@ -389,7 +333,10 @@ class _MyTicketViewState extends State<MyTicketView>
                   Expanded(
                     child: Text(
                       issueDate,
-                      style: const TextStyle(fontSize: 14, color: Colors.black54),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black54,
+                      ),
                     ),
                   ),
                 ],
@@ -429,7 +376,8 @@ class _MyTicketViewState extends State<MyTicketView>
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => TicketDetailView(ticketId: ticket.id!),
+                          builder: (context) =>
+                              TicketDetailView(ticketId: ticket.id!),
                         ),
                       );
                     }
@@ -457,11 +405,11 @@ class _MyTicketViewState extends State<MyTicketView>
     final route = ticket.booking?.schedule?.bus?.route;
     final origin = route?.origin;
     final destination = route?.destination;
-    
+
     if (origin != null && destination != null) {
       return '$origin - $destination';
     }
-    
+
     // Fallback if route data is not available
     return 'route_not_available'.tr;
   }
@@ -482,44 +430,53 @@ class _MyTicketViewState extends State<MyTicketView>
     return '$busType $busNumber'.trim();
   }
 
-
   Widget _buildEmptyState(String title, String subtitle) {
-    return Container(
-      color: const Color(0xFFF5F5F5),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/images/no_trip.png',
-              width: 240,
-              height: 180,
-              errorBuilder: (context, error, stackTrace) {
-                return Icon(
-                  Icons.luggage_outlined,
-                  size: 80,
-                  color: goBusPrimary,
-                );
-              },
-            ),
-            const SizedBox(height: 20),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Container(
+              color: const Color(0xFFF5F5F5),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/images/no_trip.png',
+                      width: 240,
+                      height: 180,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(
+                          Icons.luggage_outlined,
+                          size: 80,
+                          color: goBusPrimary,
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              subtitle,
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -542,10 +499,7 @@ class _MyTicketViewState extends State<MyTicketView>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.grey.shade300,
-          width: 1,
-        ),
+        border: Border.all(color: Colors.grey.shade300, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.06),
@@ -561,11 +515,7 @@ class _MyTicketViewState extends State<MyTicketView>
           children: [
             Row(
               children: [
-                _buildShimmerContainer(
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                ),
+                _buildShimmerContainer(width: 40, height: 40, borderRadius: 20),
                 const SizedBox(width: 12),
                 Expanded(
                   child: _buildShimmerContainer(
@@ -579,23 +529,11 @@ class _MyTicketViewState extends State<MyTicketView>
             const SizedBox(height: 16),
             Row(
               children: [
-                _buildShimmerContainer(
-                  width: 16,
-                  height: 16,
-                  borderRadius: 2,
-                ),
+                _buildShimmerContainer(width: 16, height: 16, borderRadius: 2),
                 const SizedBox(width: 8),
-                _buildShimmerContainer(
-                  width: 80,
-                  height: 14,
-                  borderRadius: 4,
-                ),
+                _buildShimmerContainer(width: 80, height: 14, borderRadius: 4),
                 const SizedBox(width: 20),
-                _buildShimmerContainer(
-                  width: 16,
-                  height: 16,
-                  borderRadius: 2,
-                ),
+                _buildShimmerContainer(width: 16, height: 16, borderRadius: 2),
                 const SizedBox(width: 8),
                 Expanded(
                   child: _buildShimmerContainer(
@@ -609,29 +547,13 @@ class _MyTicketViewState extends State<MyTicketView>
             const SizedBox(height: 12),
             Row(
               children: [
-                _buildShimmerContainer(
-                  width: 16,
-                  height: 16,
-                  borderRadius: 2,
-                ),
+                _buildShimmerContainer(width: 16, height: 16, borderRadius: 2),
                 const SizedBox(width: 8),
-                _buildShimmerContainer(
-                  width: 100,
-                  height: 14,
-                  borderRadius: 4,
-                ),
+                _buildShimmerContainer(width: 100, height: 14, borderRadius: 4),
                 const SizedBox(width: 20),
-                _buildShimmerContainer(
-                  width: 16,
-                  height: 16,
-                  borderRadius: 2,
-                ),
+                _buildShimmerContainer(width: 16, height: 16, borderRadius: 2),
                 const SizedBox(width: 8),
-                _buildShimmerContainer(
-                  width: 60,
-                  height: 14,
-                  borderRadius: 4,
-                ),
+                _buildShimmerContainer(width: 60, height: 14, borderRadius: 4),
               ],
             ),
             const SizedBox(height: 16),
@@ -662,11 +584,7 @@ class _MyTicketViewState extends State<MyTicketView>
             gradient: LinearGradient(
               begin: Alignment(-1.0, -0.3),
               end: Alignment(1.0, 0.3),
-              colors: [
-                Colors.grey[300]!,
-                Colors.grey[100]!,
-                Colors.grey[300]!,
-              ],
+              colors: [Colors.grey[300]!, Colors.grey[100]!, Colors.grey[300]!],
               stops: [
                 0.0,
                 0.5 + (_skeletonAnimationController.value * 0.5),

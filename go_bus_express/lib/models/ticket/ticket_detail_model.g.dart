@@ -10,6 +10,7 @@ TicketDetailModel _$TicketDetailModelFromJson(Map<String, dynamic> json) =>
     TicketDetailModel(
       id: (json['id'] as num?)?.toInt(),
       bookingId: (json['bookingId'] as num?)?.toInt(),
+      qrCode: json['qrCode'] as String?,
       issuedAt: json['issuedAt'] == null
           ? null
           : DateTime.parse(json['issuedAt'] as String),
@@ -22,6 +23,7 @@ Map<String, dynamic> _$TicketDetailModelToJson(TicketDetailModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'bookingId': instance.bookingId,
+      'qrCode': instance.qrCode,
       'issuedAt': instance.issuedAt?.toIso8601String(),
       'booking': instance.booking,
     };
@@ -31,7 +33,7 @@ Booking _$BookingFromJson(Map<String, dynamic> json) => Booking(
   userId: (json['userId'] as num?)?.toInt(),
   scheduleId: (json['scheduleId'] as num?)?.toInt(),
   bookingStatus: json['bookingStatus'] as String?,
-  totalAmount: (json['totalAmount'] as num?)?.toInt(),
+  totalAmount: (json['totalAmount'] as num?)?.toDouble(),
   promoId: json['promoId'],
   paymentStatus: json['paymentStatus'] as String?,
   createdAt: json['createdAt'] == null
@@ -57,7 +59,7 @@ Map<String, dynamic> _$BookingToJson(Booking instance) => <String, dynamic>{
 Schedule _$ScheduleFromJson(Map<String, dynamic> json) => Schedule(
   id: (json['id'] as num?)?.toInt(),
   busId: (json['busId'] as num?)?.toInt(),
-  price: (json['price'] as num?)?.toInt(),
+  price: (json['price'] as num?)?.toDouble(),
   departureDate: json['departureDate'] == null
       ? null
       : DateTime.parse(json['departureDate'] as String),

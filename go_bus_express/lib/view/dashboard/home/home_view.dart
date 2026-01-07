@@ -1,9 +1,12 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/di/app_di.dart';
 import 'package:go_bus_express/models/payment/pending_payment_model.dart';
 import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
 import 'package:shared_package/design_system/x_widget/user_profile_card.dart';
+import '../../widget/x_dialog.dart';
 import '../../widget/x_loading_dialog.dart';
 import 'widgets/home_app_bar.dart';
 import 'widgets/booking_card.dart';
@@ -36,7 +39,16 @@ class _HomePageState extends State<HomePage>
     if (homeController.hasPendingPayment()) {
       final pending = homeController.getPendingPayment();
       if (pending != null) {
-        _showPendingPaymentDialog(pending);
+        // Check if payment is already expired
+        log("Timer is Expired${pending.isExpired()}");
+        if (pending.isExpired()) {
+          XDialog.showTimeoutDialog(
+            context,
+            () => homeController.cancelPendingPayment(pending.bookingId),
+          );
+        } else {
+          _showPendingPaymentDialog(pending);
+        }
       }
     }
   }

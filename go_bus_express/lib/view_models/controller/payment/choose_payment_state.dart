@@ -8,7 +8,6 @@ class ChoosePaymentState extends BaseUiState {
   final List<int> selectedSeatIds;
   final double unitPrice;
   final double discount;
-  final String? selectedPaymentMethod;
   final bool agreedToTerms;
   final String note;
   final int scheduleId;
@@ -22,7 +21,6 @@ class ChoosePaymentState extends BaseUiState {
     this.selectedSeatIds = const [],
     this.unitPrice = 0.0,
     this.discount = 0.0,
-    this.selectedPaymentMethod,
     this.agreedToTerms = false,
     this.note = '',
     this.scheduleId = 0,
@@ -57,8 +55,6 @@ class ChoosePaymentState extends BaseUiState {
       selectedSeatIds: selectedSeatIds ?? this.selectedSeatIds,
       unitPrice: unitPrice ?? this.unitPrice,
       discount: discount ?? this.discount,
-      selectedPaymentMethod:
-          selectedPaymentMethod ?? this.selectedPaymentMethod,
       agreedToTerms: agreedToTerms ?? this.agreedToTerms,
       note: note ?? this.note,
       scheduleId: scheduleId ?? this.scheduleId,

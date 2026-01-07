@@ -70,7 +70,7 @@ Future<void> setupDependencyInjection() async {
     () => BookingRepositoryImpl(getIt(), getIt()),
   );
   getIt.registerLazySingleton<TicketRepository>(
-    () => TicketRepositoryImpl(getIt()),
+    () => TicketRepositoryImpl(getIt<TicketApi>()),
   );
 
 
@@ -164,29 +164,6 @@ void resetSingletonControllers() {
     Get.put(controller);
     controller.onInit();
     controller.onReady();
-    return controller;
-  });
-  getIt.registerFactory<TicketController>(() {
-    final controller = TicketController(getIt());
-    Get.put(controller);
-    return controller;
-  });
-  getIt.registerFactory<TicketDetailController>(() {
-    final controller = TicketDetailController(getIt());
-    Get.put(controller);
-    return controller;
-  });
-  getIt.registerFactory<BookingRepository>(
-    () => BookingRepositoryImpl(getIt(), getIt()),
-  );
-    getIt.registerFactory<TicketController>(() {
-    final controller = TicketController(getIt());
-    Get.put(controller);
-    return controller;
-  });
-  getIt.registerFactory<TicketDetailController>(() {
-    final controller = TicketDetailController(getIt());
-    Get.put(controller);
     return controller;
   });
 }
