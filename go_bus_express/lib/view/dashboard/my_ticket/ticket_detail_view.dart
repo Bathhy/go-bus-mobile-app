@@ -273,21 +273,21 @@ class _TicketDetailViewState extends State<TicketDetailView> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Ticket #$ticketId',
+                '${_translate('ticket_number', fallback: 'Ticket #')}$ticketId',
                 style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 14,
                 ),
               ),
               Text(
-                'Booking #$bookingId',
+                '${_translate('booking_number', fallback: 'Booking #')}$bookingId',
                 style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 14,
                 ),
               ),
               Text(
-                'Issued: $formattedDate',
+                '${_translate('issued', fallback: 'Issued:')} $formattedDate',
                 style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 14,
