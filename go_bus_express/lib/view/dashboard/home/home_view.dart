@@ -23,6 +23,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin {
   final HomeController homeController = getIt<HomeController>();
+  Worker? _stateWorker;
 
   @override
   bool get wantKeepAlive => false;
@@ -32,6 +33,13 @@ class _HomePageState extends State<HomePage>
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkAndShowPendingPayment();
+    });
+    _stateWorker = ever(homeController.obs, (state) {
+      if (state.isLoading) {
+        XAppLoadingDialog.showAppDialog();
+      } else {
+        XAppLoadingDialog.hideAppDialog();
+      }
     });
   }
 

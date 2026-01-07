@@ -8,3 +8,10 @@ extension StringExt on String? {
     return this ?? defaultValue;
   }
 }
+
+extension StringFormattedTimeExt on String? {
+  String formattedTime() {
+    if (this == null || this!.isEmpty) return "";
+    return this!.replaceAll(' ', '').substring(0, 5);
+  }
+}

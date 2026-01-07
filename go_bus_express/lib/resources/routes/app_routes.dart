@@ -4,6 +4,7 @@ import 'package:go_bus_express/view/auth/sign_up_view.dart';
 import 'package:go_bus_express/view/booking/booking_history_view.dart';
 import 'package:go_bus_express/view/dashboard/dashboard_view.dart';
 import 'package:go_bus_express/view/dashboard/my_ticket/my_ticket_view.dart';
+import 'package:go_bus_express/view/dashboard/my_ticket/ticket_detail_view.dart';
 import 'package:go_bus_express/view/splash/splash_view.dart';
 import 'package:go_bus_express/view/edit_profile/edit_profile_view.dart';
 import 'package:go_bus_express/view/ticket/choose_payment/choose_payment_view.dart';
@@ -25,6 +26,7 @@ class AppRoutes {
   static const String animation = '/animation';
   static const String editProfile = "/editProfile";
   static const String ticket = "/ticket";
+  static const String detailTicket = "/detailTicket";
 
   static void goToSeatRoute(int? scheduleId, int? busId) => Get.toNamed(
     arguments: {"scheduleId": scheduleId, "busId": busId},
@@ -35,6 +37,20 @@ class AppRoutes {
       Get.toNamed(
         arguments: {"fullName": fullName, "email": email, "phone": phone},
         editProfile,
+      );
+
+  static void goToTicketDetail({
+    required int ticketId,
+    String? passengerName,
+    String? email,
+  }) =>
+      Get.toNamed(
+        detailTicket,
+        arguments: {
+          "ticketId": ticketId,
+          "passengerName": passengerName,
+          "email": email,
+        },
       );
 
   static final routes = [
@@ -55,5 +71,6 @@ class AppRoutes {
     GetPage(name: editProfile, page: () => const EditProfileView()),
     GetPage(name: animation, page: () => SplashView()),
     GetPage(name: ticket, page: () => const MyTicketView()),
+    GetPage(name: detailTicket, page: () => const TicketDetailView()),
   ];
 }

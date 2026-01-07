@@ -25,8 +25,8 @@ class KhQrController extends BaseController<KhQrState> {
   Timer? _verificationTimer;
 
   static const int _verificationIntervalSeconds = 5; // Poll every 5 seconds
-  static const int _paymentTimeoutSeconds = 60; // Payment timeout duration
-  static const int _maxRetries = 12; // 12 * 5 = 60 seconds (1 minute)
+  static const int _paymentTimeoutSeconds = 180; // Payment timeout duration
+  static const int _maxRetries = 36; // 12 * 5 = 60 seconds (1 minute)
   int _retryCount = 0;
 
   KhQrController(this._bookingRepo, this._localRepository, this._hiveManager)
@@ -54,7 +54,7 @@ class KhQrController extends BaseController<KhQrState> {
     final currency = args['currency'] as String? ?? 'USD';
     final bookingId = args['bookingId'] as int? ?? 0;
     final createdAt = args['createdAt'] as DateTime?;
-    
+
     updateState(
       (state) => state.copyWith(
         qrData: qrData,
@@ -69,8 +69,12 @@ class KhQrController extends BaseController<KhQrState> {
   void _calculateRemainingTime() {
     if (state.createdAt == null) {
       // New payment, use configured timeout
-      log('🆕 New payment session - starting with $_paymentTimeoutSeconds seconds');
-      updateState((state) => state.copyWith(remainingSeconds: _paymentTimeoutSeconds));
+      log(
+        '🆕 New payment session - starting with $_paymentTimeoutSeconds seconds',
+      );
+      updateState(
+        (state) => state.copyWith(remainingSeconds: _paymentTimeoutSeconds),
+      );
       return;
     }
 
@@ -78,20 +82,23 @@ class KhQrController extends BaseController<KhQrState> {
     final now = DateTime.now();
     final elapsed = now.difference(state.createdAt!);
     final elapsedSeconds = elapsed.inSeconds;
-    
+
     // Calculate remaining time using configured timeout
     final remaining = _paymentTimeoutSeconds - elapsedSeconds;
 
     if (remaining <= 0) {
       // Payment already expired
-      log('⏰ Payment expired (elapsed: ${elapsed.inMinutes}m ${elapsed.inSeconds % 60}s)');
-      updateState((state) => state.copyWith(
-        remainingSeconds: 0,
-        isExpired: true,
-      ));
+      log(
+        '⏰ Payment expired (elapsed: ${elapsed.inMinutes}m ${elapsed.inSeconds % 60}s)',
+      );
+      updateState(
+        (state) => state.copyWith(remainingSeconds: 0, isExpired: true),
+      );
     } else {
       // Update with actual remaining time
-      log('⏱️ Resuming payment with $remaining seconds remaining (elapsed: ${elapsed.inMinutes}m ${elapsed.inSeconds % 60}s)');
+      log(
+        '⏱️ Resuming payment with $remaining seconds remaining (elapsed: ${elapsed.inMinutes}m ${elapsed.inSeconds % 60}s)',
+      );
       updateState((state) => state.copyWith(remainingSeconds: remaining));
     }
   }
@@ -124,8 +131,10 @@ class KhQrController extends BaseController<KhQrState> {
           final payment = result.data.result;
           if (payment?.payment?.status == BakongPaymentStatusEnum.paid.status) {
             // Mark as paid immediately to prevent duplicate calls
-            updateState((state) => state.copyWith(isPaid: true, isLoading: true));
-            
+            updateState(
+              (state) => state.copyWith(isPaid: true, isLoading: true),
+            );
+
             // Stop timers immediately
             _stopVerificationPolling();
             _stopCountdownTimer();
@@ -133,7 +142,7 @@ class KhQrController extends BaseController<KhQrState> {
             // Clear pending payment from Hive && Clear Md5
             await _hiveManager.clearPendingPayment();
             _clearLocalMd5();
-            
+
             // Show success notification
             _showPaymentSuccessNotification();
 

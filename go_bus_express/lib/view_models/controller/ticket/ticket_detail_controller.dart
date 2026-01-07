@@ -18,6 +18,29 @@ class TicketDetailController extends BaseController<TicketDetailState> {
     super.onInit();
   }
 
+  // Method to initialize with route arguments
+  void initializeWithArguments(Map<String, dynamic>? args) {
+    if (args == null) {
+      log('⚠️ No arguments provided to TicketDetailController');
+      return;
+    }
+
+    final ticketId = args['ticketId'] as int? ?? 0;
+    final passengerName = args['passengerName'] as String?;
+    final passengerEmail = args['email'] as String?;
+
+    log('📋 Initializing with arguments: ticketId=$ticketId, passengerName=$passengerName, email=$passengerEmail');
+
+    updateState((state) => state.copyWith(
+      ticketId: ticketId,
+      passengerName: passengerName,
+      passengerEmail: passengerEmail,
+    ));
+
+    // Fetch ticket details
+    fetchTicketDetail(ticketId: ticketId);
+  }
+
   // Method to fetch ticket detail by ID
   Future<void> fetchTicketDetail({required int ticketId}) async {
     log('📡 Fetching ticket detail with ID: $ticketId');
@@ -101,5 +124,15 @@ class TicketDetailController extends BaseController<TicketDetailState> {
   // Helper method to clear error state
   void clearError() {
     updateState((state) => state.copyWith(clearError: true));
+  }
+
+  // Helper method to get passenger name
+  String getPassengerName() {
+    return state.passengerName ?? 'N/A';
+  }
+
+  // Helper method to get passenger email
+  String getPassengerEmail() {
+    return state.passengerEmail ?? 'N/A';
   }
 }

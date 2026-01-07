@@ -33,17 +33,12 @@ class HomeController extends BaseController<HomeState> {
   ) : super(HomeState());
 
   Future<void> fetchProfile() async {
-    // Set loading
-    updateState((state) => state.copyWith(isLoading: true));
     final result = await _repository.fetchProfile();
 
     switch (result) {
       case Success<ProfileModel?>():
         // Update profile
-        updateState(
-          (state) =>
-              state.copyWith(isLoading: false, profileModel: result.data),
-        );
+        updateState((state) => state.copyWith(profileModel: result.data));
         if (result.data != null) {
           final profileJson = jsonEncode(result.data!.toJson());
           await _localRepository.saveProfile(profileJson);
@@ -53,7 +48,6 @@ class HomeController extends BaseController<HomeState> {
         if (result.error.statusCode == 403) {
           logout();
         }
-        updateState((state) => state.copyWith(isLoading: false));
         log('Profile error: ${result.error}');
     }
   }
@@ -179,14 +173,17 @@ class HomeController extends BaseController<HomeState> {
   }
 
   void cancelPendingPayment(int bookingId) async {
+    updateState((state) => state.copyWith(isLoading: true));
     final result = await _bookingRepository.cancelBooking(bookingId: bookingId);
 
     switch (result) {
       case Success<void>():
+        updateState((state) => state.copyWith(isLoading: false));
         await _hiveRepository.clearPendingPayment();
         log('✅ Pending payment canceled');
         break;
       case Error<void>():
+        updateState((state) => state.copyWith(isLoading: false));
         log('❌ Failed to cancel pending payment');
         break;
     }

@@ -54,15 +54,13 @@ class TicketController extends BaseController<TicketState> {
 
       switch (result) {
         case Success<TicketModel?>():
-          log(
-            '✅ Tickets fetched successfully: ${result.data != null ? 1 : 0} ticket model',
-          );
           final ticketModel = result.data;
           if (ticketModel != null) {
             final ticketDataItems = ticketModel.data ?? [];
             log('📊 Total ticket data items: ${ticketDataItems.length}');
             updateState((state) => state.copyWith(
-              tickets: [ticketModel], 
+              tickets: [ticketModel],
+              user: ticketModel.user,
               isLoading: false,
             ));
           } else {

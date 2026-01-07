@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+
 part 'ticket_model.g.dart';
 
 @JsonSerializable()
@@ -23,8 +24,7 @@ class Datum {
 
   Datum({this.id, this.issuedAt, this.booking});
 
-    factory Datum.fromJson(Map<String, dynamic> json) =>
-      _$DatumFromJson(json);
+  factory Datum.fromJson(Map<String, dynamic> json) => _$DatumFromJson(json);
 
   Map<String, dynamic> toJson() => _$DatumToJson(this);
 }
@@ -71,8 +71,7 @@ class Bus {
 
   Bus({this.busType, this.busNumber, this.route});
 
-  factory Bus.fromJson(Map<String, dynamic> json) =>
-      _$BusFromJson(json);
+  factory Bus.fromJson(Map<String, dynamic> json) => _$BusFromJson(json);
 
   Map<String, dynamic> toJson() => _$BusToJson(this);
 }
@@ -84,21 +83,20 @@ class Route {
 
   Route({this.origin, this.destination});
 
-  factory Route.fromJson(Map<String, dynamic> json) =>
-      _$RouteFromJson(json);
+  factory Route.fromJson(Map<String, dynamic> json) => _$RouteFromJson(json);
 
   Map<String, dynamic> toJson() => _$RouteToJson(this);
 }
 
 @JsonSerializable()
 class User {
-  int? id;
-  String? fullName;
+  final int? id;
+  final String? fullName;
+  final String? email;
 
-  User({this.id, this.fullName});
+  const User({this.id, this.fullName, this.email});
 
-  factory User.fromJson(Map<String, dynamic> json) =>
-      _$UserFromJson(json);
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
   Map<String, dynamic> toJson() => _$UserToJson(this);
 }

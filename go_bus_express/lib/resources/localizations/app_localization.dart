@@ -31,11 +31,9 @@ class AppLocalization extends Translations {
   static Future<void> clearLanguage() async {
     await _localRepo.removeLanguage();
     log("Language cleared");
+    Get.updateLocale(const Locale('en'));
   }
 
   @override
-  Map<String, Map<String, String>> get keys => {
-    'en': en,
-    'km': km,
-  };
+  Map<String, Map<String, String>> get keys => {'en': en, 'km': km};
 }
