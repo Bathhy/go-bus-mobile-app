@@ -18,6 +18,7 @@ class _MyTicketViewState extends State<MyTicketView>
   late TabController _tabController;
   late TicketController _ticketController;
   late AnimationController _refreshAnimationController;
+  late AnimationController _skeletonAnimationController;
   bool _isRefreshing = false;
 
   // Helper method for safe translation
@@ -45,7 +46,14 @@ class _MyTicketViewState extends State<MyTicketView>
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
+    _skeletonAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
     _ticketController = getIt<TicketController>();
+    
+    // Start skeleton animation
+    _skeletonAnimationController.repeat();
     
     // Listen to tab changes to trigger API calls
     _tabController.addListener(() {
@@ -65,6 +73,7 @@ class _MyTicketViewState extends State<MyTicketView>
   void dispose() {
     _tabController.dispose();
     _refreshAnimationController.dispose();
+    _skeletonAnimationController.dispose();
     super.dispose();
   }
 
@@ -214,27 +223,9 @@ class _MyTicketViewState extends State<MyTicketView>
                           // Debug: Show total tickets count and current type
                           print('🎫 Current tickets in UI: ${currentTickets.length}, type: ${controller.state.type}');
                           
-                          // Show loading if no tickets yet
-                          if (controller.state.tickets.isEmpty) {
-                            return Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  CircularProgressIndicator(
-                                    color: goBusPrimary,
-                                    strokeWidth: 3,
-                                  ),
-                                  SizedBox(height: 16),
-                                  Text(
-                                    'loading_tickets'.tr,
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
+                          // Show loading if no tickets yet AND it's the initial load
+                          if (controller.state.tickets.isEmpty && controller.state.isLoading) {
+                            return _buildSkeletonLoading();
                           }
                           
                           return TabBarView(
@@ -245,12 +236,14 @@ class _MyTicketViewState extends State<MyTicketView>
                                 controller,
                                 'no_upcoming_trips'.tr,
                                 'upcoming_trips_description'.tr,
+                                isUpcoming: true,
                               ),
                               // Past tickets tab  
                               _buildCurrentTicketTab(
                                 controller,
                                 'no_past_trips'.tr,
                                 'past_trips_description'.tr,
+                                isUpcoming: false,
                               ),
                             ],
                           );
@@ -271,9 +264,24 @@ class _MyTicketViewState extends State<MyTicketView>
   Widget _buildCurrentTicketTab(
     TicketController controller,
     String emptyTitle,
-    String emptySubtitle,
-  ) {
+    String emptySubtitle, {
+    required bool isUpcoming,
+  }) {
+    final expectedType = isUpcoming ? "coming" : "pass";
+    final currentType = controller.state.type;
     final tickets = controller.getCurrentTickets();
+    final isLoading = controller.state.isLoading;
+    
+    // Debug logging
+    print('🔍 Tab check - Expected: $expectedType, Current: $currentType, Tickets: ${tickets.length}, Loading: $isLoading');
+    
+    // Show loading skeleton if we're loading or waiting for the correct type's data
+    if (isLoading || currentType != expectedType) {
+      print('⏳ Loading or waiting for $expectedType data, current type is $currentType');
+      return _buildSkeletonLoading();
+    }
+    
+    // Only show tickets if we have data for the current type
     return tickets.isNotEmpty
         ? _buildTicketList(tickets)
         : _buildEmptyState(emptyTitle, emptySubtitle);
@@ -512,6 +520,162 @@ class _MyTicketViewState extends State<MyTicketView>
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSkeletonLoading() {
+    return Container(
+      color: const Color(0xFFF5F5F5),
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: 3, // Show 3 skeleton cards
+        itemBuilder: (context, index) {
+          return _buildSkeletonCard();
+        },
+      ),
+    );
+  }
+
+  Widget _buildSkeletonCard() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.grey.shade300,
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                _buildShimmerContainer(
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildShimmerContainer(
+                    width: double.infinity,
+                    height: 20,
+                    borderRadius: 4,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                _buildShimmerContainer(
+                  width: 16,
+                  height: 16,
+                  borderRadius: 2,
+                ),
+                const SizedBox(width: 8),
+                _buildShimmerContainer(
+                  width: 80,
+                  height: 14,
+                  borderRadius: 4,
+                ),
+                const SizedBox(width: 20),
+                _buildShimmerContainer(
+                  width: 16,
+                  height: 16,
+                  borderRadius: 2,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _buildShimmerContainer(
+                    width: double.infinity,
+                    height: 14,
+                    borderRadius: 4,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                _buildShimmerContainer(
+                  width: 16,
+                  height: 16,
+                  borderRadius: 2,
+                ),
+                const SizedBox(width: 8),
+                _buildShimmerContainer(
+                  width: 100,
+                  height: 14,
+                  borderRadius: 4,
+                ),
+                const SizedBox(width: 20),
+                _buildShimmerContainer(
+                  width: 16,
+                  height: 16,
+                  borderRadius: 2,
+                ),
+                const SizedBox(width: 8),
+                _buildShimmerContainer(
+                  width: 60,
+                  height: 14,
+                  borderRadius: 4,
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _buildShimmerContainer(
+              width: double.infinity,
+              height: 40,
+              borderRadius: 8,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerContainer({
+    required double width,
+    required double height,
+    required double borderRadius,
+  }) {
+    return AnimatedBuilder(
+      animation: _skeletonAnimationController,
+      builder: (context, child) {
+        return Container(
+          width: width,
+          height: height,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(borderRadius),
+            gradient: LinearGradient(
+              begin: Alignment(-1.0, -0.3),
+              end: Alignment(1.0, 0.3),
+              colors: [
+                Colors.grey[300]!,
+                Colors.grey[100]!,
+                Colors.grey[300]!,
+              ],
+              stops: [
+                0.0,
+                0.5 + (_skeletonAnimationController.value * 0.5),
+                1.0,
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
