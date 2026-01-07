@@ -92,6 +92,9 @@ final Map<String, String> en = {
   'total_amount': 'Total Amount',
   'departure_location_not_available': 'Departure location not available',
   'arrival_location_not_available': 'Arrival location not available',
+  'ticket_number': 'Ticket #',
+  'booking_number': 'Booking #',
+  'issued': 'Issued:',
   "Pay Now": "Pay Now",
   "Would you like to continue or cancel this payment?":
       "Would you like to continue or cancel this payment?",
