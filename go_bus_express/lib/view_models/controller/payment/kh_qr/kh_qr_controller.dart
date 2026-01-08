@@ -88,17 +88,11 @@ class KhQrController extends BaseController<KhQrState> {
 
     if (remaining <= 0) {
       // Payment already expired
-      log(
-        '⏰ Payment expired (elapsed: ${elapsed.inMinutes}m ${elapsed.inSeconds % 60}s)',
-      );
       updateState(
         (state) => state.copyWith(remainingSeconds: 0, isExpired: true),
       );
     } else {
       // Update with actual remaining time
-      log(
-        '⏱️ Resuming payment with $remaining seconds remaining (elapsed: ${elapsed.inMinutes}m ${elapsed.inSeconds % 60}s)',
-      );
       updateState((state) => state.copyWith(remainingSeconds: remaining));
     }
   }
@@ -205,10 +199,6 @@ class KhQrController extends BaseController<KhQrState> {
       Duration(seconds: _verificationIntervalSeconds),
       (timer) => _verifyPayment(),
     );
-
-    log(
-      '🔄 Started payment verification polling (every $_verificationIntervalSeconds seconds)',
-    );
   }
 
   void _stopCountdownTimer() {
@@ -219,23 +209,20 @@ class KhQrController extends BaseController<KhQrState> {
   void _stopVerificationPolling() {
     _verificationTimer?.cancel();
     _verificationTimer = null;
-    log('⏹️ Stopped payment verification polling');
   }
 
   // MARK: API Cancel Booking
   void cancelBooking() async {
-    if (state.bookingId == 0) {
-      log('⚠️ No booking ID to cancel');
-      return;
-    }
+    if (state.bookingId == 0) return;
+
     updateState((state) => state.copyWith(isLoading: true));
+
     final result = await _bookingRepo.cancelBooking(bookingId: state.bookingId);
 
     switch (result) {
       case Success<void>():
         {
           updateState((state) => state.copyWith(isLoading: false));
-          log('✅ Booking ${state.bookingId} canceled successfully');
           _clearLocalMd5();
           await _hiveManager.clearPendingPayment();
           Get.offAllNamed(AppRoutes.mainNavigation);
@@ -243,7 +230,6 @@ class KhQrController extends BaseController<KhQrState> {
       case Error<void>():
         {
           updateState((state) => state.copyWith(isLoading: false));
-          log('❌ Failed to cancel booking: ${result.error.displayMessage}');
           _showError(
             'Failed to cancel booking: ${result.error.displayMessage}',
           );
@@ -258,9 +244,7 @@ class KhQrController extends BaseController<KhQrState> {
     return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
 
-  bool isLowTime() {
-    return state.remainingSeconds <= 30;
-  }
+  bool isLowTime() => state.remainingSeconds <= 30;
 
   void _showError(String message) {
     if (Get.isSnackbarOpen) Get.closeAllSnackbars();
