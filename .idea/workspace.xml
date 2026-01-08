@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c1e0c764-1193-40f0-a810-d82c1bcb3dcf" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/go_bus_express/lib/core/di/app_di.dart" beforeDir="false" afterPath="$PROJECT_DIR$/go_bus_express/lib/core/di/app_di.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go_bus_express/lib/models/ticket/ticket_detail_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/go_bus_express/lib/models/ticket/ticket_detail_model.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go_bus_express/lib/models/ticket/ticket_detail_model.g.dart" beforeDir="false" afterPath="$PROJECT_DIR$/go_bus_express/lib/models/ticket/ticket_detail_model.g.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go_bus_express/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/go_bus_express/pubspec.lock" afterDir="false" />
-    </list>
+    <list default="true" id="c1e0c764-1193-40f0-a810-d82c1bcb3dcf" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -51,7 +46,7 @@
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "#5 on dev",
+    "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/MSI63/Videos/Captures/OneDrive/Pictures/XML/Final project",
     "show.migrate.to.gradle.popup": "false"

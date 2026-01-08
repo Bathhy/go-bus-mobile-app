@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/di/app_di.dart';
 import 'package:go_bus_express/resources/app_images.dart';
@@ -22,10 +23,13 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
   final controller = getIt<KhQrController>();
   Worker? _stateWorker;
   Worker? _expiryWorker;
+  static const platform = MethodChannel('com.gobus.express/security');
 
   @override
   void initState() {
     super.initState();
+    _disableScreenshots();
+    
     _stateWorker = ever(controller.obs, (state) {
       if (state.isLoading) {
         XAppLoadingDialog.showAppDialog();
@@ -49,8 +53,25 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
     });
   }
 
+  Future<void> _disableScreenshots() async {
+    try {
+      await platform.invokeMethod('disableScreenshots');
+    } catch (e) {
+      debugPrint('Failed to disable screenshots: $e');
+    }
+  }
+
+  Future<void> _enableScreenshots() async {
+    try {
+      await platform.invokeMethod('enableScreenshots');
+    } catch (e) {
+      debugPrint('Failed to enable screenshots: $e');
+    }
+  }
+
   @override
   void dispose() {
+    _enableScreenshots();
     _stateWorker?.dispose();
     _expiryWorker?.dispose();
     super.dispose();
