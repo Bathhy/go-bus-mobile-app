@@ -37,7 +37,11 @@ abstract class GoBusApi {
   Future<BaseResponse<List<AllRouteModel>>> fetchRoutes();
 
   @PUT('/profile/updateProfile')
+  @MultiPart()
   Future<BaseResponse<ProfileModel>> updateProfile({
-    @Body() required UpdateProfileBody body,
+    @Part(name: "email") required String email,
+    @Part(name: "fullName") required String fullName,
+    @Part(name: "phone") required String phone,
+    @Part(name: "image") MultipartFile? image,
   });
 }

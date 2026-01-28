@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:get/get.dart';
@@ -8,6 +9,7 @@ import 'package:go_bus_express/view/edit_profile/model/edit_profile_model.dart';
 import 'package:go_bus_express/view_models/controller/base/base_controller.dart';
 import 'package:go_bus_express/view_models/controller/editProfile/edit_profile_state.dart';
 import 'package:go_bus_express/view_models/controller/profile/profile_state.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_package/network/x_result.dart';
 
 import '../../../core/storage/local_repository.dart';
@@ -19,6 +21,7 @@ import '../../../resources/routes/app_routes.dart';
 class EditProfileController extends BaseController<EditProfileState> {
   final ProfileRepository _repository;
   final LocalRepository _localRepository;
+  final ImagePicker _imagePicker = ImagePicker();
 
   EditProfileController(this._repository, this._localRepository)
     : super(EditProfileState());
@@ -41,6 +44,7 @@ class EditProfileController extends BaseController<EditProfileState> {
     final fullName = args['fullName'] as String? ?? '';
     final email = args['email'] as String? ?? '';
     final phoneNumber = args['phone'] as String? ?? "";
+    final imageFullUrl = args['image'] as String? ?? "";
 
     updateState(
       (state) => state.copyWith(
@@ -48,16 +52,59 @@ class EditProfileController extends BaseController<EditProfileState> {
           fullName: fullName,
           email: email,
           phoneNumber: phoneNumber,
+          imageFullUrl: imageFullUrl,
         ),
       ),
     );
   }
 
+  /// MARK - Image Pick From Phone Gallery
+
+  Future<void> pickImageFromGallery() async {
+    try {
+      final XFile? pickedFile = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 85,
+      );
+
+      if (pickedFile != null) {
+        log('✅ Image picked from gallery: ${pickedFile.path}');
+        final File imageFile = File(pickedFile.path);
+        updateState((state) => state.copyWith(selectedImage: imageFile));
+      }
+    } catch (e) {
+      log('Profile error: $e');
+    }
+  }
+
+  /// MARK - Image Pick From Phone Camera
+  Future<void> pickImageFromCamera() async {
+    try {
+      final XFile? pickedFile = await _imagePicker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 85,
+      );
+
+      if (pickedFile != null) {
+        log('Photo taken: ${pickedFile.path}');
+        final File imageFile = File(pickedFile.path);
+        updateState((state) => state.copyWith(selectedImage: imageFile));
+      }
+    } catch (e) {
+      log('Profile error: $e');
+    }
+  }
+
   void updateProfile(String email, String fullName, String phoneNumber) async {
     // Set loading
     updateState((state) => state.copyWith(isLoading: true));
+    final File? image = state.selectedImage;
     final body = UpdateProfileBody(email, fullName, phoneNumber);
-    final result = await _repository.updateProfile(body);
+    final result = await _repository.updateProfile(body, image);
 
     switch (result) {
       case Success<ProfileModel?>():

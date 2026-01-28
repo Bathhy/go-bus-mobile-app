@@ -1,3 +1,4 @@
+import '../../../core/utils/image_helper.dart';
 import '../../../models/profile/profile_model.dart';
 
 class ProfileState {
@@ -10,6 +11,10 @@ class ProfileState {
     this.profileModel = const ProfileModel(),
     this.currentLanguage = 'en',
   });
+
+  String get imageUrl {
+    return getImageUrl(profileModel?.image);
+  }
 
   ProfileState copyWith({
     bool? isLoading,

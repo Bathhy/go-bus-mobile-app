@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/view_models/controller/editProfile/edit_profile_controller.dart';
@@ -49,6 +51,47 @@ class _EditProfileViewState extends State<EditProfileView> {
     super.dispose();
   }
 
+  void _showImagePickerOptions() {
+    Get.bottomSheet(
+      Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library, color: goBusPrimary),
+                title: Text('choose_from_gallery'.tr),
+                onTap: () {
+                  Get.back();
+                  _editController.pickImageFromGallery();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt, color: goBusPrimary),
+                title: Text('take_photo'.tr),
+                onTap: () {
+                  Get.back();
+                  _editController.pickImageFromCamera();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.cancel, color: Colors.grey),
+                title: Text('cancel'.tr),
+                onTap: () => Get.back(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,14 +127,63 @@ class _EditProfileViewState extends State<EditProfileView> {
                         ),
                         const SizedBox(height: 32),
                         Center(
-                          child: CircleAvatar(
-                            radius: 60,
-                            backgroundColor: Colors.pink[300],
-                            child: const Icon(
-                              Icons.person,
-                              size: 60,
-                              color: Colors.white,
-                            ),
+                          child: Stack(
+                            children: [
+                              Obx(() {
+                                final state = _editController.obs.value;
+                                final selectedImage = state.selectedImage;
+                                final imageUrl = state.profileModel.imageFullUrl;
+
+                                return ClipOval(
+                                  child: selectedImage != null
+                                      ? Image.file(
+                                          selectedImage,
+                                          height: 120,
+                                          width: 120,
+                                          fit: BoxFit.fill,
+                                        )
+                                      : imageUrl.isNotEmpty
+                                      ? Image.network(
+                                          imageUrl,
+                                          height: 120,
+                                          width: 120,
+                                          fit: BoxFit.fill,
+                                        )
+                                      : CircleAvatar(
+                                          radius: 60,
+                                          backgroundColor: Colors.pink[300],
+                                          child: const Icon(
+                                            Icons.person,
+                                            size: 60,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                );
+                              }),
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: GestureDetector(
+                                  onTap: _showImagePickerOptions,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: goBusPrimary,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: const Icon(
+                                      Icons.camera_alt,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 32),

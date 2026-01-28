@@ -83,14 +83,18 @@ class UserProfileCard extends StatelessWidget {
             ),
           ],
         ),
-        child: CircleAvatar(
-          radius: 34,
-          backgroundColor: Colors.transparent,
-          backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl!) : null,
+        child: ClipOval(
           child:
-              avatarUrl == null
-                  ? Icon(Icons.person_rounded, size: 38, color: white)
-                  : null,
+          avatarUrl != null
+              ? Image.network(
+            errorBuilder: (context, error, stackTrace) =>
+                Icon(Icons.person_rounded, size: 38, color: white),
+            avatarUrl!,
+            fit: BoxFit.fill,
+            width: 75,
+            height: 75,
+          )
+              : Icon(Icons.person_rounded, size: 38, color: white),
         ),
       ),
     );

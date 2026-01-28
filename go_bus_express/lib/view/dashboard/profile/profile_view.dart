@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_bus_express/core/utils/image_helper.dart';
 import 'package:go_bus_express/resources/app_images.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
@@ -57,6 +58,7 @@ class _ProfilePageState extends State<ProfilePage>
                         return UserProfileCard(
                           name: controller.state.profileModel!.fullName ?? "",
                           email: controller.state.profileModel!.email ?? "",
+                          avatarUrl: controller.state.imageUrl,
                         );
                       }
                       return const SizedBox.shrink();
@@ -76,6 +78,7 @@ class _ProfilePageState extends State<ProfilePage>
                             'fullName': controller.state.profileModel?.fullName,
                             'email': controller.state.profileModel?.email,
                             'phone': controller.state.profileModel?.phone,
+                            'image': controller.state.imageUrl,
                           },
                         );
 
