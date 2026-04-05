@@ -8,14 +8,19 @@ part of 'verify_payment_model.dart';
 
 VerifyPaymentModel _$VerifyPaymentModelFromJson(Map<String, dynamic> json) =>
     VerifyPaymentModel(
-      success: json['success'] as bool?,
-      result: json['result'] == null
-          ? null
-          : Result.fromJson(json['result'] as Map<String, dynamic>),
+      completedExceptionally: json['completedExceptionally'] as bool?,
+      numberOfDependents: (json['numberOfDependents'] as num?)?.toInt(),
+      done: json['done'] as bool?,
+      cancelled: json['cancelled'] as bool?,
     );
 
 Map<String, dynamic> _$VerifyPaymentModelToJson(VerifyPaymentModel instance) =>
-    <String, dynamic>{'success': instance.success, 'result': instance.result};
+    <String, dynamic>{
+      'completedExceptionally': instance.completedExceptionally,
+      'numberOfDependents': instance.numberOfDependents,
+      'done': instance.done,
+      'cancelled': instance.cancelled,
+    };
 
 Result _$ResultFromJson(Map<String, dynamic> json) => Result(
   message: json['message'] as String?,

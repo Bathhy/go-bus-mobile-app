@@ -52,38 +52,66 @@ class HomeController extends BaseController<HomeState> {
     }
   }
 
+  @override
+  void onInit() {
+    super.onInit();
+    // Load cache first for instant display
+    loadCachedRoutes();
+    // Then fetch fresh data in background
+    fetchRoutes(forceRefresh: true);
+  }
+
   void loadCachedRoutes() {
     final cachedRoutesJson = _localRepository.getRoutes();
-    if (cachedRoutesJson != null) {
+    if (cachedRoutesJson != null && cachedRoutesJson.isNotEmpty) {
       try {
         final List<dynamic> routesData = jsonDecode(cachedRoutesJson);
         final routes = routesData
             .map((json) => AllRouteModel.fromJson(json))
             .toList();
         updateState((state) => state.copyWith(routes: routes));
-        log('📦 Loaded ${routes.length} routes from cache');
+        print('📦 Loaded ${routes.length} routes from cache');
       } catch (e) {
-        log('❌ Error loading cached routes: $e');
+        print('❌ Error loading cached routes: $e');
       }
+    } else {
+      print('📦 No cached routes found');
     }
   }
 
   Future<void> fetchRoutes({bool forceRefresh = false}) async {
+    print('🔄 [fetchRoutes] START - forceRefresh: $forceRefresh');
+    print('🔄 [fetchRoutes] Current state.routes.length: ${state.routes.length}');
+    
     // If routes already exist and not forcing refresh, skip
     if (!forceRefresh && state.routes.isNotEmpty) {
-      log('✅ Routes already loaded from cache');
+      print('✅ Routes already loaded - SKIPPING API call');
       return;
     }
 
+    print('🔄 Setting isLoadingRoutes = true');
     updateState((state) => state.copyWith(isLoadingRoutes: true));
+    
+    print('🔄 Calling _routeRepository.fetchRoutes()...');
     final result = await _routeRepository.fetchRoutes();
+    print('🔄 Repository returned result type: ${result.runtimeType}');
 
     switch (result) {
       case Success<List<AllRouteModel>>():
+        print('✅ SUCCESS - API returned ${result.data.length} routes');
+        print('✅ Routes data: ${result.data.map((r) => r.origin).toList()}');
+        
         updateState(
-          (state) =>
-              state.copyWith(isLoadingRoutes: false, routes: result.data),
+          (state) {
+            print('🔍 BEFORE copyWith - state.routes.length: ${state.routes.length}');
+            final newState = state.copyWith(isLoadingRoutes: false, routes: result.data);
+            print('🔍 AFTER copyWith - newState.routes.length: ${newState.routes.length}');
+            return newState;
+          },
         );
+
+        print('🔍 AFTER updateState - this.state.routes.length: ${state.routes.length}');
+        print('🔍 Routes in state: ${state.routes.map((r) => r.origin).toList()}');
 
         // Save to cache
         final routesJson = jsonEncode(
@@ -91,14 +119,13 @@ class HomeController extends BaseController<HomeState> {
         );
         await _localRepository.saveRoutes(routesJson);
 
-        log('✅ Routes fetched successfully: ${result.data.length} routes');
-      // for (var route in result.data) {
-      //   log('  📍 Route ${route.id}: ${route.origin} → ${route.destination} (${route.distanceKm}km, ${route.durationMinutes}min)');
-      // }
+        print('✅ Routes saved to cache successfully');
       case Error<List<AllRouteModel>>():
+        print('❌ ERROR - Routes fetch failed: ${result.error}');
         updateState((state) => state.copyWith(isLoadingRoutes: false));
-        log('❌ Routes error: ${result.error}');
     }
+    
+    print('🔄 [fetchRoutes] END');
   }
 
   void selectRoute(AllRouteModel route) {
@@ -117,14 +144,26 @@ class HomeController extends BaseController<HomeState> {
       return null;
     }
 
+    // Format date as ISO 8601 with time (e.g., 2026-03-30T00:00:00)
+    final departureDateStr = DateTime(
+      state.departureDate!.year,
+      state.departureDate!.month,
+      state.departureDate!.day,
+    ).toIso8601String();
+
     final params = {
       'route_id': state.selectedRouteId,
-      'departure_date': state.departureDate!.toIso8601String().split('T')[0],
+      'departure_date': departureDateStr,
     };
 
     // Add return_date only if it's provided
     if (state.returnDate != null) {
-      params['return_date'] = state.returnDate!.toIso8601String().split('T')[0];
+      final returnDateStr = DateTime(
+        state.returnDate!.year,
+        state.returnDate!.month,
+        state.returnDate!.day,
+      ).toIso8601String();
+      params['return_date'] = returnDateStr;
     }
 
     log('✅ Search params: $params');
@@ -207,11 +246,14 @@ class HomeController extends BaseController<HomeState> {
       }
     } catch (e) {
       log('❌ Error opening Telegram: $e');
-      Get.snackbar(
-        'Error',
-        'Could not open Telegram. Please make sure Telegram is installed.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      // Only show snackbar if context is available
+      if (Get.context != null) {
+        Get.snackbar(
+          'Error',
+          'Could not open Telegram. Please make sure Telegram is installed.',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
     }
   }
 
@@ -225,11 +267,14 @@ class HomeController extends BaseController<HomeState> {
       }
     } catch (e) {
       log('❌ Error launching phone call: $e');
-      Get.snackbar(
-        'Error',
-        'Could not launch phone call.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      // Only show snackbar if context is available
+      if (Get.context != null) {
+        Get.snackbar(
+          'Error',
+          'Could not launch phone call.',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
     }
   }
 

@@ -5,14 +5,17 @@ part 'detail_route_model.g.dart';
 
 @JsonSerializable()
 class RouteListResponseModel {
+  @JsonKey(name: 'content')
   final List<DetailRouteModel>? schedules;
-  final int? count;
+  final int? totalElements;
+  final int? totalPages;
   final RouteSummary? summary;
   final RouteModel? route;
 
   const RouteListResponseModel({
     this.schedules,
-    this.count,
+    this.totalElements,
+    this.totalPages,
     this.summary,
     this.route,
   });
@@ -27,21 +30,34 @@ class RouteListResponseModel {
 class DetailRouteModel {
   final int? id;
   final int? busId;
+  final String? busNumber;
   final double? price;
+  @JsonKey(name: 'departureDateTime')
   final DateTime? departureDate;
-  final String? arrivalTime;
-  final String? departureTime;
-  final BusModel? bus;
+  @JsonKey(name: 'arrivalDateTime')
+  final DateTime? arrivalDate;
+  final RouteModel? route;
+  final String? bookingIds;
 
   const DetailRouteModel({
     this.id,
     this.busId,
+    this.busNumber,
     this.price,
     this.departureDate,
-    this.arrivalTime,
-    this.departureTime,
-    this.bus,
+    this.arrivalDate,
+    this.route,
+    this.bookingIds,
   });
+
+  // Helper getters for time strings
+  String? get departureTime => departureDate != null 
+      ? '${departureDate!.hour.toString().padLeft(2, '0')}:${departureDate!.minute.toString().padLeft(2, '0')}'
+      : null;
+  
+  String? get arrivalTime => arrivalDate != null 
+      ? '${arrivalDate!.hour.toString().padLeft(2, '0')}:${arrivalDate!.minute.toString().padLeft(2, '0')}'
+      : null;
 
   factory DetailRouteModel.fromJson(Map<String, dynamic> json) =>
       _$DetailRouteModelFromJson(json);
@@ -104,8 +120,10 @@ class RouteModel {
   final int? id;
   final String? origin;
   final String? destination;
-  final int? distanceKm;
+  final double? distanceKm;
   final int? durationMinutes;
+  final String? location;
+  final int? busCount;
 
   RouteModel({
     this.id,
@@ -113,20 +131,26 @@ class RouteModel {
     this.destination,
     this.distanceKm,
     this.durationMinutes,
+    this.location,
+    this.busCount,
   });
 
   RouteModel copyWith({
     int? id,
     String? origin,
     String? destination,
-    int? distanceKm,
+    double? distanceKm,
     int? durationMinutes,
+    String? location,
+    int? busCount,
   }) => RouteModel(
     id: id ?? this.id,
     origin: origin ?? this.origin,
     destination: destination ?? this.destination,
     distanceKm: distanceKm ?? this.distanceKm,
     durationMinutes: durationMinutes ?? this.durationMinutes,
+    location: location ?? this.location,
+    busCount: busCount ?? this.busCount,
   );
 
   factory RouteModel.fromJson(Map<String, dynamic> json) =>

@@ -27,7 +27,7 @@ class _GoBusApi implements GoBusApi {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/profile/getProfile',
+            '/users/profile',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -49,11 +49,14 @@ class _GoBusApi implements GoBusApi {
 
   @override
   Future<BaseResponse<RouteListResponseModel>> fetchBusBySchedule(
-    int destinationId, {
+    int destinationId,
     String? departureDate,
-  }) async {
+  ) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'departureDate': departureDate};
+    final queryParameters = <String, dynamic>{
+      r'routeId': destinationId,
+      r'fromDate': departureDate,
+    };
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
@@ -61,7 +64,7 @@ class _GoBusApi implements GoBusApi {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/bus/bySchedule/${destinationId}',
+            '/schedules/filter/specification',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -82,22 +85,16 @@ class _GoBusApi implements GoBusApi {
   }
 
   @override
-  Future<BaseResponse<SeatLayoutModel>> fetchBusSeat(
-    int scheduleId,
-    int busId,
-  ) async {
+  Future<BaseResponse<SeatLayoutModel>> fetchBusSeat(int scheduleId) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{
-      r'scheduleId': scheduleId,
-      r'busId': busId,
-    };
+    final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<BaseResponse<SeatLayoutModel>>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/bus/seat/seatAndLayout',
+            '/schedule-seats/schedule/${scheduleId}',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -157,7 +154,7 @@ class _GoBusApi implements GoBusApi {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/route',
+            '/routes',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -210,7 +207,7 @@ class _GoBusApi implements GoBusApi {
           )
           .compose(
             _dio.options,
-            '/profile/updateProfile',
+            '/users',
             queryParameters: queryParameters,
             data: _data,
           )

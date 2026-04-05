@@ -6,6 +6,7 @@ import 'package:go_bus_express/resources/app_images.dart';
 import 'package:go_bus_express/view/widget/x_dialog.dart';
 import 'package:go_bus_express/view_models/controller/payment/kh_qr/kh_qr_controller.dart';
 import 'package:khqr_sdk/khqr_sdk.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 import 'package:shared_package/design_system/x_widget/x_app_bar.dart';
@@ -29,7 +30,7 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
   void initState() {
     super.initState();
     _disableScreenshots();
-    
+
     _stateWorker = ever(controller.obs, (state) {
       if (state.isLoading) {
         XAppLoadingDialog.showAppDialog();
@@ -287,6 +288,41 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
                         ? KhqrCurrency.usd
                         : KhqrCurrency.khr,
                   ),
+                // Container(
+                //   padding: EdgeInsets.all(XPadding.large),
+                //   decoration: BoxDecoration(
+                //     color: Colors.white,
+                //     borderRadius: BorderRadius.circular(16),
+                //     boxShadow: [
+                //       BoxShadow(
+                //         color: Colors.black.withOpacity(0.1),
+                //         blurRadius: 10,
+                //         offset: Offset(0, 4),
+                //       ),
+                //     ],
+                //   ),
+                //   child: Column(
+                //     mainAxisSize: MainAxisSize.min,
+                //     children: [
+                //       QrImageView(
+                //         data: state.qrData,
+                //         version: QrVersions.auto,
+                //         size: 280.0,
+                //         errorCorrectionLevel: QrErrorCorrectLevel.L,
+                //         backgroundColor: Colors.white,
+                //       ),
+                //       SizedBox(height: XPadding.medium),
+                //       Text(
+                //         state.receiverName,
+                //         style: TextStyle(
+                //           fontSize: 16,
+                //           fontWeight: FontWeight.w600,
+                //           color: Colors.black87,
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ),
 
                 // Instructions
                 Text(

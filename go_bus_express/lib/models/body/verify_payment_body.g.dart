@@ -7,10 +7,7 @@ part of 'verify_payment_body.dart';
 // **************************************************************************
 
 VerifyPaymentBody _$VerifyPaymentBodyFromJson(Map<String, dynamic> json) =>
-    VerifyPaymentBody(
-      md5: json['md5'] as String?,
-      bookingId: (json['booking_id'] as num?)?.toInt(),
-    );
+    VerifyPaymentBody(md5: json['md5'] as String?);
 
 Map<String, dynamic> _$VerifyPaymentBodyToJson(VerifyPaymentBody instance) =>
-    <String, dynamic>{'md5': instance.md5, 'booking_id': instance.bookingId};
+    <String, dynamic>{'md5': instance.md5};

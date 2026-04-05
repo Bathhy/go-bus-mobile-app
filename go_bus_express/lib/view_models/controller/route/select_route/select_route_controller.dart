@@ -28,7 +28,8 @@ class SelectRouteController extends BaseController<SelectRouteState> {
 
     final routeId = args['route_id'] as int?;
     final departureDate = args['departure_date'] as String?;
-    // final returnDate = args['return_date'] as String?;
+    final origin = args['origin'] as String?;
+    final destination = args['destination'] as String?;
 
     if (routeId == null || departureDate == null) {
       log('❌ Missing required parameters');
@@ -41,6 +42,8 @@ class SelectRouteController extends BaseController<SelectRouteState> {
         routeId: routeId,
         departureDate: departureDate,
         returnDate: "",
+        origin: origin ?? "",
+        destination: destination ?? "",
         isLoading: true,
       ),
     );
@@ -58,12 +61,12 @@ class SelectRouteController extends BaseController<SelectRouteState> {
     required String departureDate,
     required String returnDate,
   }) async {
-    final result = await _repository.fetchBusBySchedule(
-      routeId,
-      departureDate,
-      //
-      // '2025-11-20',
-    );
+    print('🔍 DEBUG: routeId = $routeId');
+    print('🔍 DEBUG: departureDate = $departureDate');
+
+    final result = await _repository.fetchBusBySchedule(routeId, departureDate);
+
+    log('🔍 DEBUG: API call completed');
 
     switch (result) {
       case Success<RouteListResponseModel?>():

@@ -27,7 +27,7 @@ class _TicketApi implements TicketApi {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/ticket/getTicket',
+            '/tickets',
             queryParameters: queryParameters,
             data: _data,
           )

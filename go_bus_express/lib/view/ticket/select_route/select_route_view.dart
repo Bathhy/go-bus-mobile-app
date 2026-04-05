@@ -5,6 +5,7 @@ import 'package:go_bus_express/core/utils/string_ext.dart';
 import 'package:go_bus_express/models/route/detail_route_model.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:go_bus_express/view_models/controller/route/select_route/select_route_controller.dart';
+import 'package:go_bus_express/view_models/controller/route/select_route/select_route_state.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
@@ -23,13 +24,32 @@ class SelectRouteView extends StatelessWidget {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: Obx(
-          () => XAppBar(
-            title:
-                '${controller.state.model?.route?.origin.orDefault("Origin")} → ${controller.state.model?.route?.destination.orDefault("Destination")}',
-            subTitle:
-                '${controller.state.departureDate.orDefault("N/A")}',
-            onBackPressed: () => Get.back(),
-          ),
+          () {
+            // Use state's origin/destination first, fallback to API response
+            final origin = controller.state.origin.isNotEmpty 
+                ? controller.state.origin 
+                : controller.state.model?.route?.origin ?? "Origin";
+            final destination = controller.state.destination.isNotEmpty 
+                ? controller.state.destination 
+                : controller.state.model?.route?.destination ?? "Destination";
+            
+            // Format date from ISO 8601 to readable format
+            String formattedDate = "N/A";
+            if (controller.state.departureDate.isNotEmpty) {
+              try {
+                final dt = DateTime.parse(controller.state.departureDate);
+                formattedDate = DateFormat('EEE, MMM d, yyyy').format(dt);
+              } catch (e) {
+                formattedDate = controller.state.departureDate;
+              }
+            }
+            
+            return XAppBar(
+              title: '$origin → $destination',
+              subTitle: formattedDate,
+              onBackPressed: () => Get.back(),
+            );
+          },
         ),
       ),
       body: Obx(
@@ -86,10 +106,12 @@ class SelectRouteView extends StatelessWidget {
                                 }
 
                                 return _buildBusCard(
+                                  state: uiState,
                                   scheduleId: model?.id,
                                   departDate: controller.state.departureDate,
                                   routeModel: controller.state.model?.route,
                                   budId: model?.busId,
+                                  busNumber: model?.busNumber,
                                   departureTime:
                                       model?.departureTime
                                           ?.formattedTime()
@@ -106,13 +128,10 @@ class SelectRouteView extends StatelessWidget {
                                   ).toString(),
                                   price:
                                       '\$${model?.price?.toStringAsFixed(2) ?? '0.00'}',
-                                  availableSeats:
-                                      '${model?.bus?.availableSeats ?? 0}/${model?.bus?.totalSeats ?? 0} ${'seats'.tr}',
                                   departureLocation:
                                       '${'boarding'.tr}: ${controller.state.model?.route?.origin ?? 'N/A'}',
                                   arrivalLocation:
                                       '${'drop_off'.tr}: ${controller.state.model?.route?.destination ?? 'N/A'}',
-                                  busType: model?.bus?.busType ?? 'bus'.tr,
                                 );
                               },
                             ),
@@ -156,14 +175,14 @@ class SelectRouteView extends StatelessWidget {
     required String arrivalTime,
     required String duration,
     required String price,
-    required String availableSeats,
     required String departureLocation,
     required String arrivalLocation,
-    String busType = 'Bus',
+    String? busNumber,
     int? budId,
     int? scheduleId,
     RouteModel? routeModel,
     required String departDate,
+    required SelectRouteState state,
   }) {
     return Container(
       width: double.infinity,
@@ -188,17 +207,12 @@ class SelectRouteView extends StatelessWidget {
               Image.asset('assets/images/image 18.png', width: 24, height: 24),
               const SizedBox(width: 12),
               Text(
-                busType,
+                busNumber != null ? 'Bus $busNumber' : 'bus'.tr,
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF1A1A1A),
                 ),
-              ),
-              const Spacer(),
-              Text(
-                availableSeats,
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
               ),
             ],
           ),
@@ -289,8 +303,8 @@ class SelectRouteView extends StatelessWidget {
                     arguments: {
                       'scheduleId': scheduleId ?? 0,
                       'busId': budId ?? 0,
-                      'origin': routeModel?.origin ?? 'Origin',
-                      'destination': routeModel?.destination ?? 'Destination',
+                      'origin': state.origin,
+                      'destination': state.destination,
                       'departureDate': departDate.orDefault("N/A"),
                       'departureTime': departureTime,
                       'unitPrice':

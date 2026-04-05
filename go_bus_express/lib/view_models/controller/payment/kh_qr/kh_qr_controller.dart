@@ -55,6 +55,7 @@ class KhQrController extends BaseController<KhQrState> {
     final bookingId = args['bookingId'] as int? ?? 0;
     final createdAt = args['createdAt'] as DateTime?;
 
+    print("This is QR Data ${qrData}");
     updateState(
       (state) => state.copyWith(
         qrData: qrData,
@@ -115,19 +116,21 @@ class KhQrController extends BaseController<KhQrState> {
 
     _retryCount++;
 
-    final body = VerifyPaymentBody(md5: state.md5, bookingId: state.bookingId);
+    final body = VerifyPaymentBody(md5: state.md5);
 
-    final result = await _bookingRepo.verifyMd5(body: body);
+    final result = await _bookingRepo.verifyMd5(
+      body: body,
+      bookingId: state.bookingId.toString(),
+    );
 
     switch (result) {
       case Success<VerifyPaymentModel>():
         {
-          final payment = result.data.result;
-          if (payment?.payment?.status == BakongPaymentStatusEnum.paid.status) {
+          final alreadyPaid = result.data.done;
+          // if (payment?.payment?.status == BakongPaymentStatusEnum.paid.status) {
+          if (alreadyPaid == true) {
             // Mark as paid immediately to prevent duplicate calls
-            updateState(
-              (state) => state.copyWith(isPaid: true, isLoading: true),
-            );
+            updateState((state) => state.copyWith(isPaid: true));
 
             // Stop timers immediately
             _stopVerificationPolling();
@@ -140,12 +143,8 @@ class KhQrController extends BaseController<KhQrState> {
             // Show success notification
             _showPaymentSuccessNotification();
 
-            // Delay 5s before navigate to Success
-            Future.delayed(Duration(seconds: 5), () {
-              _handlePaymentSuccess();
-            });
-          } else {
-            log('⏳ Payment status: ${payment?.payment?.status}');
+            // Navigate immediately to success page
+            _handlePaymentSuccess();
           }
         }
       case Error<VerifyPaymentModel>():
@@ -247,20 +246,27 @@ class KhQrController extends BaseController<KhQrState> {
   bool isLowTime() => state.remainingSeconds <= 30;
 
   void _showError(String message) {
-    if (Get.isSnackbarOpen) Get.closeAllSnackbars();
+    // Use WidgetsBinding to ensure we're in the right context
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.context != null) {
+        if (Get.isSnackbarOpen == true) {
+          Get.closeAllSnackbars();
+        }
 
-    Get.showSnackbar(
-      GetSnackBar(
-        backgroundColor: Colors.red,
-        snackPosition: SnackPosition.TOP,
-        duration: const Duration(seconds: 3),
-        titleText: Text(
-          'Error'.tr,
-          style: TextStyle(color: white, fontWeight: FontWeight.bold),
-        ),
-        messageText: Text(message, style: TextStyle(color: white)),
-      ),
-    );
+        Get.showSnackbar(
+          GetSnackBar(
+            backgroundColor: Colors.red,
+            snackPosition: SnackPosition.TOP,
+            duration: const Duration(seconds: 3),
+            titleText: Text(
+              'Error'.tr,
+              style: TextStyle(color: white, fontWeight: FontWeight.bold),
+            ),
+            messageText: Text(message, style: TextStyle(color: white)),
+          ),
+        );
+      }
+    });
   }
 
   // MARK - Get Local MD5

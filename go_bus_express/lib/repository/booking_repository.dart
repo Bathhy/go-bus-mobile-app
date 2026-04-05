@@ -12,14 +12,16 @@ import 'package:shared_package/network/x_result.dart';
 abstract class BookingRepository {
   Future<XResult<BookingModel?>> createBooking({required BookingBody body});
 
-  Future<XResult<GenerateQrModel>> generateQr({required PaymentBody body});
+  Future<XResult<BaseResponse<GenerateQrModel>>> generateQr({
+    required PaymentBody body,
+  });
 
   Future<XResult<VerifyPaymentModel>> verifyMd5({
     required VerifyPaymentBody body,
+    required String bookingId,
   });
 
   Future<XResult<void>> cancelBooking({required int bookingId});
-
 }
 
 class BookingRepositoryImpl implements BookingRepository {
@@ -38,19 +40,36 @@ class BookingRepositoryImpl implements BookingRepository {
   }
 
   @override
-  Future<XResult<GenerateQrModel>> generateQr({required PaymentBody body}) {
+  Future<XResult<BaseResponse<GenerateQrModel>>> generateQr({
+    required PaymentBody body,
+  }) {
     return xResultHandler(() async {
-      final res = await _paymentApi.generateQr(body: body);
-      return res;
+      try {
+        final res = await _paymentApi
+            .generateQr(body: body)
+            .timeout(
+              const Duration(seconds: 30),
+              onTimeout: () {
+                throw Exception(
+                  'QR generation request timed out after 30 seconds',
+                );
+              },
+            );
+        return res;
+      } catch (e) {
+        print('❌ Error in generateQr repository: $e');
+        rethrow;
+      }
     });
   }
 
   @override
   Future<XResult<VerifyPaymentModel>> verifyMd5({
     required VerifyPaymentBody body,
+    required String bookingId,
   }) {
     return xResultHandler(() async {
-      final res = await _paymentApi.verifyMd5(body: body);
+      final res = await _paymentApi.verifyMd5(body: body, bookingId: bookingId);
       return res;
     });
   }

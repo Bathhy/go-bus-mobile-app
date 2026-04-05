@@ -72,7 +72,7 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
 
                 _buildSummaryRow('Direction'.tr, state.direction),
                 SizedBox(height: XPadding.medium),
-                _buildSummaryRow('Departure Date'.tr, state.departureDate),
+                _buildSummaryRow('Departure Date'.tr, state.formattedDepartureDate),
                 SizedBox(height: XPadding.medium),
                 _buildSummaryRow('Seat No'.tr, state.seatsDisplay),
                 SizedBox(height: XPadding.medium),

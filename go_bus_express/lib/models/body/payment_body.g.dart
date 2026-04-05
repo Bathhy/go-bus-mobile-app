@@ -7,9 +7,12 @@ part of 'payment_body.dart';
 // **************************************************************************
 
 PaymentBody _$PaymentBodyFromJson(Map<String, dynamic> json) => PaymentBody(
-  amount: (json['amount'] as num?)?.toDouble(),
-  currency: json['currency'] as String?,
+  bookingId: (json['bookingId'] as num).toInt(),
+  currency: json['currency'] as String? ?? 'KHR',
 );
 
 Map<String, dynamic> _$PaymentBodyToJson(PaymentBody instance) =>
-    <String, dynamic>{'amount': instance.amount, 'currency': instance.currency};
+    <String, dynamic>{
+      'bookingId': instance.bookingId,
+      'currency': instance.currency,
+    };

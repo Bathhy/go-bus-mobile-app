@@ -31,13 +31,14 @@ class SelectSeatController extends BaseController<SelectSeatState> {
     }
 
     // Extract all arguments
-    final busId = args['busId'] as int?;
     final scheduleId = args['scheduleId'] as int?;
     final origin = args['origin'] as String? ?? '';
     final destination = args['destination'] as String? ?? '';
     final departureDate = args['departureDate'] as String?;
     final departureTime = args['departureTime'] as String? ?? '';
     final unitPrice = (args['unitPrice'] as num?)?.toDouble() ?? 0.0;
+
+    log('📋 Initializing with scheduleId: $scheduleId');
 
     // Update state with route information
     updateState(
@@ -50,25 +51,35 @@ class SelectSeatController extends BaseController<SelectSeatState> {
         scheduleId: scheduleId,
       ),
     );
-    fetchBusSeat(busId ?? 0);
+    
+    if (scheduleId != null) {
+      fetchBusSeat(scheduleId);
+    } else {
+      log('❌ No scheduleId provided, cannot fetch seats');
+    }
   }
 
   // MARK - Fetch Seat
 
-  Future<void> fetchBusSeat(int busId) async {
+  Future<void> fetchBusSeat(int scheduleId) async {
     updateState((state) => state.copyWith(isLoading: true));
 
-    final result = await _repository.fetchBusSeat(state.scheduleId, busId);
+    final result = await _repository.fetchBusSeat(scheduleId);
     switch (result) {
       case Success<SeatLayoutModel?>():
         {
+          log("✅ Bus seat data loaded successfully");
+          log("Layout data: ${result.data?.layout?.layout}");
+          log("Seats count: ${result.data?.layout?.layout?.seats?.length}");
+          log("Total seats in model: ${result.data?.seat?.length}");
+          
           updateState(
             (state) => state.copyWith(isLoading: false, model: result.data),
           );
         }
       case Error<SeatLayoutModel?>():
         {
-          log("Error loading bus seat: ${result.error.displayMessage}");
+          log("❌ Error loading bus seat: ${result.error.displayMessage}");
           updateState((state) => state.copyWith(isLoading: false));
         }
     }

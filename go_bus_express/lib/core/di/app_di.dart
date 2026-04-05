@@ -50,10 +50,8 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<TicketApi>(() => TicketApi(getIt<Dio>()));
 
   // Network - Payment API Service
-  final paymentDioService = PaymentDioService(getIt());
-  final paymentDio = paymentDioService.dio;
   getIt.registerLazySingleton<PaymentBakongApi>(
-    () => PaymentBakongApi(paymentDio),
+    () => PaymentBakongApi(getIt<Dio>())
   );
 
   // Repositories

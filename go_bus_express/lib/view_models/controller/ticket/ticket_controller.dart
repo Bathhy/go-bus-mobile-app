@@ -35,7 +35,7 @@ class TicketController extends BaseController<TicketState> {
 
   // Method to filter tickets by calling API with appropriate type
   Future<void> filterTickets({required bool isUpcoming}) async {
-    final newType = isUpcoming ? "coming" : "pass";
+    final newType = isUpcoming ? "INCOMING" : "PASS";
 
     log('🔄 Filtering tickets with API call - type: $newType');
 

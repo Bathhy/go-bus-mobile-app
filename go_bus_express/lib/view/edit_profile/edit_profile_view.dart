@@ -45,6 +45,7 @@ class _EditProfileViewState extends State<EditProfileView> {
 
   @override
   void dispose() {
+    _stateWorker?.dispose();
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();

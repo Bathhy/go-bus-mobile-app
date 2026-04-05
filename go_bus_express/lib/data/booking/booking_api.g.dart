@@ -30,7 +30,7 @@ class _BookingApi implements BookingApi {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/booking/bookSeat',
+            '/bookings',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -57,10 +57,10 @@ class _BookingApi implements BookingApi {
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<BaseResponse<void>>(
-      Options(method: 'POST', headers: _headers, extra: _extra)
+      Options(method: 'PATCH', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/booking/cancelBooking/${id}',
+            '/bookings/${id}/cancel',
             queryParameters: queryParameters,
             data: _data,
           )

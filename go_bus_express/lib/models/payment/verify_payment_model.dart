@@ -27,10 +27,20 @@ class VerifyPaymentModel {
 }*/
 @JsonSerializable()
 class VerifyPaymentModel {
-  final bool? success;
-  final Result? result;
+  // final bool? success;
+  // final Result? result;
 
-  VerifyPaymentModel({this.success, this.result});
+  final bool? completedExceptionally;
+  final int? numberOfDependents;
+  final bool? done;
+  final bool? cancelled;
+
+  VerifyPaymentModel({
+    this.completedExceptionally,
+    this.numberOfDependents,
+    this.done,
+    this.cancelled,
+  });
 
   factory VerifyPaymentModel.fromJson(Map<String, dynamic> json) =>
       _$VerifyPaymentModelFromJson(json);
@@ -45,8 +55,7 @@ class Result {
 
   Result({this.message, this.payment});
 
-  factory Result.fromJson(Map<String, dynamic> json) =>
-      _$ResultFromJson(json);
+  factory Result.fromJson(Map<String, dynamic> json) => _$ResultFromJson(json);
 
   Map<String, dynamic> toJson() => _$ResultToJson(this);
 }

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../core/network/connectivity_interceptor.dart';
 import '../../core/storage/local_repository.dart';
+import 'Interceptor/token_refresh_interceptor.dart';
 import 'Interceptor/x_app_interceptor.dart';
 import 'network_constant.dart';
 
@@ -18,10 +19,17 @@ class DioService {
         responseType: ResponseType.json,
         contentType: "application/json",
       ),
-    )..interceptors.addAll([
-        ConnectivityInterceptor(), // Check internet before request
-        XInterceptor(_localRepository),
-      ]);
+    );
+
+    _dio.interceptors.addAll([
+      ConnectivityInterceptor(), // Check internet before request
+      XInterceptor(_localRepository), // Add auth headers
+      TokenRefreshInterceptor(
+        dio: _dio,
+        localRepository: _localRepository,
+        baseUrl: NetworkConstant.baseUrl,
+      ), // Handle token refresh
+    ]);
   }
 
   Dio get dio => _dio;

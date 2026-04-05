@@ -6,9 +6,8 @@ part 'booking_body.g.dart';
 class BookingBody {
   final int? scheduleId;
   final List<int>? seatIds;
-  final String? passengerNumber;
 
-  BookingBody({this.scheduleId, this.seatIds, this.passengerNumber});
+  BookingBody({this.scheduleId, this.seatIds,});
 
   factory BookingBody.fromJson(Map<String, dynamic> json) =>
       _$BookingBodyFromJson(json);

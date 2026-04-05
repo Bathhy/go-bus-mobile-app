@@ -2,6 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 enum PreferencesKey {
   token,
+  refreshToken,
   fcm,
   language,
   theme,
@@ -73,6 +74,7 @@ mixin class BaseSharePreference {
   Future<void> logoutBox() async {
     await removeValue(PreferencesKey.isLogin);
     await removeValue(PreferencesKey.token);
+    await removeValue(PreferencesKey.refreshToken);
     await removeValue(PreferencesKey.locale);
     await removeValue(PreferencesKey.isLogin);
     await removeValue(PreferencesKey.profile);

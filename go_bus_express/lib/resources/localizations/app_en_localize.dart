@@ -124,5 +124,6 @@ final Map<String, String> en = {
   "boarding": "Boarding",
   "drop_off": "Drop-off",
   "bus": "Bus",
-  "no_seat": "No seat layout available"
+  "no_seat": "No seat layout available",
+  "security": "Security"
 };

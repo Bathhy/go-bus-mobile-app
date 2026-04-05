@@ -11,12 +11,12 @@ part 'booking_api.g.dart';
 abstract class BookingApi {
   factory BookingApi(Dio dio, {String baseUrl}) = _BookingApi;
 
-  @POST('/booking/bookSeat')
+  @POST('/bookings')
   Future<BaseResponse<BookingModel>> createBooking({
     @Body() required BookingBody body,
   });
 
-  @POST('/booking/cancelBooking/{id}')
+  @PATCH('/bookings/{id}/cancel')
   Future<BaseResponse<void>> cancelBooking({
     @Path('id') required int id,
   });

@@ -9,32 +9,39 @@ class PromotionsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'New & Promotions'.tr,
+          const Text(
+            'Special Offers',
             style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           SizedBox(
-            height: 140,
+            height: 160,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: fakeBannerList.length,
               itemBuilder: (context, index) {
                 final content = fakeBannerList[index];
                 return Container(
-                  width: 160,
-                  margin: const EdgeInsets.only(right: 12),
+                  width: 280,
+                  margin: const EdgeInsets.only(right: 16),
                   decoration: BoxDecoration(
                     color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 15,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                     image: DecorationImage(
                       image: AssetImage(content),
                       fit: BoxFit.cover,

@@ -18,26 +18,31 @@ class _PaymentBakongApi implements PaymentBakongApi {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<GenerateQrModel> generateQr({required PaymentBody body}) async {
+  Future<BaseResponse<GenerateQrModel>> generateQr({
+    required PaymentBody body,
+  }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     _data.addAll(body.toJson());
-    final _options = _setStreamType<GenerateQrModel>(
+    final _options = _setStreamType<BaseResponse<GenerateQrModel>>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/bakong/generateQR',
+            '/payments/bakong/generateKHQR',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late GenerateQrModel _value;
+    late BaseResponse<GenerateQrModel> _value;
     try {
-      _value = GenerateQrModel.fromJson(_result.data!);
+      _value = BaseResponse<GenerateQrModel>.fromJson(
+        _result.data!,
+        (json) => GenerateQrModel.fromJson(json as Map<String, dynamic>),
+      );
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -48,9 +53,10 @@ class _PaymentBakongApi implements PaymentBakongApi {
   @override
   Future<VerifyPaymentModel> verifyMd5({
     required VerifyPaymentBody body,
+    required String bookingId,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'bookingId': bookingId};
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     _data.addAll(body.toJson());
@@ -58,7 +64,7 @@ class _PaymentBakongApi implements PaymentBakongApi {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/bakong/verifyMD5',
+            '/payments/bakong/checking-transaction',
             queryParameters: queryParameters,
             data: _data,
           )

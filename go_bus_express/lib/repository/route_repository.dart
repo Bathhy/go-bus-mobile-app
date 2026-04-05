@@ -13,7 +13,7 @@ abstract class RouteRepository {
     String? departureDate,
   );
 
-  Future<XResult<SeatLayoutModel?>> fetchBusSeat(int scheduleId, int busId);
+  Future<XResult<SeatLayoutModel?>> fetchBusSeat(int scheduleId);
 }
 
 class RouteRepositoryImpl implements RouteRepository {
@@ -24,10 +24,9 @@ class RouteRepositoryImpl implements RouteRepository {
   @override
   Future<XResult<SeatLayoutModel?>> fetchBusSeat(
     int scheduleId,
-    int busId,
   ) async {
     return xResultHandler(() async {
-      final result = await api.fetchBusSeat(scheduleId, busId);
+      final result = await api.fetchBusSeat(scheduleId);
       return result.data;
     });
   }
@@ -46,10 +45,7 @@ class RouteRepositoryImpl implements RouteRepository {
     String? departureDate,
   ) async {
     return xResultHandler(() async {
-      final result = await api.fetchBusBySchedule(
-        id,
-        departureDate: departureDate,
-      );
+      final result = await api.fetchBusBySchedule(id, departureDate);
       return result.data;
     });
   }

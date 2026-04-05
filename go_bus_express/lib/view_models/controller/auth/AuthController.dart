@@ -21,37 +21,51 @@ class AuthController extends BaseController<AuthState> {
 
   /* -------------------- SNACKBARS -------------------- */
   void _showError(String message) {
-    if (Get.isSnackbarOpen) Get.closeAllSnackbars();
-
-    Get.showSnackbar(
-      GetSnackBar(
-        backgroundColor: Colors.red,
-        snackPosition: SnackPosition.TOP,
-        duration: const Duration(seconds: 3),
-        titleText: Text(
-          'Error',
-          style: TextStyle(color: white, fontWeight: FontWeight.bold),
-        ),
-        messageText: Text(message, style: TextStyle(color: white)),
-      ),
-    );
+    // Use WidgetsBinding to ensure we're in the right context
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.context != null) {
+        if (Get.isSnackbarOpen == true) {
+          Get.closeAllSnackbars();
+        }
+        
+        Get.showSnackbar(
+          GetSnackBar(
+            backgroundColor: Colors.red,
+            snackPosition: SnackPosition.TOP,
+            duration: const Duration(seconds: 3),
+            titleText: Text(
+              'Error',
+              style: TextStyle(color: white, fontWeight: FontWeight.bold),
+            ),
+            messageText: Text(message, style: TextStyle(color: white)),
+          ),
+        );
+      }
+    });
   }
 
   void _showSuccess(String message) {
-    if (Get.isSnackbarOpen) Get.closeAllSnackbars();
-
-    Get.showSnackbar(
-      GetSnackBar(
-        backgroundColor: Colors.green,
-        snackPosition: SnackPosition.TOP,
-        duration: const Duration(seconds: 2),
-        titleText: Text(
-          'Success',
-          style: TextStyle(color: white, fontWeight: FontWeight.bold),
-        ),
-        messageText: Text(message, style: TextStyle(color: white)),
-      ),
-    );
+    // Use WidgetsBinding to ensure we're in the right context
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.context != null) {
+        if (Get.isSnackbarOpen == true) {
+          Get.closeAllSnackbars();
+        }
+        
+        Get.showSnackbar(
+          GetSnackBar(
+            backgroundColor: Colors.green,
+            snackPosition: SnackPosition.TOP,
+            duration: const Duration(seconds: 2),
+            titleText: Text(
+              'Success',
+              style: TextStyle(color: white, fontWeight: FontWeight.bold),
+            ),
+            messageText: Text(message, style: TextStyle(color: white)),
+          ),
+        );
+      }
+    });
   }
 
   /* -------------------- LOGIN -------------------- */
@@ -74,7 +88,13 @@ class AuthController extends BaseController<AuthState> {
 
       switch (result) {
         case Success<AuthModel?>():
-          _localRepository.saveToken(result.data?.token ?? "");
+          final authData = result.data;
+          if (authData?.token != null) {
+            await _localRepository.saveToken(authData!.token!);
+            if (authData.refreshToken != null) {
+              await _localRepository.saveRefreshToken(authData.refreshToken!);
+            }
+          }
           Get.offAllNamed(AppRoutes.mainNavigation);
           log("Login success >>> ${result.data?.token}");
           break;
@@ -119,6 +139,13 @@ class AuthController extends BaseController<AuthState> {
 
       switch (result) {
         case Success<AuthModel?>():
+          final authData = result.data;
+          if (authData?.token != null) {
+            await _localRepository.saveToken(authData!.token!);
+            if (authData.refreshToken != null) {
+              await _localRepository.saveRefreshToken(authData.refreshToken!);
+            }
+          }
           Get.back();
           log("Signup success >>> ${result.data?.token}");
           _showSuccess('Account created successfully');

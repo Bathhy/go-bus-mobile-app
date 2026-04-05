@@ -9,10 +9,11 @@ part of 'detail_route_model.dart';
 RouteListResponseModel _$RouteListResponseModelFromJson(
   Map<String, dynamic> json,
 ) => RouteListResponseModel(
-  schedules: (json['schedules'] as List<dynamic>?)
+  schedules: (json['content'] as List<dynamic>?)
       ?.map((e) => DetailRouteModel.fromJson(e as Map<String, dynamic>))
       .toList(),
-  count: (json['count'] as num?)?.toInt(),
+  totalElements: (json['totalElements'] as num?)?.toInt(),
+  totalPages: (json['totalPages'] as num?)?.toInt(),
   summary: json['summary'] == null
       ? null
       : RouteSummary.fromJson(json['summary'] as Map<String, dynamic>),
@@ -24,8 +25,9 @@ RouteListResponseModel _$RouteListResponseModelFromJson(
 Map<String, dynamic> _$RouteListResponseModelToJson(
   RouteListResponseModel instance,
 ) => <String, dynamic>{
-  'schedules': instance.schedules,
-  'count': instance.count,
+  'content': instance.schedules,
+  'totalElements': instance.totalElements,
+  'totalPages': instance.totalPages,
   'summary': instance.summary,
   'route': instance.route,
 };
@@ -34,26 +36,30 @@ DetailRouteModel _$DetailRouteModelFromJson(Map<String, dynamic> json) =>
     DetailRouteModel(
       id: (json['id'] as num?)?.toInt(),
       busId: (json['busId'] as num?)?.toInt(),
+      busNumber: json['busNumber'] as String?,
       price: (json['price'] as num?)?.toDouble(),
-      departureDate: json['departureDate'] == null
+      departureDate: json['departureDateTime'] == null
           ? null
-          : DateTime.parse(json['departureDate'] as String),
-      arrivalTime: json['arrivalTime'] as String?,
-      departureTime: json['departureTime'] as String?,
-      bus: json['bus'] == null
+          : DateTime.parse(json['departureDateTime'] as String),
+      arrivalDate: json['arrivalDateTime'] == null
           ? null
-          : BusModel.fromJson(json['bus'] as Map<String, dynamic>),
+          : DateTime.parse(json['arrivalDateTime'] as String),
+      route: json['route'] == null
+          ? null
+          : RouteModel.fromJson(json['route'] as Map<String, dynamic>),
+      bookingIds: json['bookingIds'] as String?,
     );
 
 Map<String, dynamic> _$DetailRouteModelToJson(DetailRouteModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'busId': instance.busId,
+      'busNumber': instance.busNumber,
       'price': instance.price,
-      'departureDate': instance.departureDate?.toIso8601String(),
-      'arrivalTime': instance.arrivalTime,
-      'departureTime': instance.departureTime,
-      'bus': instance.bus,
+      'departureDateTime': instance.departureDate?.toIso8601String(),
+      'arrivalDateTime': instance.arrivalDate?.toIso8601String(),
+      'route': instance.route,
+      'bookingIds': instance.bookingIds,
     };
 
 BusModel _$BusModelFromJson(Map<String, dynamic> json) => BusModel(
@@ -99,8 +105,10 @@ RouteModel _$RouteModelFromJson(Map<String, dynamic> json) => RouteModel(
   id: (json['id'] as num?)?.toInt(),
   origin: json['origin'] as String?,
   destination: json['destination'] as String?,
-  distanceKm: (json['distanceKm'] as num?)?.toInt(),
+  distanceKm: (json['distanceKm'] as num?)?.toDouble(),
   durationMinutes: (json['durationMinutes'] as num?)?.toInt(),
+  location: json['location'] as String?,
+  busCount: (json['busCount'] as num?)?.toInt(),
 );
 
 Map<String, dynamic> _$RouteModelToJson(RouteModel instance) =>
@@ -110,4 +118,6 @@ Map<String, dynamic> _$RouteModelToJson(RouteModel instance) =>
       'destination': instance.destination,
       'distanceKm': instance.distanceKm,
       'durationMinutes': instance.durationMinutes,
+      'location': instance.location,
+      'busCount': instance.busCount,
     };

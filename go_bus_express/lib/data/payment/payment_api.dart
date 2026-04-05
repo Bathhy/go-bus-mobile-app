@@ -5,15 +5,21 @@ import 'package:go_bus_express/models/payment/generate_qr_model.dart';
 import 'package:go_bus_express/models/payment/verify_payment_model.dart';
 import 'package:retrofit/http.dart';
 import 'package:go_bus_express/core/network/parse_error_logger.dart';
+import 'package:shared_package/network/base_response.dart';
 part 'payment_api.g.dart';
 
 @RestApi()
 abstract class PaymentBakongApi {
   factory PaymentBakongApi(Dio dio, {String baseUrl}) = _PaymentBakongApi;
 
-  @POST('/bakong/generateQR')
-  Future<GenerateQrModel> generateQr({@Body() required PaymentBody body});
+  @POST('/payments/bakong/generateKHQR')
+  Future<BaseResponse<GenerateQrModel>> generateQr({
+    @Body() required PaymentBody body,
+  });
 
-  @POST('/bakong/verifyMD5')
-  Future<VerifyPaymentModel> verifyMd5({@Body() required VerifyPaymentBody body});
+  @POST('/payments/bakong/checking-transaction')
+  Future<VerifyPaymentModel> verifyMd5({
+    @Body() required VerifyPaymentBody body,
+    @Query('bookingId') required String bookingId,
+  });
 }

@@ -6,7 +6,6 @@ import 'package:go_bus_express/view_models/controller/home/home_controller.dart'
 import 'package:intl/intl.dart';
 import 'package:shared_package/config/themes.dart';
 import 'route_selection_dialog.dart';
-import 'country_selection_dialog.dart';
 
 class BookingCard extends StatelessWidget {
   const BookingCard({super.key});
@@ -16,12 +15,26 @@ class BookingCard extends StatelessWidget {
     final HomeController homeController = getIt<HomeController>();
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: goBusPrimary,
-          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              goBusPrimary,
+              goBusPrimary.withOpacity(0.8),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: goBusPrimary.withOpacity(0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
         child: Column(
           children: [
@@ -77,20 +90,31 @@ class BookingCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => _handleSearch(context, homeController),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
-                foregroundColor: Colors.blue[700],
-                minimumSize: const Size(double.infinity, 48),
+                foregroundColor: goBusPrimary,
+                minimumSize: const Size(double.infinity, 54),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(16),
                 ),
+                elevation: 0,
               ),
-              child: Text(
-                'Search'.tr,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.search, size: 22),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Search Buses'.tr,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -238,6 +262,10 @@ class BookingCard extends StatelessWidget {
       );
       return;
     }
+
+    // Add origin and destination to params
+    params['origin'] = controller.state.selectedRouteOrigin ?? '';
+    params['destination'] = controller.state.selectedRouteDestination ?? '';
 
     // Navigate with parameters
     Get.toNamed(AppRoutes.selectRoute, arguments: params);

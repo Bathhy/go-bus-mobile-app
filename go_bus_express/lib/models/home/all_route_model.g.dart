@@ -11,11 +11,10 @@ AllRouteModel _$AllRouteModelFromJson(Map<String, dynamic> json) =>
       id: (json['id'] as num?)?.toInt(),
       origin: json['origin'] as String?,
       destination: json['destination'] as String?,
-      distanceKm: (json['distanceKm'] as num?)?.toInt(),
+      distanceKm: (json['distanceKm'] as num?)?.toDouble(),
       durationMinutes: (json['durationMinutes'] as num?)?.toInt(),
-      location: json['location'] == null
-          ? null
-          : Location.fromJson(json['location'] as Map<String, dynamic>),
+      location: AllRouteModel._locationFromJson(json['location']),
+      busCount: (json['busCount'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$AllRouteModelToJson(AllRouteModel instance) =>
@@ -25,7 +24,8 @@ Map<String, dynamic> _$AllRouteModelToJson(AllRouteModel instance) =>
       'destination': instance.destination,
       'distanceKm': instance.distanceKm,
       'durationMinutes': instance.durationMinutes,
-      'location': instance.location,
+      'location': AllRouteModel._locationToJson(instance.location),
+      'busCount': instance.busCount,
     };
 
 Location _$LocationFromJson(Map<String, dynamic> json) => Location(

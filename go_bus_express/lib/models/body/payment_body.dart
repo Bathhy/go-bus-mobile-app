@@ -4,12 +4,12 @@ part 'payment_body.g.dart';
 
 @JsonSerializable()
 class PaymentBody {
-  final double? amount;
-  final String? currency;
+  final int bookingId;
+  final String currency;
 
   PaymentBody({
-    this.amount,
-    this.currency,
+    required this.bookingId,
+    this.currency = 'KHR',
   });
 
   factory PaymentBody.fromJson(Map<String, dynamic> json) =>

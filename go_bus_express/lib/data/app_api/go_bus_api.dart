@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:go_bus_express/models/body/update_profile_body.dart';
 import 'package:go_bus_express/models/profile/profile_model.dart';
 import 'package:go_bus_express/models/route/detail_route_model.dart';
 import 'package:go_bus_express/models/route/seat_layout_model.dart';
@@ -15,28 +14,41 @@ part 'go_bus_api.g.dart';
 abstract class GoBusApi {
   factory GoBusApi(Dio dio, {String baseUrl}) = _GoBusApi;
 
-  @GET('/profile/getProfile')
+  @GET('/users/profile')
   Future<BaseResponse<ProfileModel>> fetchProfile();
 
-  @GET('/bus/bySchedule/{destinationId}')
-  Future<BaseResponse<RouteListResponseModel>> fetchBusBySchedule(
-    @Path('destinationId') int destinationId, {
-    @Query('departureDate') String? departureDate,
-  });
+  // @GET('/bus/bySchedule/{destinationId}')
+  // Future<BaseResponse<RouteListResponseModel>> fetchBusBySchedule(
+  //   @Path('destinationId') int destinationId, {
+  //   @Query('departureDate') String? departureDate,
+  // });
 
-  @GET('/bus/seat/seatAndLayout')
+  //  @GET('/schedules/{destinationId}/filter/specification')
+  // Future<BaseResponse<RouteListResponseModel>> fetchBusBySchedule(
+  //   @Path('destinationId') int destinationId, {
+  //   @Query('departureDate') String? departureDate,
+  // });
+
+  @GET('/schedules/filter/specification')
+  Future<BaseResponse<RouteListResponseModel>> fetchBusBySchedule(
+    // @Path('destinationId') int destinationId, {
+    // @Query('departureDate') String? departureDate,
+    @Query('routeId') int destinationId,
+    @Query('fromDate') String? departureDate,
+  );
+
+  @GET('/schedule-seats/schedule/{scheduleId}')
   Future<BaseResponse<SeatLayoutModel>> fetchBusSeat(
-    @Query("scheduleId") int scheduleId,
-    @Query("busId") int busId,
+    @Path("scheduleId") int scheduleId,    
   );
 
   @GET('/route/{id}')
   Future<BaseResponse<DetailRouteModel>> fetchRouteDetail(@Path('id') int id);
 
-  @GET('/route')
+  @GET('/routes')
   Future<BaseResponse<List<AllRouteModel>>> fetchRoutes();
 
-  @PUT('/profile/updateProfile')
+  @PUT('/users')
   @MultiPart()
   Future<BaseResponse<ProfileModel>> updateProfile({
     @Part(name: "email") required String email,

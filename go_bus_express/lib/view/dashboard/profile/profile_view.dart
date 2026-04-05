@@ -14,6 +14,7 @@ import 'package:shared_package/design_system/x_widget/user_profile_card.dart';
 
 import '../../../core/di/app_di.dart';
 import '../../../utils/enums/image_type_enum.dart';
+import 'pin_code_view.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -90,6 +91,17 @@ class _ProfilePageState extends State<ProfilePage>
                     const SizedBox(height: 12),
                     _buildMenuItem(
                       context: context,
+                      imageType: ImageType.iconData,
+                      source: Icons.account_balance_wallet,
+                      iconColor: Colors.green,
+                      title: 'My Wallet'.tr,
+                      onTap: () {
+                        Get.toNamed('/wallet');
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    _buildMenuItem(
+                      context: context,
                       imageType: ImageType.svgImage,
                       source: AppImages.imgLanguage,
                       iconColor: Colors.purple,
@@ -98,17 +110,28 @@ class _ProfilePageState extends State<ProfilePage>
                         _showLanguageBottomSheet(context, controller);
                       },
                     ),
-                    /*  const SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     _buildMenuItem(
                       context: context,
                       imageType: ImageType.iconData,
-                      source: Icons.history,
+                      source: Icons.security,
                       iconColor: Colors.blue,
-                      title: 'Booking History'.tr,
+                      title: 'security'.tr,
                       onTap: () {
-                        Get.toNamed(AppRoutes.bookingHistory);
                       },
-                    ),*/
+                    ),
+                    const SizedBox(height: 12),
+                    _buildMenuItem(
+                      context: context,
+                      imageType: ImageType.iconData,
+                      source: Icons.pin,
+                      iconColor: Colors.teal,
+                      title: 'PIN Code'.tr,
+                      onTap: () {
+                        Get.to(() => const PinCodeView());
+                      },
+                    ),
+
                     const SizedBox(height: 36),
                     _buildLogoutButton(context, controller),
                   ],

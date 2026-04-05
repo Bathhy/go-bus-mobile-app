@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 import '../../../../core/base/base_ui_state.dart';
 
 class ChoosePaymentState extends BaseUiState {
@@ -31,6 +33,16 @@ class ChoosePaymentState extends BaseUiState {
   double get totalPrice => (unitPrice * quantity) - discount;
 
   String get seatsDisplay => selectedSeats.join(', ');
+
+  String get formattedDepartureDate {
+    if (departureDate.isEmpty) return '';
+    try {
+      final date = DateTime.parse(departureDate);
+      return DateFormat('MMM dd, yyyy').format(date);
+    } catch (e) {
+      return departureDate; // Return original if parsing fails
+    }
+  }
 
   ChoosePaymentState copyWith({
     bool? isLoading,

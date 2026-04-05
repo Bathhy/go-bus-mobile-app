@@ -12,9 +12,14 @@ part 'auth_api.g.dart';
 abstract class AuthApi {
   factory AuthApi(Dio dio, {String baseUrl}) = _AuthApi;
 
-  @POST('/login')
+  @POST('/auth/login')
   Future<BaseResponse<AuthModel>> login({@Body() required LoginBody body});
 
-  @POST('/register')
+  @POST('/auth/register')
   Future<BaseResponse<AuthModel>> signup({@Body() required SignupBody body});
+
+  @POST('/auth/refresh')
+  Future<BaseResponse<AuthModel>> refreshToken({
+    @Body() required Map<String, dynamic> body,
+  });
 }

@@ -5,11 +5,12 @@ import 'package:get/get.dart';
 import 'package:go_bus_express/core/di/app_di.dart';
 import 'package:go_bus_express/models/payment/pending_payment_model.dart';
 import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
-import 'package:shared_package/design_system/x_widget/user_profile_card.dart';
+import 'package:shared_package/config/themes.dart';
+import 'package:shared_package/design_system/x_widget/AppImage.dart';
 import '../../../core/utils/image_helper.dart';
+import '../../../resources/app_images.dart';
 import '../../widget/x_dialog.dart';
 import '../../widget/x_loading_dialog.dart';
-import 'widgets/home_app_bar.dart';
 import 'widgets/booking_card.dart';
 import 'widgets/promotions_section.dart';
 import 'widgets/need_help_section.dart';
@@ -48,7 +49,6 @@ class _HomePageState extends State<HomePage>
     if (homeController.hasPendingPayment()) {
       final pending = homeController.getPendingPayment();
       if (pending != null) {
-        // Check if payment is already expired
         log("Timer is Expired${pending.isExpired()}");
         if (pending.isExpired()) {
           XDialog.showTimeoutDialog(
@@ -74,7 +74,6 @@ class _HomePageState extends State<HomePage>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Icon Container
               Container(
                 width: 80,
                 height: 80,
@@ -89,11 +88,9 @@ class _HomePageState extends State<HomePage>
                 ),
               ),
               const SizedBox(height: 24),
-
-              // Title
               Text(
                 'Pending Payment'.tr,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
@@ -101,8 +98,6 @@ class _HomePageState extends State<HomePage>
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
-
-              // Payment Details
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -127,13 +122,10 @@ class _HomePageState extends State<HomePage>
                       'Amount'.tr,
                       '\$${pending.amount.toStringAsFixed(2)}',
                     ),
-                    const SizedBox(height: 8),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
-
-              // Message
               Text(
                 'Would you like to continue or cancel this payment?'.tr,
                 style: TextStyle(
@@ -144,10 +136,8 @@ class _HomePageState extends State<HomePage>
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
-
               Row(
                 children: [
-                  // Cancel Payment Button
                   Expanded(
                     child: SizedBox(
                       height: 50,
@@ -180,8 +170,6 @@ class _HomePageState extends State<HomePage>
                     ),
                   ),
                   const SizedBox(width: 12),
-
-                  // Continue Payment Button
                   Expanded(
                     child: SizedBox(
                       height: 50,
@@ -191,7 +179,7 @@ class _HomePageState extends State<HomePage>
                           homeController.resumePendingPayment(pending);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4CAF50),
+                          backgroundColor: goBusPrimary,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -243,46 +231,356 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context); // Required for AutomaticKeepAliveClientMixin
+    super.build(context);
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-      body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: () => homeController.pullRefresh(),
-          color: const Color(0xFF4CAF50),
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                HomeAppBar(
-                  onTap: () => homeController.callPhone(),
-                  onTapTelegram: () => homeController.openTelegram(),
+      backgroundColor: const Color(0xFFF8F9FA),
+      body: RefreshIndicator(
+        onRefresh: () => homeController.pullRefresh(),
+        color: goBusPrimary,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            // Modern Gradient App Bar
+            SliverAppBar(
+              expandedHeight: 140,
+              floating: false,
+              pinned: true,
+              backgroundColor: goBusPrimary,
+              elevation: 0,
+              flexibleSpace: FlexibleSpaceBar(
+                background: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [goBusPrimary, goBusPrimary.withOpacity(0.8)],
+                    ),
+                  ),
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Hello! 👋',
+                                      style: TextStyle(
+                                        color: Colors.white.withOpacity(0.9),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Obx(() {
+                                      final name =
+                                          homeController
+                                              .state
+                                              .profileModel
+                                              ?.fullName ??
+                                          'Guest';
+                                      return Text(
+                                        name,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      );
+                                    }),
+                                  ],
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  _buildIconButton(
+                                    Icons.telegram,
+                                    () => homeController.openTelegram(),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  _buildIconButton(
+                                    Icons.phone,
+                                    () => homeController.callPhone(),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  // Profile Picture
+                                  Obx(() {
+                                    final imageUrl = getImageUrl(
+                                      homeController.state.profileModel?.image,
+                                    );
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: Colors.white,
+                                          width: 2,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(
+                                              0.2,
+                                            ),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: CircleAvatar(
+                                        radius: 22,
+                                        backgroundColor: Colors.white,
+                                        backgroundImage: imageUrl.isNotEmpty
+                                            ? NetworkImage(imageUrl)
+                                            : null,
+                                        child: imageUrl.isEmpty
+                                            ? Icon(
+                                                Icons.person,
+                                                color: goBusPrimary,
+                                                size: 24,
+                                              )
+                                            : null,
+                                      ),
+                                    );
+                                  }),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 16),
-                Obx(() {
-                  if (homeController.state.profileModel != null) {
-                    return UserProfileCard(
-                      name: homeController.state.profileModel!.fullName ?? "NA",
-                      email: homeController.state.profileModel!.email ?? "NA",
-                      avatarUrl: getImageUrl(homeController.state.profileModel?.image),
-                    );
-                  }
-                  return const SizedBox.shrink();
-                }),
-                const SizedBox(height: 16),
-                const BookingCard(),
-                const SizedBox(height: 16),
-                const PromotionsSection(),
-                const SizedBox(height: 16),
-                NeedHelpSection(
-                  onTap: () => homeController.callPhone(),
-                  onTapTelegram: () => homeController.openTelegram(),
-                ),
-                const SizedBox(height: 20),
-              ],
+              ),
+            ),
+
+            // Content
+            SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+
+                  // Quick Stats Card
+                  _buildQuickStatsCard(),
+
+                  const SizedBox(height: 20),
+
+                  // Top Up Wallet Section
+                  // TopUpWalletSection(
+                  //   onAddMoney: (amount) => homeController.handleTopUpWallet(amount),
+                  // ),
+                  const SizedBox(height: 20),
+
+                  // Booking Card
+                  const BookingCard(),
+
+                  const SizedBox(height: 24),
+
+                  // Promotions Section
+                  const PromotionsSection(),
+
+                  const SizedBox(height: 24),
+
+                  // Quick Actions
+                  _buildQuickActions(),
+
+                  const SizedBox(height: 24),
+
+                  // Need Help Section
+                  NeedHelpSection(
+                    onTap: () => homeController.callPhone(),
+                    onTapTelegram: () => homeController.openTelegram(),
+                  ),
+
+                  const SizedBox(height: 30),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildIconButton(IconData icon, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+        ),
+        child: Icon(icon, color: Colors.white, size: 20),
+      ),
+    );
+  }
+
+  Widget _buildQuickStatsCard() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 20,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: _buildStatItem(
+                icon: Icons.confirmation_number_outlined,
+                label: 'Total Trips'.tr,
+                value: '0',
+                color: const Color(0xFF4CAF50),
+              ),
+            ),
+            Container(width: 1, height: 40, color: Colors.grey.shade200),
+            Expanded(
+              child: _buildStatItem(
+                icon: Icons.account_balance_wallet_outlined,
+                label: 'Wallet'.tr,
+                value: '\$0.00',
+                color: const Color(0xFF2196F3),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatItem({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, color: color, size: 24),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickActions() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Quick Actions',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
             ),
           ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildActionCard(
+                  icon: AppImages.icTicket,
+                  title: 'My Tickets'.tr,
+                  color: const Color(0xFF9C27B0),
+                  onTap: () {},
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionCard({
+    required String icon,
+    required String title,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 20,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: AppSvgImage(
+                path: icon,
+                width: 28,
+                height: 28,
+                color: Colors.white70,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       ),
     );

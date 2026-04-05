@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:go_bus_express/core/utils/string_ext.dart';
+import 'package:go_bus_express/models/route/seat_layout_model.dart';
 import 'package:go_bus_express/resources/app_images.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:go_bus_express/view_models/controller/route/select_seat/select_seat_controller.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 import 'package:shared_package/design_system/x_widget/AppImage.dart';
@@ -31,9 +32,21 @@ class _SelectSeatViewState extends State<SelectSeatView> {
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: Obx(() {
           final state = controller.state;
+          
+          // Format date from ISO 8601 to readable format
+          String formattedDate = "N/A";
+          if (state.departureDate != null && state.departureDate!.isNotEmpty) {
+            try {
+              final dt = DateTime.parse(state.departureDate!);
+              formattedDate = DateFormat('EEE, MMM d, yyyy').format(dt);
+            } catch (e) {
+              formattedDate = state.departureDate!;
+            }
+          }
+          
           return XAppBar(
             title: '${state.origin} → ${state.destination}',
-            subTitle: state.departureDate.orDefault("N/A"),
+            subTitle: formattedDate,
             onBackPressed: () => Get.back(),
           );
         }),
@@ -45,7 +58,13 @@ class _SelectSeatViewState extends State<SelectSeatView> {
           return Center(child: CircularProgressIndicator());
         }
 
-        final layout = state.model?.busLayout?.layout?.layout;
+        final layout = state.model?.layout?.layout?.seats;
+        
+        // Debug logging
+        print('🔍 Debug - Model: ${state.model != null}');
+        print('🔍 Debug - Layout Info: ${state.model?.layout != null}');
+        print('🔍 Debug - Layout Data: ${state.model?.layout?.layout != null}');
+        print('🔍 Debug - Seats: ${layout?.length ?? 0} rows');
 
         if (layout == null || layout.isEmpty) {
           return Center(
@@ -227,15 +246,16 @@ class _SelectSeatViewState extends State<SelectSeatView> {
   }
 
   Widget _buildDynamicSeatRow(
-    List<String?> rowSeats,
+    List<SeatPosition> rowSeats,
     SelectSeatController controller,
   ) {
     return Row(
       children: rowSeats.asMap().entries.map((entry) {
         final index = entry.key;
-        final seatNumber = entry.value;
+        final seatPosition = entry.value;
+        final seatNumber = seatPosition.seatNumber;
 
-        if (seatNumber == null) {
+        if (seatNumber == null || seatNumber.isEmpty) {
           // Aisle space - wider gap between seat groups
           return SizedBox(width: XPadding.extralarge * 2, height: 70);
         }
@@ -244,7 +264,8 @@ class _SelectSeatViewState extends State<SelectSeatView> {
         final isSelected = controller.isSeatSelected(seatNumber);
 
         // Add small spacing between seats in the same group
-        final needsSpacing = index > 0 && rowSeats[index - 1] != null;
+        final needsSpacing =
+            index > 0 && rowSeats[index - 1].seatNumber != null;
 
         return Row(
           children: [

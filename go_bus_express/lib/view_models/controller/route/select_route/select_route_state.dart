@@ -6,6 +6,8 @@ class SelectRouteState extends BaseUiState {
   final int routeId;
   final String departureDate;
   final String returnDate;
+  final String origin;
+  final String destination;
 
   SelectRouteState({
     super.isLoading = false,
@@ -13,6 +15,8 @@ class SelectRouteState extends BaseUiState {
     this.routeId = 0,
     this.departureDate = "",
     this.returnDate = "",
+    this.origin = "",
+    this.destination = "",
   });
 
   SelectRouteState copyWith({
@@ -21,6 +25,8 @@ class SelectRouteState extends BaseUiState {
     int? routeId,
     String? departureDate,
     String? returnDate,
+    String? origin,
+    String? destination,
   }) {
     return SelectRouteState(
       isLoading: isLoading ?? this.isLoading,
@@ -28,6 +34,8 @@ class SelectRouteState extends BaseUiState {
       routeId: routeId ?? this.routeId,
       departureDate: departureDate ?? this.departureDate,
       returnDate: returnDate ?? this.returnDate,
+      origin: origin ?? this.origin,
+      destination: destination ?? this.destination,
     );
   }
 }

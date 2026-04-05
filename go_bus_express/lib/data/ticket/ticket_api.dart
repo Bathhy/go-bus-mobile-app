@@ -11,7 +11,7 @@ part 'ticket_api.g.dart';
 abstract class TicketApi {
   factory TicketApi(Dio dio, {String baseUrl}) = _TicketApi;
 
-  @GET('/ticket/getTicket')
+  @GET('/tickets')
   Future<BaseResponse<TicketModel>> getTicket({
     @Query('type') required String type,
   });

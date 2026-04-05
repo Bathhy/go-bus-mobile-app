@@ -3,14 +3,17 @@ import 'package:get/get.dart';
 import 'package:shared_package/config/themes.dart';
 
 class XAppLoadingDialog {
+  static bool _isShowing = false;
+
   static void showAppDialog() {
-    if (Get.isDialogOpen != true) {
+    if (!_isShowing && Get.isDialogOpen != true) {
+      _isShowing = true;
       Get.dialog(
         PopScope(
           canPop: false,
           child: Center(
             child: Container(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
@@ -32,8 +35,14 @@ class XAppLoadingDialog {
   }
 
   static void hideAppDialog() {
-    if (Get.isDialogOpen == true) {
-      Get.back();
+    if (_isShowing && Get.isDialogOpen == true) {
+      _isShowing = false;
+      try {
+        Get.back();
+      } catch (e) {
+        // Ignore errors when closing dialog
+        _isShowing = false;
+      }
     }
   }
 }

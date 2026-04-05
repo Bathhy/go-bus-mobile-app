@@ -12,6 +12,7 @@ import 'package:go_bus_express/repository/hive_manager_repository.dart';
 import 'package:go_bus_express/view_models/controller/base/base_controller.dart';
 import 'package:go_bus_express/view_models/controller/payment/choose_payment_state.dart';
 import 'package:shared_package/config/themes.dart';
+import 'package:shared_package/network/base_response.dart';
 import 'package:shared_package/network/x_result.dart';
 
 import '../../../resources/routes/app_routes.dart';
@@ -71,10 +72,6 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
         scheduleId: scheduleId,
       ),
     );
-
-    log(
-      '✅ Payment initialized: $direction, Seats: ${selectedSeats.join(", ")}, IDs: $selectedSeatIds, Total: \$${state.totalPrice}',
-    );
   }
 
   void selectPaymentMethod(String method) {
@@ -90,94 +87,118 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
   }
 
   void createBooking() async {
-    final body = BookingBody(
-      passengerNumber: "123123",
-      scheduleId: state.scheduleId,
-      seatIds: state.selectedSeatIds,
-    );
-    updateState((state) => state.copyWith(isLoading: true));
-    log('Creating booking with seat IDs: ${state.selectedSeatIds}');
-    log('Booking body: ${body.toJson()}');
+    try {
+      final body = BookingBody(
+        scheduleId: state.scheduleId,
+        seatIds: state.selectedSeatIds,
+      );
+      updateState((state) => state.copyWith(isLoading: true));
+      log('🔄 Creating booking with seat IDs: ${state.selectedSeatIds}');
+      log('📤 Booking body: ${body.toJson()}');
 
-    final result = await _bookingRepository.createBooking(body: body);
+      final result = await _bookingRepository.createBooking(body: body);
+      log('📥 Booking API response received');
 
-    switch (result) {
-      case Success<BookingModel?>():
-        log('✅ Booking created successfully');
-        final bookingId = result.data?.id;
-        log('✅ Booking ID $bookingId');
-        if (bookingId != null) {
-          log('✅ Booking created successfully $bookingId');
-          await _generateQr(state.totalPrice, bookingId);
-        } else {
+      switch (result) {
+        case Success<BookingModel?>():
+          log('✅ Booking created successfully');
+          final bookingId = result.data?.id;
+          log('✅ Booking ID: $bookingId');
+
+          if (bookingId != null) {
+            log('🔄 Proceeding to generate QR code...');
+            await _generateQr(bookingId);
+          } else {
+            log('❌ Booking ID is null');
+            updateState((state) => state.copyWith(isLoading: false));
+            _showError('Booking created but ID is missing');
+          }
+          break;
+
+        case Error<BookingModel?>():
+          log('❌ Booking creation error: ${result.error.displayMessage}');
+          log('❌ Error code: ${result.error.statusCode}');
           updateState((state) => state.copyWith(isLoading: false));
-        }
-        break;
-
-      case Error<BookingModel?>():
-        updateState((state) => state.copyWith(isLoading: false));
-        _showError(result.error.displayMessage);
-        break;
+          _showError(result.error.displayMessage);
+          break;
+      }
+    } catch (e, stackTrace) {
+      log('❌ Exception in createBooking: $e');
+      log('Stack trace: $stackTrace');
+      updateState((state) => state.copyWith(isLoading: false));
+      _showError('Failed to create booking. Please try again.');
     }
   }
 
-  Future<void> _generateQr(double amount, int bookingId) async {
-    final body = PaymentBody(amount: 0.01, currency: "USD");
-    final result = await _bookingRepository.generateQr(body: body);
+  Future<void> _generateQr(int bookingId) async {
+    try {
+      final currency = "KHR";
+      final body = PaymentBody(bookingId: bookingId, currency: currency);
 
-    switch (result) {
-      case Success<GenerateQrModel>():
-        {
-          await _localRepository.saveMD5(result.data.md5 ?? '');
-          final now = DateTime.now();
-          
-          // Save pending payment to Hive
-          final pendingPayment = PendingPaymentModel(
-            bookingId: bookingId,
-            amount: 0.01,
-            currency: 'USD',
-            qrData: result.data.qr ?? '',
-            md5: result.data.md5 ?? '',
-            createdAt: now,
-            direction: state.direction,
-            selectedSeats: state.selectedSeats,
-          );
-          await _hiveManager.savePendingPayment(pendingPayment);
+      final result = await _bookingRepository.generateQr(body: body);
+
+      switch (result) {
+        case Success<BaseResponse<GenerateQrModel>>():
+          {
+            final qrData = result.data.data?.data?.qr ?? '';
+            final md5Data = result.data.data?.data?.md5 ?? '';
+            await _localRepository.saveMD5(md5Data);
+            final now = DateTime.now();
+
+            // Calculate total amount based on selected seats
+            final totalAmount = state.unitPrice * state.selectedSeats.length;
+
+            // Save pending payment to Hive
+            final pendingPayment = PendingPaymentModel(
+              bookingId: bookingId,
+              amount: totalAmount,
+              currency: currency,
+              qrData: qrData,
+              md5: md5Data,
+              createdAt: now,
+              direction: state.direction,
+              selectedSeats: state.selectedSeats,
+            );
+            await _hiveManager.savePendingPayment(pendingPayment);
+
             updateState((state) => state.copyWith(isLoading: false));
-          Get.toNamed(
-            AppRoutes.makePayment,
-            arguments: {
-              'qrData': result.data.qr ?? '',
-              'md5': result.data.md5 ?? '',
-              'amount': 0.01,
-              'currency': 'USD',
-              'bookingId': bookingId,
-              'createdAt': now,
-            },
-          );
-        }
-      case Error<GenerateQrModel>():
-        log('❌ QR generation error: ${result.error.displayMessage}');
-        updateState((state) => state.copyWith(isLoading: false));
-        _showError(result.error.displayMessage);
-        break;
+
+            Get.toNamed(
+              AppRoutes.makePayment,
+              arguments: {
+                'qrData': qrData,
+                'md5': md5Data,
+                'amount': totalAmount,
+                'currency': currency,
+                'bookingId': bookingId,
+                'createdAt': now,
+              },
+            );
+          }
+        case Error<BaseResponse<GenerateQrModel>>():
+          updateState((state) => state.copyWith(isLoading: false));
+          _showError(result.error.displayMessage);
+          break;
+      }
+    } catch (e) {
+      updateState((state) => state.copyWith(isLoading: false));
+      _showError('Failed to generate QR code. Please try again.');
     }
   }
 
   void _showError(String message) {
-    if (Get.isSnackbarOpen) Get.closeAllSnackbars();
+    final context = Get.context;
+    if (context == null) return;
 
-    Get.showSnackbar(
-      GetSnackBar(
-        backgroundColor: Colors.red,
-        snackPosition: SnackPosition.TOP,
-        duration: const Duration(seconds: 3),
-        titleText: Text(
-          'Error'.tr,
-          style: TextStyle(color: white, fontWeight: FontWeight.bold),
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message, style: TextStyle(color: white)),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+          behavior: SnackBarBehavior.floating,
         ),
-        messageText: Text(message, style: TextStyle(color: white)),
-      ),
-    );
+      );
+    });
   }
 }

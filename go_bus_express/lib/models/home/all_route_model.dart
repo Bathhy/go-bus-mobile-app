@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'all_route_model.g.dart';
@@ -7,26 +8,51 @@ class AllRouteModel {
   final int? id;
   final String? origin;
   final String? destination;
-  final int? distanceKm;
+  final double? distanceKm;
   final int? durationMinutes;
+  @JsonKey(fromJson: _locationFromJson, toJson: _locationToJson)
   final Location? location;
+  final int? busCount;
 
   AllRouteModel({
-   this.id,
-  this.origin,
-   this.destination,
-   this.distanceKm,
+    this.id,
+    this.origin,
+    this.destination,
+    this.distanceKm,
     this.durationMinutes,
     this.location,
+    this.busCount,
   });
+
+  static Location? _locationFromJson(dynamic json) {
+    if (json == null) return null;
+    if (json is String) {
+      try {
+        final Map<String, dynamic> decoded = jsonDecode(json);
+        return Location.fromJson(decoded);
+      } catch (e) {
+        print('❌ Error parsing location string: $e');
+        return null;
+      }
+    }
+    if (json is Map<String, dynamic>) {
+      return Location.fromJson(json);
+    }
+    return null;
+  }
+
+  static dynamic _locationToJson(Location? location) {
+    return location?.toJson();
+  }
 
   AllRouteModel copyWith({
     int? id,
     String? origin,
     String? destination,
-    int? distanceKm,
+    double? distanceKm,
     int? durationMinutes,
     Location? location,
+    int? busCount,
   }) =>
       AllRouteModel(
         id: id ?? this.id,
@@ -35,7 +61,9 @@ class AllRouteModel {
         distanceKm: distanceKm ?? this.distanceKm,
         durationMinutes: durationMinutes ?? this.durationMinutes,
         location: location ?? this.location,
+        busCount: busCount ?? this.busCount,
       );
+
   factory AllRouteModel.fromJson(Map<String, dynamic> json) =>
       _$AllRouteModelFromJson(json);
 

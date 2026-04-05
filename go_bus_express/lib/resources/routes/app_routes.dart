@@ -12,6 +12,8 @@ import 'package:go_bus_express/view/ticket/khqr_payment/khqr_payment_view.dart';
 import 'package:go_bus_express/view/ticket/payment_success/payment_success_view.dart';
 import 'package:go_bus_express/view/ticket/select_route/select_route_view.dart';
 import 'package:go_bus_express/view/ticket/select_seat/select_seat_view.dart';
+import 'package:go_bus_express/view/wallet/wallet_view.dart';
+import 'package:go_bus_express/view/wallet/top_up_wallet_view.dart';
 
 class AppRoutes {
   static const String selectSeat = "/selectSeat";
@@ -27,6 +29,8 @@ class AppRoutes {
   static const String editProfile = "/editProfile";
   static const String ticket = "/ticket";
   static const String detailTicket = "/detailTicket";
+  static const String wallet = "/wallet";
+  static const String topUpWallet = "/top-up-wallet";
 
   static void goToSeatRoute(int? scheduleId, int? busId) => Get.toNamed(
     arguments: {"scheduleId": scheduleId, "busId": busId},
@@ -72,5 +76,7 @@ class AppRoutes {
     GetPage(name: animation, page: () => SplashView()),
     GetPage(name: ticket, page: () => const MyTicketView()),
     GetPage(name: detailTicket, page: () => const TicketDetailView()),
+    GetPage(name: wallet, page: () => const WalletView()),
+    GetPage(name: topUpWallet, page: () => const TopUpWalletView()),
   ];
 }

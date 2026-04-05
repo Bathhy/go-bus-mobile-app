@@ -124,5 +124,6 @@ final Map<String, String> km = {
   "boarding": "ទីតាំងឡើង",
   "drop_off": "ទីតាំងចុះ",
   "bus": "រថយន្ត",
-  "no_seat": "មិនមានកៅអីនោះទេ"
+  "no_seat": "មិនមានកៅអីនោះទេ",
+  "security": "សុវត្ថិភាព"
 };

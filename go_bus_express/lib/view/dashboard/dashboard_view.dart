@@ -34,7 +34,7 @@ class _MainNavigationState extends State<MainNavigation> {
 
   void _refetch() {
     homeController.fetchProfile();
-    homeController.loadCachedRoutes();
+    // homeController.loadCachedRoutes();
 
     profileController.loadCachedProfile();
     profileController.loadCurrentLanguage();
@@ -53,7 +53,7 @@ class _MainNavigationState extends State<MainNavigation> {
         // Home tab - refresh HomeController
         try {
           homeController.fetchProfile();
-          homeController.loadCachedRoutes();
+          // homeController.loadCachedRoutes();
         } catch (e) {
           // Controller not found
         }

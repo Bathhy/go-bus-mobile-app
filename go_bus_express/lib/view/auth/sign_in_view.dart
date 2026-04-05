@@ -14,8 +14,8 @@ class SignInView extends StatefulWidget {
 }
 
 class _SignInViewState extends State<SignInView> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController emailController = TextEditingController(text: "john@example.com");
+  final TextEditingController passwordController = TextEditingController(text: "S@mbath1302");
   final AuthController authController = getIt<AuthController>();
   bool rememberMe = false;
   bool isPasswordVisible = false;

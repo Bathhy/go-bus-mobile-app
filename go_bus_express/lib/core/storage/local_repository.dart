@@ -12,8 +12,17 @@ class LocalRepository with BaseSharePreference {
     return readString(PreferencesKey.token);
   }
 
+  Future<void> saveRefreshToken(String refreshToken) async {
+    await storeValue(PreferencesKey.refreshToken, refreshToken);
+  }
+
+  String? getRefreshToken() {
+    return readString(PreferencesKey.refreshToken);
+  }
+
   Future<void> removeToken() async {
     await removeValue(PreferencesKey.token);
+    await removeValue(PreferencesKey.refreshToken);
     await removeValue(PreferencesKey.isLogin);
   }
 

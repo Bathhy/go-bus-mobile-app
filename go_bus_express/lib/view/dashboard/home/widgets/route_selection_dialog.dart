@@ -86,7 +86,7 @@ class RouteSelectionDialog {
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
               subtitle: Text(
-                '${route.distanceKm} km • ${route.durationMinutes} min',
+                '${route.distanceKm?.toStringAsFixed(0)} km • ${route.durationMinutes} min',
                 style: TextStyle(color: Colors.grey[600]),
               ),
               trailing: const Icon(Icons.chevron_right),
