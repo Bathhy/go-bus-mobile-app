@@ -114,16 +114,31 @@ class EditProfileController extends BaseController<EditProfileState> {
             // Stop loading before showing success message
             updateState((state) => state.copyWith(isLoading: false));
 
-            // Show success message using Get.rawSnackbar
-            Get.rawSnackbar(
-              title: 'Success'.tr,
-              message: 'Profile updated successfully'.tr,
-              snackPosition: SnackPosition.BOTTOM,
-              backgroundColor: const Color(0xFF4CAF50),
-              borderRadius: 8,
-              margin: const EdgeInsets.all(16),
-              duration: const Duration(seconds: 2),
-            );
+            // Show success message
+            if (Get.context != null) {
+              ScaffoldMessenger.of(Get.context!).showSnackBar(
+                SnackBar(
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Success'.tr,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text('Profile updated successfully'.tr),
+                    ],
+                  ),
+                  backgroundColor: const Color(0xFF4CAF50),
+                  behavior: SnackBarBehavior.floating,
+                  margin: const EdgeInsets.all(16),
+                  duration: const Duration(seconds: 2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              );
+            }
 
             // Navigate back after a short delay
             Future.delayed(const Duration(milliseconds: 500), () {
@@ -136,30 +151,60 @@ class EditProfileController extends BaseController<EditProfileState> {
           updateState((state) => state.copyWith(isLoading: false));
           log('Profile error: ${result.error.displayMessage}');
 
-          // Show error message using Get.rawSnackbar
-          Get.rawSnackbar(
-            title: 'Error'.tr,
-            message: result.error.displayMessage ?? 'Failed to update profile',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.red.shade400,
-            borderRadius: 8,
-            margin: const EdgeInsets.all(16),
-            duration: const Duration(seconds: 3),
-          );
+          // Show error message
+          if (Get.context != null) {
+            ScaffoldMessenger.of(Get.context!).showSnackBar(
+              SnackBar(
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Error'.tr,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(result.error.displayMessage ?? 'Failed to update profile'),
+                  ],
+                ),
+                backgroundColor: Colors.red.shade400,
+                behavior: SnackBarBehavior.floating,
+                margin: const EdgeInsets.all(16),
+                duration: const Duration(seconds: 3),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            );
+          }
       }
     } catch (e) {
       updateState((state) => state.copyWith(isLoading: false));
       log('Profile update exception: $e');
 
-      Get.rawSnackbar(
-        title: 'Error'.tr,
-        message: 'An unexpected error occurred'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.shade400,
-        borderRadius: 8,
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 3),
-      );
+      if (Get.context != null) {
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Error'.tr,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text('An unexpected error occurred'.tr),
+              ],
+            ),
+            backgroundColor: Colors.red.shade400,
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(16),
+            duration: const Duration(seconds: 3),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
+      }
     }
   }
 }

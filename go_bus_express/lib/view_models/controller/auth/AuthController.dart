@@ -24,20 +24,23 @@ class AuthController extends BaseController<AuthState> {
     // Use WidgetsBinding to ensure we're in the right context
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Get.context != null) {
-        if (Get.isSnackbarOpen == true) {
-          Get.closeAllSnackbars();
-        }
-        
-        Get.showSnackbar(
-          GetSnackBar(
-            backgroundColor: Colors.red,
-            snackPosition: SnackPosition.TOP,
-            duration: const Duration(seconds: 3),
-            titleText: Text(
-              'Error',
-              style: TextStyle(color: white, fontWeight: FontWeight.bold),
+        ScaffoldMessenger.of(Get.context!).clearSnackBars();
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Error',
+                  style: TextStyle(color: white, fontWeight: FontWeight.bold),
+                ),
+                Text(message, style: TextStyle(color: white)),
+              ],
             ),
-            messageText: Text(message, style: TextStyle(color: white)),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -48,20 +51,23 @@ class AuthController extends BaseController<AuthState> {
     // Use WidgetsBinding to ensure we're in the right context
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Get.context != null) {
-        if (Get.isSnackbarOpen == true) {
-          Get.closeAllSnackbars();
-        }
-        
-        Get.showSnackbar(
-          GetSnackBar(
-            backgroundColor: Colors.green,
-            snackPosition: SnackPosition.TOP,
-            duration: const Duration(seconds: 2),
-            titleText: Text(
-              'Success',
-              style: TextStyle(color: white, fontWeight: FontWeight.bold),
+        ScaffoldMessenger.of(Get.context!).clearSnackBars();
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Success',
+                  style: TextStyle(color: white, fontWeight: FontWeight.bold),
+                ),
+                Text(message, style: TextStyle(color: white)),
+              ],
             ),
-            messageText: Text(message, style: TextStyle(color: white)),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }

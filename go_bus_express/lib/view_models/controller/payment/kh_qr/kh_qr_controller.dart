@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:ui';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/services/local_notification_service.dart';
@@ -11,7 +9,6 @@ import 'package:go_bus_express/models/payment/verify_payment_model.dart';
 import 'package:go_bus_express/repository/booking_repository.dart';
 import 'package:go_bus_express/repository/hive_manager_repository.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
-import 'package:go_bus_express/utils/enums/enum.dart';
 import 'package:go_bus_express/view_models/controller/base/base_controller.dart';
 import 'package:go_bus_express/view_models/controller/payment/kh_qr/kh_qr_state.dart';
 import 'package:shared_package/config/themes.dart';
@@ -22,12 +19,8 @@ class KhQrController extends BaseController<KhQrState> {
   final LocalRepository _localRepository;
   final HiveManagerRepository _hiveManager;
   Timer? _countdownTimer;
-  Timer? _verificationTimer;
 
-  static const int _verificationIntervalSeconds = 5; // Poll every 5 seconds
   static const int _paymentTimeoutSeconds = 180; // Payment timeout duration
-  static const int _maxRetries = 36; // 12 * 5 = 60 seconds (1 minute)
-  int _retryCount = 0;
 
   KhQrController(this._bookingRepo, this._localRepository, this._hiveManager)
     : super(KhQrState());
@@ -39,7 +32,7 @@ class KhQrController extends BaseController<KhQrState> {
     _getLocalMd5();
     _calculateRemainingTime();
     _startCountdownTimer();
-    _startVerificationPolling();
+    _verifyPayment();
   }
 
   void _initializeFromArguments() {
@@ -55,7 +48,7 @@ class KhQrController extends BaseController<KhQrState> {
     final bookingId = args['bookingId'] as int? ?? 0;
     final createdAt = args['createdAt'] as DateTime?;
 
-    print("This is QR Data ${qrData}");
+    log("This is QR Data $qrData");
     updateState(
       (state) => state.copyWith(
         qrData: qrData,
@@ -103,18 +96,10 @@ class KhQrController extends BaseController<KhQrState> {
   void _verifyPayment() async {
     // Don't verify if already paid or expired
     if (state.isPaid || state.isExpired) {
-      _stopVerificationPolling();
       return;
     }
 
-    // Check retry limit
-    if (_retryCount >= _maxRetries) {
-      log('⚠️ Max verification retries reached');
-      _stopVerificationPolling();
-      return;
-    }
-
-    _retryCount++;
+    log('🔄 Calling verify payment API - waiting for backend response...');
 
     final body = VerifyPaymentBody(md5: state.md5);
 
@@ -127,13 +112,11 @@ class KhQrController extends BaseController<KhQrState> {
       case Success<VerifyPaymentModel>():
         {
           final alreadyPaid = result.data.done;
-          // if (payment?.payment?.status == BakongPaymentStatusEnum.paid.status) {
           if (alreadyPaid == true) {
-            // Mark as paid immediately to prevent duplicate calls
+            // Mark as paid immediately
             updateState((state) => state.copyWith(isPaid: true));
 
-            // Stop timers immediately
-            _stopVerificationPolling();
+            // Stop countdown timer
             _stopCountdownTimer();
 
             // Clear pending payment from Hive && Clear Md5
@@ -143,16 +126,15 @@ class KhQrController extends BaseController<KhQrState> {
             // Show success notification
             _showPaymentSuccessNotification();
 
-            // Navigate immediately to success page
+            // Navigate to success page
             _handlePaymentSuccess();
+          } else {
+            log('⚠️ Payment not completed yet');
           }
         }
       case Error<VerifyPaymentModel>():
         {
-          // Show error only on first few attempts to avoid spam
-          if (_retryCount <= 3) {
-            _showError(result.error.displayMessage);
-          }
+          _showError(result.error.displayMessage);
         }
     }
   }
@@ -183,31 +165,14 @@ class KhQrController extends BaseController<KhQrState> {
         _stopCountdownTimer();
         if (!state.isPaid) {
           updateState((state) => state.copyWith(isExpired: true));
-          _stopVerificationPolling();
         }
       }
     });
   }
 
-  void _startVerificationPolling() {
-    // First check immediately
-    _verifyPayment();
-
-    // Then check every 5 seconds
-    _verificationTimer = Timer.periodic(
-      Duration(seconds: _verificationIntervalSeconds),
-      (timer) => _verifyPayment(),
-    );
-  }
-
   void _stopCountdownTimer() {
     _countdownTimer?.cancel();
     _countdownTimer = null;
-  }
-
-  void _stopVerificationPolling() {
-    _verificationTimer?.cancel();
-    _verificationTimer = null;
   }
 
   // MARK: API Cancel Booking
@@ -249,20 +214,23 @@ class KhQrController extends BaseController<KhQrState> {
     // Use WidgetsBinding to ensure we're in the right context
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Get.context != null) {
-        if (Get.isSnackbarOpen == true) {
-          Get.closeAllSnackbars();
-        }
-
-        Get.showSnackbar(
-          GetSnackBar(
-            backgroundColor: Colors.red,
-            snackPosition: SnackPosition.TOP,
-            duration: const Duration(seconds: 3),
-            titleText: Text(
-              'Error'.tr,
-              style: TextStyle(color: white, fontWeight: FontWeight.bold),
+        ScaffoldMessenger.of(Get.context!).clearSnackBars();
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Error'.tr,
+                  style: TextStyle(color: white, fontWeight: FontWeight.bold),
+                ),
+                Text(message, style: TextStyle(color: white)),
+              ],
             ),
-            messageText: Text(message, style: TextStyle(color: white)),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -280,7 +248,6 @@ class KhQrController extends BaseController<KhQrState> {
   @override
   void onClose() {
     _stopCountdownTimer();
-    _stopVerificationPolling();
     super.onClose();
   }
 }

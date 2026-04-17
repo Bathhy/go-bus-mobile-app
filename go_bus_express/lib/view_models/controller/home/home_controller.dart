@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/storage/local_repository.dart';
 import 'package:go_bus_express/core/utils/social_constant.dart';
@@ -248,10 +249,11 @@ class HomeController extends BaseController<HomeState> {
       log('❌ Error opening Telegram: $e');
       // Only show snackbar if context is available
       if (Get.context != null) {
-        Get.snackbar(
-          'Error',
-          'Could not open Telegram. Please make sure Telegram is installed.',
-          snackPosition: SnackPosition.BOTTOM,
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          const SnackBar(
+            content: Text('Could not open Telegram. Please make sure Telegram is installed.'),
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       }
     }
@@ -269,10 +271,11 @@ class HomeController extends BaseController<HomeState> {
       log('❌ Error launching phone call: $e');
       // Only show snackbar if context is available
       if (Get.context != null) {
-        Get.snackbar(
-          'Error',
-          'Could not launch phone call.',
-          snackPosition: SnackPosition.BOTTOM,
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          const SnackBar(
+            content: Text('Could not launch phone call.'),
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       }
     }

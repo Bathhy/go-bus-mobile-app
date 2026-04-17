@@ -9,6 +9,7 @@ import 'package:go_bus_express/models/payment/generate_qr_model.dart';
 import 'package:go_bus_express/models/payment/pending_payment_model.dart';
 import 'package:go_bus_express/repository/booking_repository.dart';
 import 'package:go_bus_express/repository/hive_manager_repository.dart';
+import 'package:go_bus_express/utils/enums/currency_enum.dart';
 import 'package:go_bus_express/view_models/controller/base/base_controller.dart';
 import 'package:go_bus_express/view_models/controller/payment/choose_payment_state.dart';
 import 'package:shared_package/config/themes.dart';
@@ -132,7 +133,7 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
 
   Future<void> _generateQr(int bookingId) async {
     try {
-      final currency = "KHR";
+      final currency = CurrrencyEnum.USD.key;
       final body = PaymentBody(bookingId: bookingId, currency: currency);
 
       final result = await _bookingRepository.generateQr(body: body);

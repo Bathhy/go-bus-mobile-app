@@ -317,21 +317,23 @@ class _TopUpWalletViewState extends State<TopUpWalletView> {
               (double.tryParse(_amountController.text) ?? 0);
           
           if (amount <= 0) {
-            Get.snackbar(
-              'Error'.tr,
-              'Please enter a valid amount'.tr,
-              backgroundColor: errorPrimary,
-              colorText: Colors.white,
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Please enter a valid amount'.tr),
+                backgroundColor: errorPrimary,
+                behavior: SnackBarBehavior.floating,
+              ),
             );
             return;
           }
 
           // Navigate to payment screen
-          Get.snackbar(
-            'Success'.tr,
-            'Processing top up of \$${amount.toStringAsFixed(2)}'.tr,
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Processing top up of \$${amount.toStringAsFixed(2)}'.tr),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+            ),
           );
         },
       ),
