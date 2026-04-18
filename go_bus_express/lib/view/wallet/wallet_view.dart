@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 import 'package:shared_package/design_system/x_widget/TextComponent.dart';
@@ -70,10 +71,7 @@ class _WalletViewState extends State<WalletView> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            goBusPrimary,
-            goBusPrimary.withOpacity(0.8),
-          ],
+          colors: [goBusPrimary, goBusPrimary.withOpacity(0.8)],
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
@@ -141,18 +139,18 @@ class _WalletViewState extends State<WalletView> {
               label: 'Top Up'.tr,
               color: goBusPrimary,
               onTap: () {
-                Get.toNamed('/top-up-wallet');
+                Get.toNamed(AppRoutes.topUpWallet);
               },
             ),
           ),
           SizedBox(width: XPadding.large),
           Expanded(
             child: _buildActionButton(
-              icon: Icons.history,
-              label: 'History'.tr,
-              color: Colors.orange,
+              icon: Icons.account_balance,
+              label: 'Withdraw'.tr,
+              color: const Color(0xFFCC531D),
               onTap: () {
-                // Navigate to transaction history
+                Get.toNamed(AppRoutes.withdrawWallet);
               },
             ),
           ),
@@ -272,10 +270,7 @@ class _WalletViewState extends State<WalletView> {
                 const SizedBox(height: 4),
                 Text(
                   date,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey.shade600,
-                  ),
+                  style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                 ),
               ],
             ),

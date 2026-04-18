@@ -49,7 +49,7 @@ final Map<String, String> en = {
   "SubTotal: ": "SubTotal: ",
   "Are you sure you want to leave?\nYour booking will be cancelled.":
       "Are you sure you want to leave?\nYour booking will be cancelled.",
-  
+
   // New Ticket Screen Translations
   'ticket': 'Ticket',
   'upcoming': 'Upcoming',
@@ -63,7 +63,7 @@ final Map<String, String> en = {
   'route_not_available': 'Route information not available',
   'bus_info_not_available': 'Bus Info N/A',
   'seat': 'seat',
-  
+
   // Ticket Detail Screen Translations
   'ticket_details': 'Ticket Details',
   'loading_ticket_details': 'Loading ticket details...',
@@ -125,5 +125,36 @@ final Map<String, String> en = {
   "drop_off": "Drop-off",
   "bus": "Bus",
   "no_seat": "No seat layout available",
-  "security": "Security"
+  "security": "Security",
+  "gobus_wallet_topup_title": "GoBus Wallet Top Up",
+  "gobus_wallet_topup_description":
+      "Top up now for instant credit! Use your GoBus Wallet balance to pay for your next trip, seat reservations, and more.",
+  "payment_selection_title": "Payment Selection",
+  "total_payment": "Total Payment",
+  "select_payment_method": "Select Payment Method",
+  "one_option_available": "1 OPTION AVAILABLE",
+  "Bakong": "Bakong",
+  "bakong_payment_subtitle": "National Payment System",
+  "bakong_info_message":
+      "Transactions via Bakong are processed instantly. Please ensure your Bakong app is installed and configured on this device.",
+  "confirm_payment": "Confirm Payment",
+  "Withdraw": "Withdraw",
+  "withdraw_funds": "Withdraw Funds",
+  "transfer_details": "TRANSFER DETAILS",
+  "available_balance": "Available Balance",
+  "select_bank": "Select Bank",
+  "choose_your_bank": "Choose your bank",
+  "equivalent_to": "EQUIVALENT TO",
+  "max_amount": "MAX AMOUNT",
+  "account_name": "Account Name",
+  "enter_full_name": "Enter full name",
+  "account_number": "Account Number",
+  "remark_optional": "Remark (Optional)",
+  "withdraw_remark_hint": "e.g. Weekly earnings withdrawal",
+  "upload_bank_khqr": "Upload Bank KHQR",
+  "tap_to_upload_qr": "Tap to upload QR",
+  "upload_qr_format": "PNG, JPG or PDF up to 5MB",
+  "upload_qr_coming_soon": "Upload feature will be available soon",
+  "fill_required_fields": "Please fill in all required fields",
+  "withdraw_request_submitted": "Withdraw request submitted successfully",
 };

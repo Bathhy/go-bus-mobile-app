@@ -49,7 +49,7 @@ final Map<String, String> km = {
   "SubTotal: ": "សរុប: ",
   "Are you sure you want to leave?\nYour booking will be cancelled.":
       "តើអ្នកប្រាកដថាចង់ចាកចេញមែនទេ?\nការកក់របស់អ្នកនឹងត្រូវបានលុបចោល។",
-  
+
   // New Ticket Screen Translations
   'ticket': 'សំបុត្រ',
   'upcoming': 'នាពេលខាងមុខ',
@@ -63,7 +63,7 @@ final Map<String, String> km = {
   'route_not_available': 'មិនមានព័ត៌មានផ្លូវ',
   'bus_info_not_available': 'មិនមានព័ត៌មានឡាន',
   'seat': 'កៅអី',
-  
+
   // Ticket Detail Screen Translations
   'ticket_details': 'ព័ត៌មានលម្អិតសំបុត្រ',
   'loading_ticket_details': 'កំពុងផ្ទុកព័ត៌មានសំបុត្រ...',
@@ -108,10 +108,10 @@ final Map<String, String> km = {
   "We are always here to help": "យើងតែងតែស្ថិតនៅទីនេះដើម្បីជួយអ្នក",
   "available_trips": "@count ជើងដំណើរ",
   "Pay": "បង់ប្រាក់ \$@amount",
-  "logout":
-      "តើអ្នកប្រាកដជាចង់ចេញពីគណនីរបស់អ្នកមែនទេ?",
+  "logout": "តើអ្នកប្រាកដជាចង់ចេញពីគណនីរបស់អ្នកមែនទេ?",
   "payment_success_title": "🎉 ការទូទាត់បានជោគជ័យ!",
-  "payment_success_message": "ការទូទាត់សម្រាប់ការកក់លេខ #@bookingId ចំនួន @amount @currency របស់អ្នក ត្រូវបានបញ្ចប់រួចរាល់។",
+  "payment_success_message":
+      "ការទូទាត់សម្រាប់ការកក់លេខ #@bookingId ចំនួន @amount @currency របស់អ្នក ត្រូវបានបញ្ចប់រួចរាល់។",
   "select_route": "ជ្រើសរើសទិសដៅ",
   "ok": "យល់ព្រម",
   "qty": "បរិមាណ",
@@ -125,5 +125,36 @@ final Map<String, String> km = {
   "drop_off": "ទីតាំងចុះ",
   "bus": "រថយន្ត",
   "no_seat": "មិនមានកៅអីនោះទេ",
-  "security": "សុវត្ថិភាព"
+  "security": "សុវត្ថិភាព",
+  "gobus_wallet_topup_title": "បញ្ចូលប្រាក់ GoBus Wallet",
+  "gobus_wallet_topup_description":
+      "បញ្ចូលប្រាក់ឥឡូវនេះ ដើម្បីទទួលបានឥណទានភ្លាមៗ! អ្នកអាចប្រើសមតុល្យ GoBus Wallet សម្រាប់បង់ថ្លៃដំណើរបន្ទាប់ ការកក់កៅអី និងសេវាកម្មផ្សេងៗទៀត។",
+  "payment_selection_title": "ជ្រើសរើសការទូទាត់",
+  "total_payment": "ចំនួនទូទាត់សរុប",
+  "select_payment_method": "ជ្រើសរើសវិធីសាស្ត្រទូទាត់",
+  "one_option_available": "មានជម្រើស ១",
+  "Bakong": "បាគង",
+  "bakong_payment_subtitle": "ប្រព័ន្ធទូទាត់ជាតិ",
+  "bakong_info_message":
+      "ប្រតិបត្តិការតាមរយៈ Bakong ត្រូវបានដំណើរការភ្លាមៗ។ សូមប្រាកដថាកម្មវិធី Bakong របស់អ្នកបានដំឡើង និងកំណត់រចនាសម្ព័ន្ធលើឧបករណ៍នេះរួចរាល់។",
+  "confirm_payment": "បញ្ជាក់ការទូទាត់",
+  "Withdraw": "ដកប្រាក់",
+  "withdraw_funds": "ដកប្រាក់",
+  "transfer_details": "ព័ត៌មានផ្ទេរប្រាក់",
+  "available_balance": "សមតុល្យដែលមាន",
+  "select_bank": "ជ្រើសរើសធនាគារ",
+  "choose_your_bank": "ជ្រើសរើសធនាគាររបស់អ្នក",
+  "equivalent_to": "ស្មើនឹង",
+  "max_amount": "ចំនួនអតិបរមា",
+  "account_name": "ឈ្មោះគណនី",
+  "enter_full_name": "បញ្ចូលឈ្មោះពេញ",
+  "account_number": "លេខគណនី",
+  "remark_optional": "កំណត់សម្គាល់ (ជាជម្រើស)",
+  "withdraw_remark_hint": "ឧ. ដកប្រាក់ចំណូលប្រចាំសប្តាហ៍",
+  "upload_bank_khqr": "ផ្ទុកឡើង Bank KHQR",
+  "tap_to_upload_qr": "ចុចដើម្បីផ្ទុកឡើង QR",
+  "upload_qr_format": "PNG, JPG ឬ PDF ទំហំអតិបរមា 5MB",
+  "upload_qr_coming_soon": "មុខងារផ្ទុកឡើងនឹងមានឆាប់ៗ",
+  "fill_required_fields": "សូមបំពេញព័ត៌មានចាំបាច់ទាំងអស់",
+  "withdraw_request_submitted": "សំណើដកប្រាក់ត្រូវបានផ្ញើដោយជោគជ័យ",
 };

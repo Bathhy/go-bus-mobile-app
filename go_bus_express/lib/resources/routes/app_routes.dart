@@ -12,8 +12,10 @@ import 'package:go_bus_express/view/ticket/khqr_payment/khqr_payment_view.dart';
 import 'package:go_bus_express/view/ticket/payment_success/payment_success_view.dart';
 import 'package:go_bus_express/view/ticket/select_route/select_route_view.dart';
 import 'package:go_bus_express/view/ticket/select_seat/select_seat_view.dart';
+import 'package:go_bus_express/view/wallet/payment_wallet_selection.dart';
 import 'package:go_bus_express/view/wallet/wallet_view.dart';
 import 'package:go_bus_express/view/wallet/top_up_wallet_view.dart';
+import 'package:go_bus_express/view/wallet/withdraw_wallet_view.dart';
 
 class AppRoutes {
   static const String selectSeat = "/selectSeat";
@@ -31,6 +33,8 @@ class AppRoutes {
   static const String detailTicket = "/detailTicket";
   static const String wallet = "/wallet";
   static const String topUpWallet = "/top-up-wallet";
+  static const String paymentWalletSelection = "/payment-wallet-selection";
+  static const String withdrawWallet = "/withdraw-wallet";
 
   static void goToSeatRoute(int? scheduleId, int? busId) => Get.toNamed(
     arguments: {"scheduleId": scheduleId, "busId": busId},
@@ -47,15 +51,14 @@ class AppRoutes {
     required int ticketId,
     String? passengerName,
     String? email,
-  }) =>
-      Get.toNamed(
-        detailTicket,
-        arguments: {
-          "ticketId": ticketId,
-          "passengerName": passengerName,
-          "email": email,
-        },
-      );
+  }) => Get.toNamed(
+    detailTicket,
+    arguments: {
+      "ticketId": ticketId,
+      "passengerName": passengerName,
+      "email": email,
+    },
+  );
 
   static final routes = [
     GetPage(name: choosePayment, page: () => const ChoosePaymentView()),
@@ -78,5 +81,10 @@ class AppRoutes {
     GetPage(name: detailTicket, page: () => const TicketDetailView()),
     GetPage(name: wallet, page: () => const WalletView()),
     GetPage(name: topUpWallet, page: () => const TopUpWalletView()),
+    GetPage(
+      name: paymentWalletSelection,
+      page: () => const PaymentWalletSelectionView(),
+    ),
+    GetPage(name: withdrawWallet, page: () => const WithdrawWalletView()),
   ];
 }
