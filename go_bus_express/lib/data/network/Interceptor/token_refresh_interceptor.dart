@@ -19,12 +19,33 @@ class TokenRefreshInterceptor extends QueuedInterceptor {
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    // Check if error is 401 and has TOKEN_EXPIRED error
+    // Check if error is 401 - Unauthorized
     if (err.response?.statusCode == 401) {
+      final requestPath = err.requestOptions.path;
+      
+      // Skip token refresh for auth endpoints (login, register, refresh)
+      if (requestPath.contains('/auth/login') || 
+          requestPath.contains('/auth/register') ||
+          requestPath.contains('/auth/refresh')) {
+        debugPrint('[TokenRefresh] Skipping refresh for auth endpoint: $requestPath');
+        return handler.next(err);
+      }
+      
       final errorData = err.response?.data;
       
+      debugPrint('[TokenRefresh] 401 Unauthorized detected');
+      debugPrint('[TokenRefresh] Request path: $requestPath');
+      debugPrint('[TokenRefresh] Error data: $errorData');
+      
       // Check if it's a token expiration error
-      if (errorData is Map && errorData['error'] == 'TOKEN_EXPIRED') {
+      // Handle both possible error formats:
+      // 1. {"status": 401, "error": "TOKEN_EXPIRED", "message": "..."}
+      // 2. Any other 401 error (treat as token expired)
+      final isTokenExpired = errorData is Map && 
+          (errorData['error'] == 'TOKEN_EXPIRED' || 
+           errorData['status'] == 401);
+      
+      if (isTokenExpired || errorData == null) {
         debugPrint('[TokenRefresh] Access token expired, attempting refresh...');
         
         final refreshToken = localRepository.getRefreshToken();

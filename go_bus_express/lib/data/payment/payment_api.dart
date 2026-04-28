@@ -18,7 +18,7 @@ abstract class PaymentBakongApi {
   });
 
   @POST('/payments/bakong/checking-transaction')
-  Future<VerifyPaymentModel> verifyMd5({
+  Future<BaseResponse<VerifyPaymentModel>> verifyMd5({
     @Body() required VerifyPaymentBody body,
     @Query('bookingId') required String bookingId,
   });

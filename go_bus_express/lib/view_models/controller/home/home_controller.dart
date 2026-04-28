@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/storage/local_repository.dart';
+import 'package:go_bus_express/core/utils/date_ext.dart';
 import 'package:go_bus_express/core/utils/social_constant.dart';
 import 'package:go_bus_express/models/profile/profile_model.dart';
 import 'package:go_bus_express/repository/booking_repository.dart';
@@ -145,12 +146,9 @@ class HomeController extends BaseController<HomeState> {
       return null;
     }
 
-    // Format date as ISO 8601 with time (e.g., 2026-03-30T00:00:00)
-    final departureDateStr = DateTime(
-      state.departureDate!.year,
-      state.departureDate!.month,
-      state.departureDate!.day,
-    ).toIso8601String();
+    // Format date as simple date string (e.g., 2026-04-28)
+    // Backend expects LocalDate format: yyyy-MM-dd
+    final departureDateStr = state.departureDate!.toLocalDateString();
 
     final params = {
       'route_id': state.selectedRouteId,
@@ -159,12 +157,7 @@ class HomeController extends BaseController<HomeState> {
 
     // Add return_date only if it's provided
     if (state.returnDate != null) {
-      final returnDateStr = DateTime(
-        state.returnDate!.year,
-        state.returnDate!.month,
-        state.returnDate!.day,
-      ).toIso8601String();
-      params['return_date'] = returnDateStr;
+      params['return_date'] = state.returnDate!.toLocalDateString();
     }
 
     log('✅ Search params: $params');

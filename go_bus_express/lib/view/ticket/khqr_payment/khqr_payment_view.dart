@@ -23,7 +23,7 @@ class KHQRPaymentView extends StatefulWidget {
 class _KHQRPaymentViewState extends State<KHQRPaymentView> {
   final controller = getIt<KhQrController>();
   Worker? _stateWorker;
-  Worker? _expiryWorker;
+  // Worker? _expiryWorker;
   static const platform = MethodChannel('com.gobus.express/security');
 
   @override
@@ -40,18 +40,18 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
     });
 
     // Handle expiry in initState to show dialog only once
-    _expiryWorker = ever(controller.obs, (state) {
-      if (state.isExpired) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            XDialog.showTimeoutDialog(
-              context,
-              () => controller.cancelBooking(),
-            );
-          }
-        });
-      }
-    });
+    // _expiryWorker = ever(controller.obs, (state) {
+    //   if (state.isExpired) {
+    //     WidgetsBinding.instance.addPostFrameCallback((_) {
+    //       if (mounted) {
+    //         XDialog.showTimeoutDialog(
+    //           context,
+    //           () => controller.cancelBooking(),
+    //         );
+    //       }
+    //     });
+    //   }
+    // });
   }
 
   Future<void> _disableScreenshots() async {
@@ -74,7 +74,7 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
   void dispose() {
     _enableScreenshots();
     _stateWorker?.dispose();
-    _expiryWorker?.dispose();
+    // _expiryWorker?.dispose();
     super.dispose();
   }
 
@@ -207,57 +207,51 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
         backgroundColor: shimerBgColor,
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(kToolbarHeight),
-          child: Obx(() {
-            // Timeout dialog is now handled in initState via worker
-            return Column(
-              children: [
-                XAppBar(
-                  title: 'Payment'.tr,
-                  onBackPressed: () => _showCancelPaymentDialog(),
-                  actions: [
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        vertical: XPadding.medium,
-                        horizontal: XPadding.small,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(XPadding.medium),
-                        ),
-                        color: controller.isLowTime()
-                            ? Colors.red.shade100
-                            : Colors.orange.shade100,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.timer_outlined,
-                            color: controller.isLowTime()
-                                ? Colors.red
-                                : Colors.orange,
-                            size: 20,
-                          ),
-                          SizedBox(width: XPadding.small),
-                          Text(
-                            controller.formatTime(),
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: controller.isLowTime()
-                                  ? Colors.red.shade900
-                                  : Colors.orange.shade900,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: XPadding.extralarge),
-                  ],
-                ),
-              ],
-            );
-          }),
+          child: XAppBar(
+            title: 'Payment'.tr,
+            onBackPressed: () => _showCancelPaymentDialog(),
+            // Timer UI commented out - Backend handles timing
+            // actions: [
+            //   Container(
+            //     padding: EdgeInsets.symmetric(
+            //       vertical: XPadding.medium,
+            //       horizontal: XPadding.small,
+            //     ),
+            //     decoration: BoxDecoration(
+            //       borderRadius: BorderRadius.all(
+            //         Radius.circular(XPadding.medium),
+            //       ),
+            //       color: controller.isLowTime()
+            //           ? Colors.red.shade100
+            //           : Colors.orange.shade100,
+            //     ),
+            //     child: Row(
+            //       mainAxisAlignment: MainAxisAlignment.center,
+            //       children: [
+            //         Icon(
+            //           Icons.timer_outlined,
+            //           color: controller.isLowTime()
+            //               ? Colors.red
+            //               : Colors.orange,
+            //           size: 20,
+            //         ),
+            //         SizedBox(width: XPadding.small),
+            //         Text(
+            //           controller.formatTime(),
+            //           style: TextStyle(
+            //             fontSize: 16,
+            //             fontWeight: FontWeight.w600,
+            //             color: controller.isLowTime()
+            //                 ? Colors.red.shade900
+            //                 : Colors.orange.shade900,
+            //           ),
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            //   SizedBox(width: XPadding.extralarge),
+            // ],
+          ),
         ),
         body: Obx(() {
           final state = controller.state;

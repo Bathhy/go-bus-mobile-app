@@ -16,7 +16,7 @@ abstract class BookingRepository {
     required PaymentBody body,
   });
 
-  Future<XResult<VerifyPaymentModel>> verifyMd5({
+  Future<XResult<BaseResponse<VerifyPaymentModel>>> verifyMd5({
     required VerifyPaymentBody body,
     required String bookingId,
   });
@@ -64,7 +64,7 @@ class BookingRepositoryImpl implements BookingRepository {
   }
 
   @override
-  Future<XResult<VerifyPaymentModel>> verifyMd5({
+  Future<XResult<BaseResponse<VerifyPaymentModel>>> verifyMd5({
     required VerifyPaymentBody body,
     required String bookingId,
   }) {

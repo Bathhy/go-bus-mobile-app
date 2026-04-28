@@ -51,7 +51,7 @@ class _PaymentBakongApi implements PaymentBakongApi {
   }
 
   @override
-  Future<VerifyPaymentModel> verifyMd5({
+  Future<BaseResponse<VerifyPaymentModel>> verifyMd5({
     required VerifyPaymentBody body,
     required String bookingId,
   }) async {
@@ -60,7 +60,7 @@ class _PaymentBakongApi implements PaymentBakongApi {
     final _headers = <String, dynamic>{};
     final _data = <String, dynamic>{};
     _data.addAll(body.toJson());
-    final _options = _setStreamType<VerifyPaymentModel>(
+    final _options = _setStreamType<BaseResponse<VerifyPaymentModel>>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -71,9 +71,12 @@ class _PaymentBakongApi implements PaymentBakongApi {
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late VerifyPaymentModel _value;
+    late BaseResponse<VerifyPaymentModel> _value;
     try {
-      _value = VerifyPaymentModel.fromJson(_result.data!);
+      _value = BaseResponse<VerifyPaymentModel>.fromJson(
+        _result.data!,
+        (json) => VerifyPaymentModel.fromJson(json as Map<String, dynamic>),
+      );
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

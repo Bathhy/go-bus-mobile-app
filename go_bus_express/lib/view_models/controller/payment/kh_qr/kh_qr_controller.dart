@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,15 +11,16 @@ import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:go_bus_express/view_models/controller/base/base_controller.dart';
 import 'package:go_bus_express/view_models/controller/payment/kh_qr/kh_qr_state.dart';
 import 'package:shared_package/config/themes.dart';
+import 'package:shared_package/network/base_response.dart';
 import 'package:shared_package/network/x_result.dart';
 
 class KhQrController extends BaseController<KhQrState> {
   final BookingRepository _bookingRepo;
   final LocalRepository _localRepository;
   final HiveManagerRepository _hiveManager;
-  Timer? _countdownTimer;
+  // Timer? _countdownTimer;
 
-  static const int _paymentTimeoutSeconds = 180; // Payment timeout duration
+  // static const int _paymentTimeoutSeconds = 180; // Payment timeout duration
 
   KhQrController(this._bookingRepo, this._localRepository, this._hiveManager)
     : super(KhQrState());
@@ -30,8 +30,8 @@ class KhQrController extends BaseController<KhQrState> {
     super.onInit();
     _initializeFromArguments();
     _getLocalMd5();
-    _calculateRemainingTime();
-    _startCountdownTimer();
+    // _calculateRemainingTime();
+    // _startCountdownTimer();
     _verifyPayment();
   }
 
@@ -60,36 +60,36 @@ class KhQrController extends BaseController<KhQrState> {
     );
   }
 
-  void _calculateRemainingTime() {
-    if (state.createdAt == null) {
-      // New payment, use configured timeout
-      log(
-        '🆕 New payment session - starting with $_paymentTimeoutSeconds seconds',
-      );
-      updateState(
-        (state) => state.copyWith(remainingSeconds: _paymentTimeoutSeconds),
-      );
-      return;
-    }
+  // void _calculateRemainingTime() {
+  //   if (state.createdAt == null) {
+  //     // New payment, use configured timeout
+  //     log(
+  //       '🆕 New payment session - starting with $_paymentTimeoutSeconds seconds',
+  //     );
+  //     updateState(
+  //       (state) => state.copyWith(remainingSeconds: _paymentTimeoutSeconds),
+  //     );
+  //     return;
+  //   }
 
-    // Calculate elapsed time since payment was created
-    final now = DateTime.now();
-    final elapsed = now.difference(state.createdAt!);
-    final elapsedSeconds = elapsed.inSeconds;
+  //   // Calculate elapsed time since payment was created
+  //   final now = DateTime.now();
+  //   final elapsed = now.difference(state.createdAt!);
+  //   final elapsedSeconds = elapsed.inSeconds;
 
-    // Calculate remaining time using configured timeout
-    final remaining = _paymentTimeoutSeconds - elapsedSeconds;
+  //   // Calculate remaining time using configured timeout
+  //   final remaining = _paymentTimeoutSeconds - elapsedSeconds;
 
-    if (remaining <= 0) {
-      // Payment already expired
-      updateState(
-        (state) => state.copyWith(remainingSeconds: 0, isExpired: true),
-      );
-    } else {
-      // Update with actual remaining time
-      updateState((state) => state.copyWith(remainingSeconds: remaining));
-    }
-  }
+  //   if (remaining <= 0) {
+  //     // Payment already expired
+  //     updateState(
+  //       (state) => state.copyWith(remainingSeconds: 0, isExpired: true),
+  //     );
+  //   } else {
+  //     // Update with actual remaining time
+  //     updateState((state) => state.copyWith(remainingSeconds: remaining));
+  //   }
+  // }
 
   // MARK: API Call - Verify Payment
 
@@ -109,15 +109,13 @@ class KhQrController extends BaseController<KhQrState> {
     );
 
     switch (result) {
-      case Success<VerifyPaymentModel>():
+      case Success<BaseResponse<VerifyPaymentModel>>():
         {
-          final alreadyPaid = result.data.done;
-          if (alreadyPaid == true) {
+          final successCode = result.data.status;
+          print("Log Status Code >>>>> ${successCode}");
+          if (successCode == 200) {
             // Mark as paid immediately
             updateState((state) => state.copyWith(isPaid: true));
-
-            // Stop countdown timer
-            _stopCountdownTimer();
 
             // Clear pending payment from Hive && Clear Md5
             await _hiveManager.clearPendingPayment();
@@ -132,7 +130,7 @@ class KhQrController extends BaseController<KhQrState> {
             log('⚠️ Payment not completed yet');
           }
         }
-      case Error<VerifyPaymentModel>():
+      case Error<BaseResponse<VerifyPaymentModel>>():
         {
           _showError(result.error.displayMessage);
         }
@@ -152,28 +150,28 @@ class KhQrController extends BaseController<KhQrState> {
     );
   }
 
-  // MARK: Timers
+  // MARK: Timers (Commented out - Backend handles timing now)
 
-  void _startCountdownTimer() {
-    _countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
-      if (state.remainingSeconds > 0 && !state.isPaid) {
-        updateState(
-          (state) =>
-              state.copyWith(remainingSeconds: state.remainingSeconds - 1),
-        );
-      } else {
-        _stopCountdownTimer();
-        if (!state.isPaid) {
-          updateState((state) => state.copyWith(isExpired: true));
-        }
-      }
-    });
-  }
+  // void _startCountdownTimer() {
+  //   _countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+  //     if (state.remainingSeconds > 0 && !state.isPaid) {
+  //       updateState(
+  //         (state) =>
+  //             state.copyWith(remainingSeconds: state.remainingSeconds - 1),
+  //       );
+  //     } else {
+  //       _stopCountdownTimer();
+  //       if (!state.isPaid) {
+  //         updateState((state) => state.copyWith(isExpired: true));
+  //       }
+  //     }
+  //   });
+  // }
 
-  void _stopCountdownTimer() {
-    _countdownTimer?.cancel();
-    _countdownTimer = null;
-  }
+  // void _stopCountdownTimer() {
+  //   _countdownTimer?.cancel();
+  //   _countdownTimer = null;
+  // }
 
   // MARK: API Cancel Booking
   void cancelBooking() async {
@@ -201,14 +199,14 @@ class KhQrController extends BaseController<KhQrState> {
     }
   }
 
-  String formatTime() {
-    final seconds = state.remainingSeconds;
-    int minutes = seconds ~/ 60;
-    int secs = seconds % 60;
-    return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
-  }
+  // String formatTime() {
+  //   final seconds = state.remainingSeconds;
+  //   int minutes = seconds ~/ 60;
+  //   int secs = seconds % 60;
+  //   return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
+  // }
 
-  bool isLowTime() => state.remainingSeconds <= 30;
+  // bool isLowTime() => state.remainingSeconds <= 30;
 
   void _showError(String message) {
     // Use WidgetsBinding to ensure we're in the right context
@@ -247,7 +245,7 @@ class KhQrController extends BaseController<KhQrState> {
 
   @override
   void onClose() {
-    _stopCountdownTimer();
+    // _stopCountdownTimer();
     super.onClose();
   }
 }

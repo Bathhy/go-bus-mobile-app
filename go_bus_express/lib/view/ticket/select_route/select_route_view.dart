@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/di/app_di.dart';
+import 'package:go_bus_express/core/utils/date_ext.dart';
 import 'package:go_bus_express/core/utils/string_ext.dart';
 import 'package:go_bus_express/models/route/detail_route_model.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
 import 'package:go_bus_express/view_models/controller/route/select_route/select_route_controller.dart';
 import 'package:go_bus_express/view_models/controller/route/select_route/select_route_state.dart';
-import 'package:intl/intl.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 import 'package:shared_package/design_system/x_widget/x_app_bar.dart';
@@ -33,16 +33,10 @@ class SelectRouteView extends StatelessWidget {
                 ? controller.state.destination 
                 : controller.state.model?.route?.destination ?? "Destination";
             
-            // Format date from ISO 8601 to readable format
-            String formattedDate = "N/A";
-            if (controller.state.departureDate.isNotEmpty) {
-              try {
-                final dt = DateTime.parse(controller.state.departureDate);
-                formattedDate = DateFormat('EEE, MMM d, yyyy').format(dt);
-              } catch (e) {
-                formattedDate = controller.state.departureDate;
-              }
-            }
+            // Format date using extension method
+            final formattedDate = controller.state.departureDate.isNotEmpty
+                ? controller.state.departureDate.toReadableDate() ?? "N/A"
+                : "N/A";
             
             return XAppBar(
               title: '$origin → $destination',
@@ -89,21 +83,10 @@ class SelectRouteView extends StatelessWidget {
                               itemBuilder: (context, index) {
                                 final model = controller.state.model?.schedules
                                     ?.elementAt(index);
-                                // Format arrival time from ISO 8601
-                                String formattedArrivalTime = 'N/A';
-                                if (model?.arrivalTime != null) {
-                                  try {
-                                    final dt = DateTime.parse(
-                                      model!.arrivalTime!,
-                                    );
-                                    formattedArrivalTime = DateFormat(
-                                      'HH:mm',
-                                    ).format(dt);
-                                  } catch (e) {
-                                    formattedArrivalTime =
-                                        model?.arrivalTime ?? 'N/A';
-                                  }
-                                }
+                                
+                                // Format arrival time using extension method
+                                final formattedArrivalTime = 
+                                    model?.arrivalTime?.toTimeString() ?? 'N/A';
 
                                 return _buildBusCard(
                                   state: uiState,
