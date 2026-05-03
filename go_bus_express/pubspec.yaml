@@ -73,6 +73,10 @@ dependencies:
   flutter_bloc: ^8.1.6
   equatable: ^2.0.5
 
+  #WebSocket / STOMP
+  stomp_dart_client: ^3.0.1
+  web_socket_channel: ^3.0.1
+
   #Connectivity
   connectivity_plus: ^6.1.2
   #Url_launcher

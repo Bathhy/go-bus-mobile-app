@@ -1,12 +1,19 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:get/get.dart';
 import '../../../core/storage/local_repository.dart';
+import '../../../resources/routes/app_routes.dart';
 
 /// Interceptor to handle token refresh on 401 errors
 class TokenRefreshInterceptor extends QueuedInterceptor {
   final Dio dio;
   final LocalRepository localRepository;
   final String baseUrl;
+  
+  // Flag to prevent multiple simultaneous logout navigations
+  bool _isLoggingOut = false;
 
   TokenRefreshInterceptor({
     required this.dio,
@@ -134,9 +141,46 @@ class TokenRefreshInterceptor extends QueuedInterceptor {
   }
 
   Future<void> _handleLogout() async {
+    // Prevent multiple simultaneous logout attempts
+    if (_isLoggingOut) {
+      debugPrint('[TokenRefresh] Logout already in progress, skipping...');
+      return;
+    }
+    
+    _isLoggingOut = true;
     debugPrint('[TokenRefresh] Logging out user...');
-    await localRepository.logout();
-    // You might want to navigate to login screen here
-    // This can be done via a navigation service or event bus
+    
+    try {
+      // Clear all stored tokens and user data
+      await localRepository.logout();
+      
+      // Navigate to login screen and clear navigation stack
+      debugPrint('[TokenRefresh] Navigating to login screen...');
+      
+      // Schedule navigation for next frame to avoid navigation during build
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (Get.currentRoute != AppRoutes.signIn) {
+          Get.offAllNamed(AppRoutes.signIn);
+          
+          // Show a snackbar to inform user
+          Get.snackbar(
+            'Session Expired',
+            'Your session has expired. Please login again.',
+            snackPosition: SnackPosition.TOP,
+            duration: const Duration(seconds: 3),
+            backgroundColor: Get.theme.colorScheme.error.withOpacity(0.1),
+            colorText: Get.theme.colorScheme.error,
+          );
+        }
+        
+        // Reset flag after navigation
+        Future.delayed(const Duration(seconds: 1), () {
+          _isLoggingOut = false;
+        });
+      });
+    } catch (e) {
+      debugPrint('[TokenRefresh] Error during logout: $e');
+      _isLoggingOut = false;
+    }
   }
 }

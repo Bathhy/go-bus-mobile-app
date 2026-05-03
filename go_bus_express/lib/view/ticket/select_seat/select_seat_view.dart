@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_bus_express/core/services/websocket_service.dart';
+import 'package:go_bus_express/data/network/network_constant.dart';
 import 'package:go_bus_express/models/route/seat_layout_model.dart';
 import 'package:go_bus_express/resources/app_images.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
+import 'package:go_bus_express/view/ticket/select_seat/widgets/connection_status_indicator.dart';
+import 'package:go_bus_express/view/ticket/select_seat/widgets/seat_grid_item.dart';
 import 'package:go_bus_express/view_models/controller/route/select_seat/select_seat_controller.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_package/config/themes.dart';
@@ -22,32 +26,49 @@ class SelectSeatView extends StatefulWidget {
 }
 
 class _SelectSeatViewState extends State<SelectSeatView> {
+  late final SelectSeatController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    // Get the controller from GetIt (which also registers it with GetX)
+    controller = getIt<SelectSeatController>();
+    print('🔍 [SelectSeatView] Controller obtained from GetIt');
+  }
+
   @override
   Widget build(BuildContext context) {
-    final SelectSeatController controller = getIt<SelectSeatController>();
 
     return Scaffold(
       backgroundColor: white,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight),
+        preferredSize: const Size.fromHeight(kToolbarHeight),
         child: Obx(() {
           final state = controller.state;
-          
-          // Format date from ISO 8601 to readable format
-          String formattedDate = "N/A";
+
+          String formattedDate = 'N/A';
           if (state.departureDate != null && state.departureDate!.isNotEmpty) {
             try {
               final dt = DateTime.parse(state.departureDate!);
               formattedDate = DateFormat('EEE, MMM d, yyyy').format(dt);
-            } catch (e) {
+            } catch (_) {
               formattedDate = state.departureDate!;
             }
           }
-          
+
           return XAppBar(
             title: '${state.origin} → ${state.destination}',
             subTitle: formattedDate,
             onBackPressed: () => Get.back(),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: ConnectionStatusIndicator(
+                  status: state.connectionStatus,
+                  onRetry: controller.retryConnection,
+                ),
+              ),
+            ],
           );
         }),
       ),
@@ -55,16 +76,10 @@ class _SelectSeatViewState extends State<SelectSeatView> {
         final state = controller.state;
 
         if (state.isLoading) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
         final layout = state.model?.layout?.layout?.seats;
-        
-        // Debug logging
-        print('🔍 Debug - Model: ${state.model != null}');
-        print('🔍 Debug - Layout Info: ${state.model?.layout != null}');
-        print('🔍 Debug - Layout Data: ${state.model?.layout?.layout != null}');
-        print('🔍 Debug - Seats: ${layout?.length ?? 0} rows');
 
         if (layout == null || layout.isEmpty) {
           return Center(
@@ -77,10 +92,10 @@ class _SelectSeatViewState extends State<SelectSeatView> {
           children: [
             Expanded(
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: XPadding.extralarge),
+                padding:
+                    EdgeInsets.symmetric(horizontal: XPadding.extralarge),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: XPadding.large,
                   children: [
                     SizedBox(height: XPadding.extralarge),
                     XTextLarge(
@@ -88,53 +103,23 @@ class _SelectSeatViewState extends State<SelectSeatView> {
                       colortext: black,
                       fontWeight: FontWeight.w600,
                     ),
-
-                    Row(
-                      spacing: XPadding.large,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: XPadding.large,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(5)),
-                            color: Colors.red.shade300,
-                          ),
-                        ),
-                        XTextMedium(label: 'Booked'.tr, colortext: Colors.grey),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: XPadding.large,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(5)),
-                            color: Colors.grey,
-                          ),
-                        ),
-                        XTextMedium(
-                          label: 'Available'.tr,
-                          colortext: Colors.grey,
-                        ),
-                      ],
-                    ),
-                    // Driver icon
+                    SizedBox(height: XPadding.large),
+                    _buildLegend(),
+                    SizedBox(height: XPadding.large),
                     AppSvgImage(
                       path: AppImages.icBusDriver,
                       width: 60,
                       height: 60,
                     ),
                     SizedBox(height: XPadding.medium),
-
-                    // Seat layout - dynamically built from API
                     Expanded(
                       child: SingleChildScrollView(
                         child: Column(
                           children: layout.map((row) {
                             return Padding(
-                              padding: EdgeInsets.only(bottom: XPadding.medium),
-                              child: _buildDynamicSeatRow(row, controller),
+                              padding:
+                                  EdgeInsets.only(bottom: XPadding.medium),
+                              child: _buildRow(row, controller),
                             );
                           }).toList(),
                         ),
@@ -147,7 +132,6 @@ class _SelectSeatViewState extends State<SelectSeatView> {
           ],
         );
       }),
-      // move the confirm button to bottomNavigationBar so it always sticks to the bottom
       bottomNavigationBar: SafeArea(
         top: false,
         child: Container(
@@ -157,22 +141,24 @@ class _SelectSeatViewState extends State<SelectSeatView> {
             color: Colors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
-                offset: Offset(0, -2),
+                offset: const Offset(0, -2),
               ),
             ],
           ),
           child: Obx(() {
             final state = controller.state;
-            final hasSelectedSeats = state.selectedSeats.isNotEmpty;
+            final hasSeats = state.selectedSeats.isNotEmpty;
 
             return XButton(
               height: 52,
-              label: 'Confirm'.tr,
+              label: hasSeats
+                  ? '${'Confirm'.tr} (${state.selectedSeats.length})'
+                  : 'Confirm'.tr,
               optionbutton: 1,
-              bgColor: hasSelectedSeats ? goBusPrimary : Colors.grey,
-              onTap: hasSelectedSeats
+              bgColor: hasSeats ? goBusPrimary : Colors.grey,
+              onTap: hasSeats
                   ? () {
                       Get.toNamed(
                         AppRoutes.choosePayment,
@@ -181,9 +167,8 @@ class _SelectSeatViewState extends State<SelectSeatView> {
                           'destination': state.destination,
                           'departureDate': state.departureDate,
                           'departureTime': state.departureTime,
-                          'selectedSeats': state.selectedSeats, // For display
-                          'selectedSeatIds':
-                              state.selectedSeatIds, // For backend
+                          'selectedSeats': state.selectedSeats,
+                          'selectedSeatIds': state.selectedSeatIds,
                           'unitPrice': state.unitPrice,
                           'discount': 0.0,
                           'scheduleId': state.scheduleId,
@@ -198,57 +183,20 @@ class _SelectSeatViewState extends State<SelectSeatView> {
     );
   }
 
-  Widget _buildSeat(
-    String seatNumber,
-    SelectSeatController controller, {
-    bool isBooked = false,
-    bool isSelected = false,
-  }) {
-    Color seatColor;
-    if (isBooked) {
-      seatColor = Colors.red.shade300;
-    } else if (isSelected) {
-      seatColor = Colors.pink.shade200;
-    } else {
-      seatColor = Colors.grey.shade500;
-    }
-
-    return GestureDetector(
-      onTap: isBooked
-          ? null
-          : () {
-              controller.toggleSeat(seatNumber);
-            },
-      child: SizedBox(
-        width: 70,
-        height: 70,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            AppSvgImage(
-              path: AppImages.icSeat,
-              width: 70,
-              height: 70,
-              color: seatColor,
-            ),
-            Text(
-              seatNumber,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-          ],
-        ),
-      ),
+  Widget _buildLegend() {
+    return Wrap(
+      spacing: XPadding.large,
+      runSpacing: XPadding.small,
+      children: const [
+        _LegendItem(color: Color(0xFFEF9A9A), label: 'Booked'),
+        _LegendItem(color: Colors.grey, label: 'Available'),
+        _LegendItem(color: Color(0xFFF48FB1), label: 'My Selection'),
+        _LegendItem(color: Color(0xFFFFB74D), label: "Others' Pending"),
+      ],
     );
   }
 
-  Widget _buildDynamicSeatRow(
-    List<SeatPosition> rowSeats,
-    SelectSeatController controller,
-  ) {
+  Widget _buildRow(List<SeatPosition> rowSeats, SelectSeatController controller) {
     return Row(
       children: rowSeats.asMap().entries.map((entry) {
         final index = entry.key;
@@ -256,29 +204,52 @@ class _SelectSeatViewState extends State<SelectSeatView> {
         final seatNumber = seatPosition.seatNumber;
 
         if (seatNumber == null || seatNumber.isEmpty) {
-          // Aisle space - wider gap between seat groups
           return SizedBox(width: XPadding.extralarge * 2, height: 70);
         }
 
-        final isBooked = !controller.isSeatAvailable(seatNumber);
-        final isSelected = controller.isSeatSelected(seatNumber);
-
-        // Add small spacing between seats in the same group
         final needsSpacing =
             index > 0 && rowSeats[index - 1].seatNumber != null;
 
         return Row(
           children: [
             if (needsSpacing) SizedBox(width: XPadding.small),
-            _buildSeat(
-              seatNumber,
-              controller,
-              isBooked: isBooked,
-              isSelected: isSelected,
+            SeatGridItem(
+              seatNumber: seatNumber,
+              info: controller.state.realtimeSeats[seatNumber],
+              currentUserId: controller.currentUserId,
+              isLegacySelected: controller.isSeatSelected(seatNumber),
+              isLegacyBooked: !controller.isSeatAvailable(seatNumber),
+              onTap: () => controller.toggleSeat(seatNumber),
             ),
           ],
         );
       }).toList(),
+    );
+  }
+}
+
+class _LegendItem extends StatelessWidget {
+  final Color color;
+  final String label;
+
+  const _LegendItem({required this.color, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 18,
+          height: 18,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(3),
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+      ],
     );
   }
 }

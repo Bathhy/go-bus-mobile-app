@@ -139,6 +139,8 @@ class AuthController extends BaseController<AuthState> {
         email: email,
         password: password,
         fullName: username,
+        isEmployee: false,
+        userName: username
       );
 
       final result = await _repository.signup(body: body);

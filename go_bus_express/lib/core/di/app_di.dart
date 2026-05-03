@@ -101,7 +101,7 @@ Future<void> setupDependencyInjection() async {
     return controller;
   });
   getIt.registerFactory<SelectSeatController>(() {
-    final controller = SelectSeatController(getIt());
+    final controller = SelectSeatController(getIt(), getIt());
     Get.put(controller);
     return controller;
   });
