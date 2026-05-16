@@ -76,6 +76,37 @@ class LocalRepository with BaseSharePreference {
     await logoutBox();
   }
 
+  // Wallet session (token + 30-min expiry)
+  Future<void> saveWalletSession(String token) async {
+    final expiresAt = DateTime.now()
+        .add(const Duration(minutes: 30))
+        .millisecondsSinceEpoch;
+    await storeValue(PreferencesKey.walletSessionToken, token);
+    await storeValue(PreferencesKey.walletSessionExpiresAt, expiresAt);
+  }
+
+  String? getWalletSessionToken() {
+    return readString(PreferencesKey.walletSessionToken);
+  }
+
+  DateTime? getWalletSessionExpiresAt() {
+    final ms = readInt(PreferencesKey.walletSessionExpiresAt);
+    if (ms == null) return null;
+    return DateTime.fromMillisecondsSinceEpoch(ms);
+  }
+
+  bool isWalletSessionValid() {
+    final token = getWalletSessionToken();
+    final expiresAt = getWalletSessionExpiresAt();
+    if (token == null || expiresAt == null) return false;
+    return DateTime.now().isBefore(expiresAt);
+  }
+
+  Future<void> clearWalletSession() async {
+    await removeValue(PreferencesKey.walletSessionToken);
+    await removeValue(PreferencesKey.walletSessionExpiresAt);
+  }
+
   // MARK : Payment Method
 
   Future<void> saveMD5(String md5) async {

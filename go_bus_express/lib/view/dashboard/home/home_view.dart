@@ -5,7 +5,9 @@ import 'package:get/get.dart';
 import 'package:go_bus_express/core/di/app_di.dart';
 import 'package:go_bus_express/models/payment/pending_payment_model.dart';
 import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
+import 'package:go_bus_express/view_models/controller/wallet/wallet_controller.dart';
 import 'package:shared_package/config/themes.dart';
+import 'package:shared_package/design_system/constant/ts_padding.dart';
 import 'package:shared_package/design_system/x_widget/AppImage.dart';
 import '../../../core/utils/image_helper.dart';
 import '../../../resources/app_images.dart';
@@ -25,7 +27,12 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin {
   final HomeController homeController = getIt<HomeController>();
+  final WalletController _walletController = getIt<WalletController>();
   Worker? _stateWorker;
+  late final ScrollController _scrollController;
+  bool _isCollapsed = false;
+
+  static const double _expandedHeight = 140;
 
   @override
   bool get wantKeepAlive => false;
@@ -33,6 +40,8 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkAndShowPendingPayment();
     });
@@ -43,6 +52,14 @@ class _HomePageState extends State<HomePage>
         XAppLoadingDialog.hideAppDialog();
       }
     });
+  }
+
+  void _onScroll() {
+    final collapsed = _scrollController.hasClients &&
+        _scrollController.offset > (_expandedHeight - kToolbarHeight - 8);
+    if (collapsed != _isCollapsed) {
+      setState(() => _isCollapsed = collapsed);
+    }
   }
 
   void _checkAndShowPendingPayment() {
@@ -230,6 +247,14 @@ class _HomePageState extends State<HomePage>
   }
 
   @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    _stateWorker?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
@@ -238,15 +263,18 @@ class _HomePageState extends State<HomePage>
         onRefresh: () => homeController.pullRefresh(),
         color: goBusPrimary,
         child: CustomScrollView(
+          controller: _scrollController,
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             // Modern Gradient App Bar
             SliverAppBar(
-              expandedHeight: 140,
+              expandedHeight: _expandedHeight,
               floating: false,
               pinned: true,
               backgroundColor: goBusPrimary,
               elevation: 0,
+              titleSpacing: 0,
+              title: _isCollapsed ? _buildCollapsedTitle() : null,
               flexibleSpace: FlexibleSpaceBar(
                 background: Container(
                   decoration: BoxDecoration(
@@ -389,11 +417,6 @@ class _HomePageState extends State<HomePage>
 
                   const SizedBox(height: 24),
 
-                  // Quick Actions
-                  _buildQuickActions(),
-
-                  const SizedBox(height: 24),
-
                   // Need Help Section
                   NeedHelpSection(
                     onTap: () => homeController.callPhone(),
@@ -404,8 +427,51 @@ class _HomePageState extends State<HomePage>
                 ],
               ),
             ),
+            SliverPadding(padding: EdgeInsetsGeometry.only(bottom: 55))
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildCollapsedTitle() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: Obx(() {
+              final name = homeController.state.profileModel?.fullName ?? 'Guest';
+              return Padding(
+                padding: EdgeInsetsGeometry.symmetric(horizontal: XPadding.medium),
+                child: Text(
+                  name,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              );
+            }),
+          ),
+          _buildIconButton(Icons.telegram, () => homeController.openTelegram()),
+          const SizedBox(width: 8),
+          _buildIconButton(Icons.phone, () => homeController.callPhone()),
+          const SizedBox(width: 12),
+          Obx(() {
+            final imageUrl = getImageUrl(homeController.state.profileModel?.image);
+            return CircleAvatar(
+              radius: 17,
+              backgroundColor: Colors.white,
+              backgroundImage: imageUrl.isNotEmpty ? NetworkImage(imageUrl) : null,
+              child: imageUrl.isEmpty
+                  ? Icon(Icons.person, color: goBusPrimary, size: 18)
+                  : null,
+            );
+          }),
+        ],
       ),
     );
   }
@@ -444,22 +510,32 @@ class _HomePageState extends State<HomePage>
         ),
         child: Row(
           children: [
+            // Expanded(
+            //   child: _buildStatItem(
+            //     icon: Icons.confirmation_number_outlined,
+            //     label: 'Total Trips'.tr,
+            //     value: '0',
+            //     color: const Color(0xFF4CAF50),
+            //   ),
+            // ),
+            // Container(width: 1, height: 40, color: Colors.grey.shade200),
             Expanded(
-              child: _buildStatItem(
-                icon: Icons.confirmation_number_outlined,
-                label: 'Total Trips'.tr,
-                value: '0',
-                color: const Color(0xFF4CAF50),
-              ),
-            ),
-            Container(width: 1, height: 40, color: Colors.grey.shade200),
-            Expanded(
-              child: _buildStatItem(
-                icon: Icons.account_balance_wallet_outlined,
-                label: 'Wallet'.tr,
-                value: '\$0.00',
-                color: const Color(0xFF2196F3),
-              ),
+              child: Obx(() {
+                final wallet = _walletController.state.wallet;
+                final isLoading = _walletController.state.isLoading;
+                final balance = wallet?.balance;
+                final valueText = isLoading
+                    ? '...'
+                    : balance != null
+                        ? '\$${balance.toStringAsFixed(2)}'
+                        : '--';
+                return _buildStatItem(
+                  icon: Icons.account_balance_wallet_outlined,
+                  label: 'Wallet'.tr,
+                  value: valueText,
+                  color: const Color(0xFF2196F3),
+                );
+              }),
             ),
           ],
         ),
@@ -501,37 +577,6 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  Widget _buildQuickActions() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Quick Actions',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildActionCard(
-                  icon: AppImages.icTicket,
-                  title: 'My Tickets'.tr,
-                  color: const Color(0xFF9C27B0),
-                  onTap: () {},
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildActionCard({
     required String icon,

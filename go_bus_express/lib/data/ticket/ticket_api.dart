@@ -13,10 +13,10 @@ abstract class TicketApi {
 
   @GET('/tickets')
   Future<BaseResponse<TicketModel>> getTicket({
-    @Query('type') required String type,
+    @Query('ticketStatus') required String type,
   });
 
-  @GET('/ticket/{id}')
+  @GET('/tickets/{id}')
   Future<BaseResponse<TicketDetailModel>> getTicketDetail({
     @Path('id') required int id,
   });

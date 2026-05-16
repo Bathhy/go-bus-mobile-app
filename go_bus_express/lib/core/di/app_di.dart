@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
@@ -7,13 +9,17 @@ import 'package:go_bus_express/data/app_api/go_bus_api.dart';
 import 'package:go_bus_express/data/auth/auth_api.dart';
 import 'package:go_bus_express/data/booking/booking_api.dart';
 import 'package:go_bus_express/data/payment/payment_api.dart';
+import 'package:go_bus_express/data/refund/refund_api.dart';
 import 'package:go_bus_express/data/ticket/ticket_api.dart';
+import 'package:go_bus_express/data/wallet/wallet_api.dart';
 import 'package:go_bus_express/repository/auth_repository.dart';
 import 'package:go_bus_express/repository/booking_repository.dart';
 import 'package:go_bus_express/repository/hive_manager_repository.dart';
 import 'package:go_bus_express/repository/profile_repository.dart';
 import 'package:go_bus_express/repository/route_repository.dart';
+import 'package:go_bus_express/repository/refund_repository.dart';
 import 'package:go_bus_express/repository/ticket_repository.dart';
+import 'package:go_bus_express/repository/wallet_repository.dart';
 import 'package:go_bus_express/view_models/controller/auth/AuthController.dart';
 import 'package:go_bus_express/view_models/controller/editProfile/edit_profile_controller.dart';
 import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
@@ -25,6 +31,9 @@ import 'package:go_bus_express/view_models/controller/route/select_seat/select_s
 import 'package:go_bus_express/view_models/controller/splash/SplashController.dart';
 import 'package:go_bus_express/view_models/controller/ticket/ticket_controller.dart';
 import 'package:go_bus_express/view_models/controller/ticket/ticket_detail_controller.dart';
+import 'package:go_bus_express/view_models/controller/refund/refund_controller.dart';
+import 'package:go_bus_express/view_models/controller/wallet/wallet_controller.dart';
+import 'package:go_bus_express/view_models/controller/wallet/wallet_khqr_controller.dart';
 
 import '../../data/network/dio_service.dart';
 import '../../data/network/payment_dio_service.dart';
@@ -70,8 +79,14 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<TicketRepository>(
     () => TicketRepositoryImpl(getIt<TicketApi>()),
   );
-
-
+  getIt.registerLazySingleton<WalletApi>(() => WalletApi(getIt<Dio>()));
+  getIt.registerLazySingleton<WalletRepository>(
+    () => WalletRepositoryImpl(getIt<WalletApi>()),
+  );
+  getIt.registerLazySingleton<RefundApi>(() => RefundApi(getIt<Dio>()));
+  getIt.registerLazySingleton<RefundRepository>(
+    () => RefundRepositoryImpl(getIt<RefundApi>()),
+  );
 
   // Controller
   getIt.registerFactory<SplashController>(() {
@@ -106,7 +121,7 @@ Future<void> setupDependencyInjection() async {
     return controller;
   });
   getIt.registerFactory<ChoosePaymentController>(() {
-    final controller = ChoosePaymentController(getIt(), getIt(), getIt());
+    final controller = ChoosePaymentController(getIt(), getIt(), getIt(), getIt());
     Get.put(controller);
     return controller;
   });
@@ -123,12 +138,38 @@ Future<void> setupDependencyInjection() async {
   });
 
   getIt.registerFactory<TicketController>(() {
-    final controller = TicketController(getIt());
+    final controller = TicketController(getIt(), getIt<RefundRepository>());
     Get.put(controller);
     return controller;
   });
   getIt.registerFactory<TicketDetailController>(() {
     final controller = TicketDetailController(getIt());
+    Get.put(controller);
+    return controller;
+  });
+
+  getIt.registerLazySingleton<WalletController>(() {
+    final controller = WalletController(
+      getIt<WalletRepository>(),
+      getIt<LocalRepository>(),
+    );
+    Get.put(controller, permanent: true);
+    return controller;
+  });
+
+  getIt.registerFactory<WalletKhQrController>(() {
+    final controller = WalletKhQrController(getIt<WalletRepository>());
+    Get.put(controller);
+    return controller;
+  });
+
+  getIt.registerFactory<RefundController>(() {
+    final controller = RefundController(getIt<RefundRepository>());
+    Get.put(controller);
+    return controller;
+  });
+  getIt.registerFactory<RefundDetailController>(() {
+    final controller = RefundDetailController(getIt<RefundRepository>());
     Get.put(controller);
     return controller;
   });
@@ -141,6 +182,10 @@ void resetSingletonControllers() {
   }
   if (getIt.isRegistered<ProfileController>()) {
     getIt.unregister<ProfileController>();
+  }
+  if (getIt.isRegistered<WalletController>()) {
+    try { unawaited(Get.find<WalletController>().clearSession()); } catch (_) {}
+    getIt.unregister<WalletController>();
   }
 
   // Re-register fresh singletons
@@ -162,6 +207,15 @@ void resetSingletonControllers() {
     Get.put(controller);
     controller.onInit();
     controller.onReady();
+    return controller;
+  });
+
+  getIt.registerLazySingleton<WalletController>(() {
+    final controller = WalletController(
+      getIt<WalletRepository>(),
+      getIt<LocalRepository>(),
+    );
+    Get.put(controller, permanent: true);
     return controller;
   });
 }

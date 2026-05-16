@@ -17,6 +17,7 @@ ProfileModel _$ProfileModelFromJson(Map<String, dynamic> json) => ProfileModel(
   gender: json['gender'] as String?,
   createdAt: json['createdAt'] as String?,
   isEmployee: json['isEmployee'] as bool?,
+  isWalletExist: json['isWalletExist'] as bool?,
 );
 
 Map<String, dynamic> _$ProfileModelToJson(ProfileModel instance) =>
@@ -31,4 +32,5 @@ Map<String, dynamic> _$ProfileModelToJson(ProfileModel instance) =>
       'gender': instance.gender,
       'createdAt': instance.createdAt,
       'isEmployee': instance.isEmployee,
+      'isWalletExist': instance.isWalletExist,
     };

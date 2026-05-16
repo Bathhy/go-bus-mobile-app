@@ -36,7 +36,7 @@ class _PaymentWalletSelectionViewState
         title: Text(
           'payment_selection_title'.tr,
           style: const TextStyle(
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: FontWeight.w700,
             color: Color(0xFF171C24),
           ),
@@ -51,48 +51,16 @@ class _PaymentWalletSelectionViewState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const SizedBox(height: 8),
+                    _buildAmountSummaryCard(usdAmount, khrAmount),
                     const SizedBox(height: 24),
-                    Center(
-                      child: Column(
-                        children: [
-                          Text(
-                            'total_payment'.tr,
-                            style: const TextStyle(
-                              fontSize: 19,
-                              color: Color(0xFF3D4452),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '\$${usdAmount.toStringAsFixed(2)}',
-                            style: TextStyle(
-                              fontSize: 58,
-                              height: 1,
-                              color: goBusPrimary,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '${_formatKhr(khrAmount)} KHR',
-                            style: const TextStyle(
-                              fontSize: 24,
-                              color: Color(0xFF8D94A0),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 38),
                     Row(
                       children: [
                         Expanded(
                           child: Text(
                             'select_payment_method'.tr,
                             style: const TextStyle(
-                              fontSize: 24,
+                              fontSize: 15,
                               fontWeight: FontWeight.w700,
                               color: Color(0xFF141922),
                             ),
@@ -100,11 +68,11 @@ class _PaymentWalletSelectionViewState
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 6,
+                            horizontal: 10,
+                            vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: goBusPrimary.withOpacity(0.12),
+                            color: goBusPrimary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
@@ -112,16 +80,16 @@ class _PaymentWalletSelectionViewState
                             style: TextStyle(
                               fontSize: 11,
                               color: goBusPrimary,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.3,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.2,
                             ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 12),
                     _buildPaymentCard(),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 14),
                     _buildInfoCard(),
                   ],
                 ),
@@ -134,10 +102,68 @@ class _PaymentWalletSelectionViewState
                 XPadding.extralarge,
                 XPadding.extralarge,
               ),
-              child: _buildConfirmButton(),
+              child: _buildConfirmButton(usdAmount),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildAmountSummaryCard(double usdAmount, int khrAmount) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE5E8EE)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            'total_payment'.tr,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.8,
+              color: Color(0xFF8D94A0),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '\$${usdAmount.toStringAsFixed(2)}',
+            style: TextStyle(
+              fontSize: 38,
+              height: 1,
+              color: goBusPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF4F6FB),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              '≈ ${_formatKhr(khrAmount)} KHR',
+              style: const TextStyle(
+                fontSize: 13,
+                color: Color(0xFF8D94A0),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -146,33 +172,39 @@ class _PaymentWalletSelectionViewState
     final isSelected = _selectedMethod == _bakongMethod;
 
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedMethod = _bakongMethod;
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.all(16),
+      onTap: () => setState(() => _selectedMethod = _bakongMethod),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isSelected ? goBusPrimary : Colors.grey.shade300,
-            width: 2,
+            color: isSelected ? goBusPrimary : const Color(0xFFE5E8EE),
+            width: isSelected ? 2 : 1,
           ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: goBusPrimary.withOpacity(0.08),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
         ),
         child: Row(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
               child: Image.asset(
                 AppImages.imgBakong,
-                width: 68,
-                height: 68,
+                width: 52,
+                height: 52,
                 fit: BoxFit.cover,
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,7 +212,7 @@ class _PaymentWalletSelectionViewState
                   Text(
                     'Bakong'.tr,
                     style: const TextStyle(
-                      fontSize: 24,
+                      fontSize: 15,
                       fontWeight: FontWeight.w700,
                       color: Color(0xFF151A21),
                     ),
@@ -189,25 +221,25 @@ class _PaymentWalletSelectionViewState
                   Text(
                     'bakong_payment_subtitle'.tr,
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: Color(0xFF4E5563),
+                      color: Color(0xFF8D94A0),
                     ),
                   ),
                 ],
               ),
             ),
             Container(
-              width: 42,
-              height: 42,
+              width: 28,
+              height: 28,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isSelected ? goBusPrimary : Colors.grey.shade300,
+                color: isSelected ? goBusPrimary : const Color(0xFFE5E8EE),
               ),
               child: Icon(
-                isSelected ? Icons.check : Icons.circle_outlined,
+                Icons.check,
                 color: Colors.white,
-                size: 24,
+                size: isSelected ? 16 : 0,
               ),
             ),
           ],
@@ -218,29 +250,30 @@ class _PaymentWalletSelectionViewState
 
   Widget _buildInfoCard() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF0F2F7),
-        borderRadius: BorderRadius.circular(14),
+        color: const Color(0xFFF0F7FF),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFD0E4F7)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 30,
-            height: 30,
-            decoration: const BoxDecoration(
+            width: 26,
+            height: 26,
+            decoration: BoxDecoration(
+              color: goBusPrimary.withOpacity(0.15),
               shape: BoxShape.circle,
-              color: Color(0xFF2535A8),
             ),
-            child: const Icon(Icons.info, color: Colors.white, size: 18),
+            child: Icon(Icons.info_outline, color: goBusPrimary, size: 15),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               'bakong_info_message'.tr,
               style: const TextStyle(
-                fontSize: 15,
+                fontSize: 12,
                 height: 1.5,
                 color: Color(0xFF4F5662),
                 fontWeight: FontWeight.w500,
@@ -252,10 +285,10 @@ class _PaymentWalletSelectionViewState
     );
   }
 
-  Widget _buildConfirmButton() {
+  Widget _buildConfirmButton(double usdAmount) {
     return SizedBox(
       width: double.infinity,
-      height: 58,
+      height: 52,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           elevation: 0,
@@ -266,17 +299,20 @@ class _PaymentWalletSelectionViewState
           ),
         ),
         onPressed: () {
-          Get.toNamed(AppRoutes.makePayment);
+          Get.toNamed(
+            AppRoutes.walletTopUpKhqr,
+            arguments: {'amount': usdAmount},
+          );
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               'confirm_payment'.tr,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
             ),
-            const SizedBox(width: 10),
-            const Icon(Icons.chevron_right_rounded, size: 30),
+            const SizedBox(width: 6),
+            const Icon(Icons.chevron_right_rounded, size: 22),
           ],
         ),
       ),

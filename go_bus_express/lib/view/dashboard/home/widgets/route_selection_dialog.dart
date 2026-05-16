@@ -43,7 +43,7 @@ class RouteSelectionDialog {
           ),
           IconButton(
             icon: const Icon(Icons.close),
-            onPressed: () => Get.back(),
+            onPressed: () => Get.back(closeOverlays: false),
           ),
         ],
       ),
@@ -92,7 +92,7 @@ class RouteSelectionDialog {
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 controller.selectRoute(route);
-                Get.back();
+                Get.back(closeOverlays: false);
               },
             );
           },

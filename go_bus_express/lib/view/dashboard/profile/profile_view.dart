@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:go_bus_express/core/utils/image_helper.dart';
 import 'package:go_bus_express/resources/app_images.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
-import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
 import 'package:go_bus_express/view_models/controller/profile/profile_controller.dart';
+import 'package:go_bus_express/view_models/controller/wallet/wallet_controller.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 import 'package:shared_package/design_system/x_widget/AppImage.dart';
@@ -14,7 +13,6 @@ import 'package:shared_package/design_system/x_widget/user_profile_card.dart';
 
 import '../../../core/di/app_di.dart';
 import '../../../utils/enums/image_type_enum.dart';
-import 'pin_code_view.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -94,10 +92,24 @@ class _ProfilePageState extends State<ProfilePage>
                       imageType: ImageType.iconData,
                       source: Icons.account_balance_wallet,
                       iconColor: Colors.green,
-                      title: 'My Wallet'.tr,
+                      title: 'wallet'.tr,
                       onTap: () {
-                        Get.toNamed('/wallet');
+                        final isWalletExist =
+                            controller.state.profileModel?.isWalletExist ??
+                                false;
+                        getIt<WalletController>().navigateToWallet(
+                          isWalletExist: isWalletExist,
+                        );
                       },
+                    ),
+                    const SizedBox(height: 12),
+                    _buildMenuItem(
+                      context: context,
+                      imageType: ImageType.iconData,
+                      source: Icons.currency_exchange,
+                      iconColor: Colors.deepPurple,
+                      title: 'my_refunds'.tr,
+                      onTap: () => Get.toNamed(AppRoutes.myRefund),
                     ),
                     const SizedBox(height: 12),
                     _buildMenuItem(
@@ -110,28 +122,16 @@ class _ProfilePageState extends State<ProfilePage>
                         _showLanguageBottomSheet(context, controller);
                       },
                     ),
-                    const SizedBox(height: 12),
-                    _buildMenuItem(
-                      context: context,
-                      imageType: ImageType.iconData,
-                      source: Icons.security,
-                      iconColor: Colors.blue,
-                      title: 'security'.tr,
-                      onTap: () {
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    _buildMenuItem(
-                      context: context,
-                      imageType: ImageType.iconData,
-                      source: Icons.pin,
-                      iconColor: Colors.teal,
-                      title: 'PIN Code'.tr,
-                      onTap: () {
-                        Get.to(() => const PinCodeView());
-                      },
-                    ),
-
+                    // const SizedBox(height: 12),
+                    // _buildMenuItem(
+                    //   context: context,
+                    //   imageType: ImageType.iconData,
+                    //   source: Icons.security,
+                    //   iconColor: Colors.blue,
+                    //   title: 'security'.tr,
+                    //   onTap: () {
+                    //   },
+                    // ),
                     const SizedBox(height: 36),
                     _buildLogoutButton(context, controller),
                   ],

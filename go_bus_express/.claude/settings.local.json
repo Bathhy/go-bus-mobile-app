@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\MSI63\\\\Videos\\\\Captures\\\\OneDrive\\\\Pictures\\\\XML\\\\Final project\\\\go_bus_express\" -Force)",
+      "Bash(Select-Object Name, PSIsContainer)",
+      "Bash(Format-Table -AutoSize)",
+      "Bash(flutter analyze *)",
+      "Bash(Select-String \"error\")",
+      "Bash(Select-String \"wallet|pin|confirm|enter_pin|create_pin\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\MSI63\\\\Videos\\\\Captures\\\\OneDrive\\\\Pictures\\\\XML\\\\Go Bus Final  System\\\\Final project\\\\go_bus_express\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Select-Object -First 30)",
+      "Bash(grep -E \"\\\\.\\(dart|yaml\\)$\")",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\MSI63\\\\Videos\\\\Captures\\\\OneDrive\\\\Pictures\\\\XML\\\\Go Bus Final  System\\\\Final project\" -Directory | Where-Object {$_.Name -eq \"shared_package\"})",
+      "Bash(Get-ChildItem *)",
+      "Bash(flutter pub *)",
+      "Bash(grep -r \"shimmer\\\\|Shimmer\" pubspec.yaml --include=\"*.yaml\" -l)",
+      "Bash(grep -r \"shimmer\" pubspec.yaml)",
+      "Read(//c/Users/MSI63/Videos/Captures/OneDrive/Pictures/XML/Go Bus Final  System/**)",
+      "Read(//c/Users/MSI63/Videos/Captures/OneDrive/Pictures/XML/**)",
+      "Bash(echo \"EXIT:$?\")"
+    ]
+  }
+}

@@ -93,25 +93,25 @@ class TicketDetailController extends BaseController<TicketDetailState> {
 
   // Helper method to get route information
   String getRouteInfo() {
-    final route = state.ticketDetail?.booking?.schedule?.bus?.route;
-    if (route?.origin != null && route?.destination != null) {
-      return '${route!.origin} - ${route.destination}';
+    final schedule = state.ticketDetail?.bookingDetailResponse?.schedule;
+    if (schedule?.origin != null && schedule?.destination != null) {
+      return '${schedule!.origin} - ${schedule.destination}';
     }
     return 'Route information not available';
   }
 
   // Helper method to get bus information
   String getBusInfo() {
-    final bus = state.ticketDetail?.booking?.schedule?.bus;
-    if (bus?.busType != null && bus?.busNumber != null) {
-      return '${bus!.busType} (${bus.busNumber})';
+    final schedule = state.ticketDetail?.bookingDetailResponse?.schedule;
+    if (schedule?.busType != null && schedule?.busNumber != null) {
+      return '${schedule!.busType} (${schedule.busNumber})';
     }
     return 'Bus information not available';
   }
 
   // Helper method to get pricing information
   Map<String, String> getPricingInfo() {
-    final totalAmount = state.ticketDetail?.booking?.totalAmount;
+    final totalAmount = state.ticketDetail?.bookingDetailResponse?.totalAmount;
     final price = totalAmount?.toString() ?? '0';
 
     return {
@@ -128,11 +128,15 @@ class TicketDetailController extends BaseController<TicketDetailState> {
 
   // Helper method to get passenger name
   String getPassengerName() {
-    return state.passengerName ?? 'N/A';
+    return state.ticketDetail?.bookingDetailResponse?.user?.fullName ?? 
+           state.passengerName ?? 
+           'N/A';
   }
 
   // Helper method to get passenger email
   String getPassengerEmail() {
-    return state.passengerEmail ?? 'N/A';
+    return state.ticketDetail?.bookingDetailResponse?.user?.email ?? 
+           state.passengerEmail ?? 
+           'N/A';
   }
 }

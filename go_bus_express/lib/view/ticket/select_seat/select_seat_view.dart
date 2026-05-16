@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/services/websocket_service.dart';
+import 'package:go_bus_express/core/utils/navigation_helper.dart';
 import 'package:go_bus_express/data/network/network_constant.dart';
 import 'package:go_bus_express/models/route/seat_layout_model.dart';
 import 'package:go_bus_express/resources/app_images.dart';
@@ -59,7 +60,7 @@ class _SelectSeatViewState extends State<SelectSeatView> {
           return XAppBar(
             title: '${state.origin} → ${state.destination}',
             subTitle: formattedDate,
-            onBackPressed: () => Get.back(),
+            onBackPressed: () => NavigationHelper.safeBack(),
             actions: [
               Padding(
                 padding: const EdgeInsets.only(right: 12),
@@ -119,7 +120,13 @@ class _SelectSeatViewState extends State<SelectSeatView> {
                             return Padding(
                               padding:
                                   EdgeInsets.only(bottom: XPadding.medium),
-                              child: _buildRow(row, controller),
+                              child: _buildRow(
+                                row,
+                                controller,
+                                _parseAisleColumns(
+                                  state.model?.layout?.layout?.aisleColumns,
+                                ),
+                              ),
                             );
                           }).toList(),
                         ),
@@ -196,19 +203,33 @@ class _SelectSeatViewState extends State<SelectSeatView> {
     );
   }
 
-  Widget _buildRow(List<SeatPosition> rowSeats, SelectSeatController controller) {
+  Set<int> _parseAisleColumns(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return {};
+    return raw.split(',').map((s) => int.tryParse(s.trim())).whereType<int>().toSet();
+  }
+
+  Widget _buildRow(
+    List<SeatPosition> rowSeats,
+    SelectSeatController controller,
+    Set<int> aisleColumns,
+  ) {
     return Row(
       children: rowSeats.asMap().entries.map((entry) {
         final index = entry.key;
         final seatPosition = entry.value;
         final seatNumber = seatPosition.seatNumber;
+        final columnNumber = index + 1; // 1-based
+
+        if (aisleColumns.contains(columnNumber)) {
+          return SizedBox(width: XPadding.extralarge * 2, height: 70);
+        }
 
         if (seatNumber == null || seatNumber.isEmpty) {
           return SizedBox(width: XPadding.extralarge * 2, height: 70);
         }
 
         final needsSpacing =
-            index > 0 && rowSeats[index - 1].seatNumber != null;
+            index > 0 && !aisleColumns.contains(index) && rowSeats[index - 1].seatNumber != null;
 
         return Row(
           children: [

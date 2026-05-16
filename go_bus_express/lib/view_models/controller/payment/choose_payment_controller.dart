@@ -9,6 +9,7 @@ import 'package:go_bus_express/models/payment/generate_qr_model.dart';
 import 'package:go_bus_express/models/payment/pending_payment_model.dart';
 import 'package:go_bus_express/repository/booking_repository.dart';
 import 'package:go_bus_express/repository/hive_manager_repository.dart';
+import 'package:go_bus_express/repository/wallet_repository.dart';
 import 'package:go_bus_express/utils/enums/currency_enum.dart';
 import 'package:go_bus_express/view_models/controller/base/base_controller.dart';
 import 'package:go_bus_express/view_models/controller/payment/choose_payment_state.dart';
@@ -23,16 +24,31 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
     this._bookingRepository,
     this._localRepository,
     this._hiveManager,
+    this._walletRepository,
   ) : super(ChoosePaymentState());
 
   final BookingRepository _bookingRepository;
   final LocalRepository _localRepository;
   final HiveManagerRepository _hiveManager;
+  final WalletRepository _walletRepository;
 
   @override
   void onInit() {
     super.onInit();
     _initializeFromArguments();
+    _fetchWalletBalance();
+  }
+
+  Future<void> _fetchWalletBalance() async {
+    final result = await _walletRepository.getWalletInfo();
+    switch (result) {
+      case Success():
+        updateState((s) => s.copyWith(walletBalance: result.data?.balance ?? 0.0));
+        break;
+      case Error():
+        log('⚠️ Failed to fetch wallet balance: ${result.error.displayMessage}');
+        break;
+    }
   }
 
   void _initializeFromArguments() {

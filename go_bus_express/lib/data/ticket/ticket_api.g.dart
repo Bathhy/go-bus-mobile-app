@@ -20,7 +20,7 @@ class _TicketApi implements TicketApi {
   @override
   Future<BaseResponse<TicketModel>> getTicket({required String type}) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'type': type};
+    final queryParameters = <String, dynamic>{r'ticketStatus': type};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<BaseResponse<TicketModel>>(
@@ -59,7 +59,7 @@ class _TicketApi implements TicketApi {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/ticket/${id}',
+            '/tickets/${id}',
             queryParameters: queryParameters,
             data: _data,
           )

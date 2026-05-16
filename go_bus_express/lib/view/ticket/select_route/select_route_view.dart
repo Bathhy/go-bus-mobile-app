@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/di/app_di.dart';
 import 'package:go_bus_express/core/utils/date_ext.dart';
+import 'package:go_bus_express/core/utils/navigation_helper.dart';
 import 'package:go_bus_express/core/utils/string_ext.dart';
 import 'package:go_bus_express/models/route/detail_route_model.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
@@ -41,7 +42,7 @@ class SelectRouteView extends StatelessWidget {
             return XAppBar(
               title: '$origin → $destination',
               subTitle: formattedDate,
-              onBackPressed: () => Get.back(),
+              onBackPressed: () => NavigationHelper.safeBack(),
             );
           },
         ),

@@ -173,8 +173,14 @@ class LayoutData {
       seats: json['seats'] != null
           ? (json['seats'] as List)
               .map((row) => (row as List)
-                  .map((seat) => SeatPosition.fromJson(
-                      seat is Map ? Map<String, dynamic>.from(seat) : {'seatNumber': seat}))
+                  .map((seat) {
+                    // Handle null seats in the layout
+                    if (seat == null) {
+                      return SeatPosition(seatNumber: null, isAvailable: false);
+                    }
+                    return SeatPosition.fromJson(
+                        seat is Map ? Map<String, dynamic>.from(seat) : {'seatNumber': seat});
+                  })
                   .toList())
               .toList()
           : null,

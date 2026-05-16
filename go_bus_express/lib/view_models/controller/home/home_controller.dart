@@ -12,6 +12,7 @@ import 'package:go_bus_express/repository/profile_repository.dart';
 import 'package:go_bus_express/repository/route_repository.dart';
 import 'package:go_bus_express/view_models/controller/base/base_controller.dart';
 import 'package:go_bus_express/view_models/controller/home/home_state.dart';
+import 'package:go_bus_express/view_models/controller/wallet/wallet_controller.dart';
 import 'package:shared_package/network/x_result.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -39,14 +40,21 @@ class HomeController extends BaseController<HomeState> {
 
     switch (result) {
       case Success<ProfileModel?>():
-        // Update profile
         updateState((state) => state.copyWith(profileModel: result.data));
         if (result.data != null) {
           final profileJson = jsonEncode(result.data!.toJson());
           await _localRepository.saveProfile(profileJson);
         }
+        // Pre-load wallet balance on home screen if session is still valid
+        final isWalletExist = result.data?.isWalletExist ?? false;
+        if (isWalletExist && _localRepository.isWalletSessionValid()) {
+          try {
+            await Get.find<WalletController>().fetchWalletMe();
+          } catch (e) {
+            log('⚠️ Could not pre-load wallet balance: $e');
+          }
+        }
       case Error<ProfileModel?>():
-        // Error
         if (result.error.statusCode == 403) {
           logout();
         }

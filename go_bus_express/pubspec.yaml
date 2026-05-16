@@ -77,6 +77,8 @@ dependencies:
   stomp_dart_client: ^3.0.1
   web_socket_channel: ^3.0.1
 
+  shimmer: ^3.0.0
+
   #Connectivity
   connectivity_plus: ^6.1.2
   #Url_launcher

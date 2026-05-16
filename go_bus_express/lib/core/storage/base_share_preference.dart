@@ -11,6 +11,8 @@ enum PreferencesKey {
   profile,
   routes,
   md5,
+  walletSessionToken,
+  walletSessionExpiresAt,
 }
 
 mixin class BaseSharePreference {
@@ -78,6 +80,8 @@ mixin class BaseSharePreference {
     await removeValue(PreferencesKey.locale);
     await removeValue(PreferencesKey.isLogin);
     await removeValue(PreferencesKey.profile);
+    await removeValue(PreferencesKey.walletSessionToken);
+    await removeValue(PreferencesKey.walletSessionExpiresAt);
   }
 
   Future<void> clearAll() async {

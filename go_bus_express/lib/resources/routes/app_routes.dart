@@ -13,7 +13,13 @@ import 'package:go_bus_express/view/ticket/payment_success/payment_success_view.
 import 'package:go_bus_express/view/ticket/select_route/select_route_view.dart';
 import 'package:go_bus_express/view/ticket/select_seat/select_seat_view.dart';
 import 'package:go_bus_express/view/wallet/payment_wallet_selection.dart';
+import 'package:go_bus_express/view/wallet/pin/confirm_pin_view.dart';
+import 'package:go_bus_express/view/wallet/pin/create_pin_view.dart';
+import 'package:go_bus_express/view/wallet/pin/enter_pin_view.dart';
 import 'package:go_bus_express/view/wallet/wallet_view.dart';
+import 'package:go_bus_express/view/wallet/khqr/wallet_khqr_view.dart';
+import 'package:go_bus_express/view/refund/my_refund_view.dart';
+import 'package:go_bus_express/view/refund/refund_detail_view.dart';
 import 'package:go_bus_express/view/wallet/top_up_wallet_view.dart';
 import 'package:go_bus_express/view/wallet/withdraw_wallet_view.dart';
 
@@ -32,9 +38,15 @@ class AppRoutes {
   static const String ticket = "/ticket";
   static const String detailTicket = "/detailTicket";
   static const String wallet = "/wallet";
+  static const String walletCreatePin = "/wallet/create-pin";
+  static const String walletConfirmPin = "/wallet/confirm-pin";
+  static const String walletEnterPin = "/wallet/enter-pin";
   static const String topUpWallet = "/top-up-wallet";
   static const String paymentWalletSelection = "/payment-wallet-selection";
   static const String withdrawWallet = "/withdraw-wallet";
+  static const String walletTopUpKhqr = "/wallet/top-up/khqr";
+  static const String myRefund = "/my-refund";
+  static const String refundDetail = "/refund-detail";
 
   static void goToSeatRoute(int? scheduleId, int? busId) => Get.toNamed(
     arguments: {"scheduleId": scheduleId, "busId": busId},
@@ -80,11 +92,17 @@ class AppRoutes {
     GetPage(name: ticket, page: () => const MyTicketView()),
     GetPage(name: detailTicket, page: () => const TicketDetailView()),
     GetPage(name: wallet, page: () => const WalletView()),
+    GetPage(name: walletCreatePin, page: () => const CreatePinView()),
+    GetPage(name: walletConfirmPin, page: () => const ConfirmPinView()),
+    GetPage(name: walletEnterPin, page: () => const EnterPinView()),
     GetPage(name: topUpWallet, page: () => const TopUpWalletView()),
     GetPage(
       name: paymentWalletSelection,
       page: () => const PaymentWalletSelectionView(),
     ),
     GetPage(name: withdrawWallet, page: () => const WithdrawWalletView()),
+    GetPage(name: walletTopUpKhqr, page: () => const WalletKhQrView()),
+    GetPage(name: myRefund, page: () => const MyRefundView()),
+    GetPage(name: refundDetail, page: () => const RefundDetailView()),
   ];
 }

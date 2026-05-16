@@ -14,6 +14,7 @@ class ProfileModel {
   final String? gender;
   final String? createdAt;
   final bool? isEmployee;
+  final bool? isWalletExist;
 
   const ProfileModel({
     this.id,
@@ -26,6 +27,7 @@ class ProfileModel {
     this.gender,
     this.createdAt,
     this.isEmployee,
+    this.isWalletExist,
   });
 
   ProfileModel copyWith({
@@ -39,6 +41,7 @@ class ProfileModel {
     String? gender,
     String? createdAt,
     bool? isEmployee,
+    bool? isWalletExist,
   }) => ProfileModel(
     id: id ?? this.id,
     userName: userName ?? this.userName,
@@ -50,6 +53,7 @@ class ProfileModel {
     gender: gender ?? this.gender,
     createdAt: createdAt ?? this.createdAt,
     isEmployee: isEmployee ?? this.isEmployee,
+    isWalletExist: isWalletExist ?? this.isWalletExist,
   );
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) =>

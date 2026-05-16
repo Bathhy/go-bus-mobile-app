@@ -4,11 +4,9 @@ part 'ticket_model.g.dart';
 
 @JsonSerializable()
 class TicketModel {
-  User? user;
-  int? totalTickets;
-  List<Datum>? data;
+  List<TicketItem>? content;
 
-  TicketModel({this.user, this.totalTickets, this.data});
+  TicketModel({this.content});
 
   factory TicketModel.fromJson(Map<String, dynamic> json) =>
       _$TicketModelFromJson(json);
@@ -17,45 +15,79 @@ class TicketModel {
 }
 
 @JsonSerializable()
-class Datum {
+class TicketItem {
   int? id;
+  BookingDetail? bookingDetailResponse;
+  String? qrCode;
   DateTime? issuedAt;
-  Booking? booking;
 
-  Datum({this.id, this.issuedAt, this.booking});
+  TicketItem({this.id, this.bookingDetailResponse, this.qrCode, this.issuedAt});
 
-  factory Datum.fromJson(Map<String, dynamic> json) => _$DatumFromJson(json);
+  factory TicketItem.fromJson(Map<String, dynamic> json) =>
+      _$TicketItemFromJson(json);
 
-  Map<String, dynamic> toJson() => _$DatumToJson(this);
+  Map<String, dynamic> toJson() => _$TicketItemToJson(this);
 }
 
 @JsonSerializable()
-class Booking {
+class BookingDetail {
   int? id;
-  String? paymentStatus;
   String? bookingStatus;
+  String? paymentStatus;
+  String? paymentMethod;
+  double? totalAmount;
+  DateTime? createdAt;
+  String? phoneNumber;
+  User? user;
   Schedule? schedule;
-  int? seatCount;
+  List<Seat>? seats;
+  Payment? payment;
+  TicketInfo? ticket;
 
-  Booking({
+  BookingDetail({
     this.id,
-    this.paymentStatus,
     this.bookingStatus,
+    this.paymentStatus,
+    this.paymentMethod,
+    this.totalAmount,
+    this.createdAt,
+    this.phoneNumber,
+    this.user,
     this.schedule,
-    this.seatCount,
+    this.seats,
+    this.payment,
+    this.ticket,
   });
 
-  factory Booking.fromJson(Map<String, dynamic> json) =>
-      _$BookingFromJson(json);
+  factory BookingDetail.fromJson(Map<String, dynamic> json) =>
+      _$BookingDetailFromJson(json);
 
-  Map<String, dynamic> toJson() => _$BookingToJson(this);
+  Map<String, dynamic> toJson() => _$BookingDetailToJson(this);
 }
 
 @JsonSerializable()
 class Schedule {
-  Bus? bus;
+  int? id;
+  int? busId;
+  String? busNumber;
+  String? busType;
+  String? origin;
+  String? destination;
+  DateTime? departureDateTime;
+  DateTime? arrivalDateTime;
+  double? price;
 
-  Schedule({this.bus});
+  Schedule({
+    this.id,
+    this.busId,
+    this.busNumber,
+    this.busType,
+    this.origin,
+    this.destination,
+    this.departureDateTime,
+    this.arrivalDateTime,
+    this.price,
+  });
 
   factory Schedule.fromJson(Map<String, dynamic> json) =>
       _$ScheduleFromJson(json);
@@ -64,28 +96,60 @@ class Schedule {
 }
 
 @JsonSerializable()
-class Bus {
-  String? busType;
-  String? busNumber;
-  Route? route;
+class Seat {
+  int? seatId;
+  String? seatNumber;
+  String? seatType;
+  String? passengerNumber;
 
-  Bus({this.busType, this.busNumber, this.route});
+  Seat({this.seatId, this.seatNumber, this.seatType, this.passengerNumber});
 
-  factory Bus.fromJson(Map<String, dynamic> json) => _$BusFromJson(json);
+  factory Seat.fromJson(Map<String, dynamic> json) => _$SeatFromJson(json);
 
-  Map<String, dynamic> toJson() => _$BusToJson(this);
+  Map<String, dynamic> toJson() => _$SeatToJson(this);
 }
 
 @JsonSerializable()
-class Route {
-  String? origin;
-  String? destination;
+class Payment {
+  int? id;
+  int? bookingId;
+  double? amount;
+  String? method;
+  String? transactionId;
+  String? status;
+  DateTime? paidAt;
+  String? walletTransactionId;
 
-  Route({this.origin, this.destination});
+  Payment({
+    this.id,
+    this.bookingId,
+    this.amount,
+    this.method,
+    this.transactionId,
+    this.status,
+    this.paidAt,
+    this.walletTransactionId,
+  });
 
-  factory Route.fromJson(Map<String, dynamic> json) => _$RouteFromJson(json);
+  factory Payment.fromJson(Map<String, dynamic> json) =>
+      _$PaymentFromJson(json);
 
-  Map<String, dynamic> toJson() => _$RouteToJson(this);
+  Map<String, dynamic> toJson() => _$PaymentToJson(this);
+}
+
+@JsonSerializable()
+class TicketInfo {
+  int? id;
+  int? bookingId;
+  String? qrCode;
+  DateTime? issuedAt;
+
+  TicketInfo({this.id, this.bookingId, this.qrCode, this.issuedAt});
+
+  factory TicketInfo.fromJson(Map<String, dynamic> json) =>
+      _$TicketInfoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TicketInfoToJson(this);
 }
 
 @JsonSerializable()
@@ -93,8 +157,9 @@ class User {
   final int? id;
   final String? fullName;
   final String? email;
+  final String? phone;
 
-  const User({this.id, this.fullName, this.email});
+  const User({this.id, this.fullName, this.email, this.phone});
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 

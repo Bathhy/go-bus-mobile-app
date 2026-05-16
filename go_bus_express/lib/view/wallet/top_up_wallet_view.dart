@@ -38,12 +38,12 @@ class _TopUpWalletViewState extends State<TopUpWalletView> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: goBusPrimary),
-          onPressed: () => Get.back(),
+          onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           'Top Up Wallet'.tr,
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: FontWeight.w700,
             color: goBusPrimary,
           ),
@@ -58,21 +58,21 @@ class _TopUpWalletViewState extends State<TopUpWalletView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildTopUpCard(),
-                    const SizedBox(height: 28),
+                    _buildBalanceCard(),
+                    const SizedBox(height: 24),
                     Text(
                       'Enter Amount'.tr,
                       style: const TextStyle(
-                        fontSize: 34,
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: Colors.black87,
+                        color: Color(0xFF1E2228),
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 10),
                     _buildAmountInput(),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 14),
                     _buildQuickAmountRow(),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 20),
                     _buildInfoCard(),
                   ],
                 ),
@@ -93,17 +93,37 @@ class _TopUpWalletViewState extends State<TopUpWalletView> {
     );
   }
 
-  Widget _buildTopUpCard() {
+  Widget _buildBalanceCard() {
     return Container(
-      padding: EdgeInsets.all(XPadding.extralarge),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F3F8),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: const Color(0xFFE5E8EE)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: goBusPrimary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              Icons.account_balance_wallet_rounded,
+              color: goBusPrimary,
+              size: 26,
+            ),
+          ),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,50 +131,22 @@ class _TopUpWalletViewState extends State<TopUpWalletView> {
                 Text(
                   'TOTAL BALANCE'.tr,
                   style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.2,
-                    color: Color(0xFF4D5562),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1.1,
+                    color: Color(0xFF8D94A0),
                   ),
                 ),
-                const SizedBox(height: 8),
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: '\$75.00',
-                        style: TextStyle(
-                          fontSize: 42,
-                          fontWeight: FontWeight.w700,
-                          color: goBusPrimary,
-                        ),
-                      ),
-                      const TextSpan(
-                        text: ' / 300,000 KHR',
-                        style: TextStyle(
-                          fontSize: 35,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF353B44),
-                        ),
-                      ),
-                    ],
+                const SizedBox(height: 4),
+                Text(
+                  '\$75.00',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                    color: goBusPrimary,
                   ),
                 ),
               ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Icon(
-              Icons.account_balance_wallet_rounded,
-              color: Color(0xFFA64D00),
-              size: 30,
             ),
           ),
         ],
@@ -165,8 +157,9 @@ class _TopUpWalletViewState extends State<TopUpWalletView> {
   Widget _buildAmountInput() {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFE5E8EE),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE5E8EE)),
       ),
       child: TextField(
         controller: _amountController,
@@ -181,27 +174,26 @@ class _TopUpWalletViewState extends State<TopUpWalletView> {
               selectedAmount = null;
               return;
             }
-            final matchedAmount = quickAmounts
-                .where((a) => a == parsed)
-                .firstOrNull;
-            selectedAmount = matchedAmount;
+            selectedAmount = quickAmounts.where((a) => a == parsed).firstOrNull;
           });
         },
         decoration: InputDecoration(
           border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: XPadding.large,
-            vertical: XPadding.large + 2,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
           ),
           prefixText: '\$  ',
           prefixStyle: TextStyle(
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: FontWeight.w700,
             color: goBusPrimary,
           ),
+          hintText: '0.00',
+          hintStyle: const TextStyle(color: Color(0xFFBCC0C8)),
         ),
         style: TextStyle(
-          fontSize: 18,
+          fontSize: 16,
           fontWeight: FontWeight.w700,
           color: goBusPrimary,
         ),
@@ -215,7 +207,7 @@ class _TopUpWalletViewState extends State<TopUpWalletView> {
         final isSelected = selectedAmount == amount;
         return Expanded(
           child: Padding(
-            padding: const EdgeInsets.only(right: 10),
+            padding: const EdgeInsets.only(right: 8),
             child: GestureDetector(
               onTap: () {
                 setState(() {
@@ -223,17 +215,21 @@ class _TopUpWalletViewState extends State<TopUpWalletView> {
                   _amountController.text = amount.toStringAsFixed(0);
                 });
               },
-              child: Container(
-                height: 50,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                height: 44,
                 decoration: BoxDecoration(
                   color: isSelected ? goBusPrimary : Colors.white,
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isSelected ? goBusPrimary : const Color(0xFFE5E8EE),
+                  ),
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: goBusPrimary.withOpacity(0.25),
-                            blurRadius: 12,
-                            offset: const Offset(0, 6),
+                            color: goBusPrimary.withOpacity(0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
                           ),
                         ]
                       : null,
@@ -242,11 +238,9 @@ class _TopUpWalletViewState extends State<TopUpWalletView> {
                   child: Text(
                     '\$${amount.toStringAsFixed(0)}',
                     style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: isSelected
-                          ? Colors.white
-                          : const Color(0xFF1E2228),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: isSelected ? Colors.white : const Color(0xFF4A5160),
                     ),
                   ),
                 ),
@@ -260,45 +254,45 @@ class _TopUpWalletViewState extends State<TopUpWalletView> {
 
   Widget _buildInfoCard() {
     return Container(
-      padding: EdgeInsets.all(XPadding.large),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F3F8),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade200),
+        color: const Color(0xFFF0F7FF),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFD0E4F7)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 30,
-            height: 30,
+            width: 26,
+            height: 26,
             decoration: BoxDecoration(
-              color: const Color(0xFF13B5A8),
-              borderRadius: BorderRadius.circular(20),
+              color: goBusPrimary.withOpacity(0.15),
+              shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.info, color: Colors.white, size: 20),
+            child: Icon(Icons.info_outline, color: goBusPrimary, size: 16),
           ),
-          SizedBox(width: XPadding.large - 2),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'gobus_wallet_topup_title'.tr,
-                  style: TextStyle(
-                    fontSize: 20,
+                  style: const TextStyle(
+                    fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF1E2228),
-                    height: 1.2,
+                    height: 1.3,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
                   'gobus_wallet_topup_description'.tr,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF4A5160),
-                    height: 1.4,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF6B7280),
+                    height: 1.5,
                   ),
                 ),
               ],
@@ -312,44 +306,41 @@ class _TopUpWalletViewState extends State<TopUpWalletView> {
   Widget _buildTopUpButton() {
     return SizedBox(
       width: double.infinity,
-      child: SizedBox(
-        height: 56,
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            elevation: 0,
-            backgroundColor: goBusPrimary,
-            foregroundColor: Colors.white,
-            shadowColor: goBusPrimary.withOpacity(0.35),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
+      height: 52,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          backgroundColor: goBusPrimary,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
           ),
-          onPressed: () {
-            final amount = double.tryParse(_amountController.text) ?? 0;
+        ),
+        onPressed: () {
+          final amount = double.tryParse(_amountController.text) ?? 0;
 
-            if (amount <= 0) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Please enter a valid amount'.tr),
-                  backgroundColor: errorPrimary,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-              return;
-            }
-
-            Get.toNamed(
-              AppRoutes.paymentWalletSelection,
-              arguments: {
-                'usdAmount': amount,
-                'khrAmount': (amount * 4000).round(),
-              },
+          if (amount <= 0) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Please enter a valid amount'.tr),
+                backgroundColor: errorPrimary,
+                behavior: SnackBarBehavior.floating,
+              ),
             );
-          },
-          child: Text(
-            'Continue'.tr,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-          ),
+            return;
+          }
+
+          Get.toNamed(
+            AppRoutes.paymentWalletSelection,
+            arguments: {
+              'usdAmount': amount,
+              'khrAmount': (amount * 4000).round(),
+            },
+          );
+        },
+        child: Text(
+          'Continue'.tr,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
         ),
       ),
     );

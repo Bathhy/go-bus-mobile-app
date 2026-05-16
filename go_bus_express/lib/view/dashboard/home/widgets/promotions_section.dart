@@ -13,8 +13,8 @@ class PromotionsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Special Offers',
+          Text(
+            "special_offer".tr,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,

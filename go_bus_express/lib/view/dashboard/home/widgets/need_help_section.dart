@@ -20,8 +20,8 @@ class NeedHelpSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Customer Support',
+           Text(
+            'customer_support'.tr,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,

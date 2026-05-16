@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/di/app_di.dart';
+import 'package:go_bus_express/resources/app_colors.dart';
 import 'package:go_bus_express/resources/app_images.dart';
 import 'package:go_bus_express/view/dashboard/home/home_view.dart';
 import 'package:go_bus_express/view/dashboard/profile/profile_view.dart';
@@ -21,6 +22,7 @@ class _MainNavigationState extends State<MainNavigation> {
   final homeController = getIt<HomeController>();
   final profileController = getIt<ProfileController>();
   int _selectedIndex = 0;
+  int? _tappedIndex;
 
   final List<Widget> _pages = const [HomePage(), MyTicketView(), ProfilePage()];
 
@@ -42,9 +44,16 @@ class _MainNavigationState extends State<MainNavigation> {
 
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index;
+      _tappedIndex = index;
     });
-    _refreshCurrentTab(index);
+    
+    Future.delayed(const Duration(milliseconds: 150), () {
+      setState(() {
+        _selectedIndex = index;
+        _tappedIndex = null;
+      });
+      _refreshCurrentTab(index);
+    });
   }
 
   void _refreshCurrentTab(int index) {
@@ -76,55 +85,100 @@ class _MainNavigationState extends State<MainNavigation> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(index: _selectedIndex, children: _pages),
+      extendBody: true,
       bottomNavigationBar: Container(
+        margin: const EdgeInsets.only(left: 20, right: 20, bottom: 15),
         decoration: BoxDecoration(
-          color: goBusPrimary,
+          color: navBarBgColor,
+          borderRadius: BorderRadius.circular(30),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
+              color: Colors.black.withValues(alpha: 0.15),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
-        child: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: goBusPrimary,
-          selectedItemColor: Colors.white,
-          unselectedItemColor: Colors.white70,
-          selectedFontSize: 12,
-          unselectedFontSize: 12,
-          items: [
-            BottomNavigationBarItem(
-              icon: AppSvgImage(
-                path: AppImages.icHome,
-                width: 25,
-                height: 25,
-                color: _selectedIndex == 0 ? Colors.white : Colors.white70,
-              ),
-              label: 'Home'.tr,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(30),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildNavItem(
+                  index: 0,
+                  icon: AppImages.icHome,
+                  label: 'Home'.tr,
+                ),
+                _buildNavItem(
+                  index: 1,
+                  icon: AppImages.icTicket,
+                  label: 'Ticket'.tr,
+                ),
+                _buildNavItem(
+                  index: 2,
+                  icon: AppImages.icProfile,
+                  label: 'Profile'.tr,
+                ),
+              ],
             ),
-            BottomNavigationBarItem(
-              icon: AppSvgImage(
-                path: AppImages.icTicket,
-                width: 25,
-                height: 25,
-                color: _selectedIndex == 1 ? Colors.white : Colors.white70,
-              ),
-              label: 'Ticket'.tr,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required int index,
+    required String icon,
+    required String label,
+  }) {
+    final isSelected = _selectedIndex == index;
+    final isTapped = _tappedIndex == index;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => _onItemTapped(index),
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedScale(
+          scale: isTapped ? 0.85 : 1.0,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeInOut,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? goBusPrimary.withValues(alpha: 0.15)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(18),
             ),
-            BottomNavigationBarItem(
-              icon: AppSvgImage(
-                path: AppImages.icProfile,
-                width: 25,
-                height: 25,
-                color: _selectedIndex == 2 ? Colors.white : Colors.white70,
-              ),
-              label: 'Profile'.tr,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AppSvgImage(
+                  path: icon,
+                  width: 22,
+                  height: 22,
+                  color: isSelected ? goBusPrimary : black,
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    color: isSelected ? goBusPrimary : black,
+                    height: 1.0,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
