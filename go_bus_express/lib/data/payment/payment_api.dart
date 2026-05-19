@@ -22,4 +22,9 @@ abstract class PaymentBakongApi {
     @Body() required VerifyPaymentBody body,
     @Query('bookingId') required String bookingId,
   });
+
+  @GET('/payments/booking/{bookingId}')
+  Future<BaseResponse<Payment>> getPaymentByBookingId({
+    @Path('bookingId') required int bookingId,
+  });
 }

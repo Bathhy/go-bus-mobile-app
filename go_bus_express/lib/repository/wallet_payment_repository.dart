@@ -2,7 +2,10 @@ import 'package:go_bus_express/data/wallet/wallet_payment_api.dart';
 import 'package:shared_package/network/x_result.dart';
 
 abstract class WalletPaymentRepository {
-  Future<XResult<void>> payWithWallet({required int id});
+  Future<XResult<void>> payWithWallet({
+    required String sessionToken,
+    required int id,
+  });
 }
 
 class WalletPaymentRepositoryImpl implements WalletPaymentRepository {
@@ -11,9 +14,12 @@ class WalletPaymentRepositoryImpl implements WalletPaymentRepository {
   WalletPaymentRepositoryImpl(this._api);
 
   @override
-  Future<XResult<void>> payWithWallet({required int id}) {
+  Future<XResult<void>> payWithWallet({
+    required String sessionToken,
+    required int id,
+  }) {
     return xResultHandler(() async {
-      await _api.payWithWallet(id: id);
+      await _api.payWithWallet(sessionToken: sessionToken, id: id);
     });
   }
 }

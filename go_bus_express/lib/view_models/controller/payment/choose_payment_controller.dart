@@ -7,10 +7,12 @@ import 'package:go_bus_express/models/body/payment_body.dart';
 import 'package:go_bus_express/models/booking/booking_model.dart';
 import 'package:go_bus_express/models/payment/generate_qr_model.dart';
 import 'package:go_bus_express/models/payment/pending_payment_model.dart';
+import 'package:go_bus_express/models/wallet/wallet_model.dart';
 import 'package:go_bus_express/repository/booking_repository.dart';
 import 'package:go_bus_express/repository/hive_manager_repository.dart';
 import 'package:go_bus_express/repository/wallet_repository.dart';
 import 'package:go_bus_express/utils/enums/currency_enum.dart';
+import 'package:go_bus_express/view/wallet/pin/wallet_pay_pin_dialog.dart';
 import 'package:go_bus_express/view_models/controller/base/base_controller.dart';
 import 'package:go_bus_express/view_models/controller/payment/choose_payment_state.dart';
 import 'package:shared_package/config/themes.dart';
@@ -103,7 +105,7 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
     return state.agreedToTerms && state.selectedSeats.isNotEmpty;
   }
 
-  void createBooking() async {
+  void createBooking({required String paymentMethod}) async {
     try {
       final body = BookingBody(
         scheduleId: state.scheduleId,
@@ -111,40 +113,117 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
       );
       updateState((state) => state.copyWith(isLoading: true));
       log('🔄 Creating booking with seat IDs: ${state.selectedSeatIds}');
-      log('📤 Booking body: ${body.toJson()}');
 
       final result = await _bookingRepository.createBooking(body: body);
-      log('📥 Booking API response received');
 
       switch (result) {
         case Success<BookingModel?>():
-          log('✅ Booking created successfully');
           final bookingId = result.data?.id;
-          log('✅ Booking ID: $bookingId');
+          log('✅ Booking created, id=$bookingId');
 
-          if (bookingId != null) {
-            log('🔄 Proceeding to generate QR code...');
-            await _generateQr(bookingId);
-          } else {
-            log('❌ Booking ID is null');
+          if (bookingId == null) {
             updateState((state) => state.copyWith(isLoading: false));
             _showError('Booking created but ID is missing');
+            return;
           }
-          break;
+
+          if (paymentMethod == 'Wallet') {
+            await _payWithWallet(bookingId);
+          } else {
+            await _generateQr(bookingId);
+          }
 
         case Error<BookingModel?>():
-          log('❌ Booking creation error: ${result.error.displayMessage}');
-          log('❌ Error code: ${result.error.statusCode}');
+          log('❌ Booking error ${result.error.statusCode}: ${result.error.displayMessage}');
           updateState((state) => state.copyWith(isLoading: false));
           _showError(result.error.displayMessage);
-          break;
       }
-    } catch (e, stackTrace) {
-      log('❌ Exception in createBooking: $e');
-      log('Stack trace: $stackTrace');
+    } catch (e, st) {
+      log('❌ Exception in createBooking: $e\n$st');
       updateState((state) => state.copyWith(isLoading: false));
       _showError('Failed to create booking. Please try again.');
     }
+  }
+
+  // ── Wallet payment ──────────────────────────────────────────────────────────
+
+  Future<void> _payWithWallet(int bookingId) async {
+    String? sessionToken = _getValidSessionToken();
+
+    if (sessionToken == null) {
+      // Pause loading so the PIN dialog appears cleanly over the page
+      updateState((s) => s.copyWith(isLoading: false));
+      sessionToken = await _showPinDialog();
+      if (sessionToken == null) return; // user cancelled
+      updateState((s) => s.copyWith(isLoading: true));
+    }
+
+    await _doWalletPay(bookingId, sessionToken);
+  }
+
+  Future<void> _doWalletPay(
+    int bookingId,
+    String sessionToken, {
+    bool isRetry = false,
+  }) async {
+    final result = await _bookingRepository.payWithWallet(
+      bookingId: bookingId,
+      sessionToken: sessionToken,
+    );
+
+    switch (result) {
+      case Success():
+        updateState((s) => s.copyWith(isLoading: false));
+        Get.toNamed(
+          AppRoutes.paymentSuccess,
+          arguments: {'bookingId': bookingId, 'amount': state.totalPrice},
+        );
+
+      case Error():
+        final isExpired = result.error.statusCode == 401;
+        if (!isRetry && isExpired) {
+          log('⚠️ Wallet session expired — requesting PIN');
+          await _localRepository.clearWalletSession();
+          updateState((s) => s.copyWith(isLoading: false));
+          final newToken = await _showPinDialog(
+            subtitle: 'session_expired_enter_pin'.tr,
+          );
+          if (newToken != null) {
+            updateState((s) => s.copyWith(isLoading: true));
+            await _doWalletPay(bookingId, newToken, isRetry: true);
+          }
+        } else {
+          updateState((s) => s.copyWith(isLoading: false));
+          _showError(result.error.displayMessage);
+        }
+    }
+  }
+
+  String? _getValidSessionToken() {
+    if (!_localRepository.isWalletSessionValid()) return null;
+    return _localRepository.getWalletSessionToken();
+  }
+
+  Future<String?> _showPinDialog({String? subtitle}) async {
+    final context = Get.context;
+    if (context == null) return null;
+
+    return WalletPayPinDialog.show(
+      context,
+      subtitle: subtitle,
+      onPinSubmit: (pin) async {
+        final result = await _walletRepository.loginWallet(pinCode: pin);
+        switch (result) {
+          case Success<WalletModel?>():
+            final token = result.data?.walletSessionToken;
+            if (token == null) throw 'Failed to get session token';
+            await _localRepository.saveWalletSession(token);
+            return token;
+          case Error<WalletModel?>():
+            throw result.error.displayMessage;
+        }
+      },
+    );
   }
 
   Future<void> _generateQr(int bookingId) async {

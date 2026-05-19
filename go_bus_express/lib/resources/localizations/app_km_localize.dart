@@ -170,6 +170,9 @@ final Map<String, String> km = {
   "top_up": "បញ្ចូលលុយ",
   "available_balance_custom": "សមតុល្យដែលមាន៖ \$@balance",
   "insufficient_balance_custom": "មិនគ្រប់គ្រាន់ (\$@balance ដែលមាន)",
+  "wallet_pin": "លេខសម្ងាត់កាបូប",
+  "enter_pin_to_pay": "បញ្ចូលលេខសម្ងាត់ដើម្បីបញ្ចប់ការទូទាត់",
+  "session_expired_enter_pin": "សម័យប្រើប្រាស់បានផុតកំណត់។ បញ្ចូលលេខសម្ងាត់ដើម្បីបន្ត។",
   
   // Booking Status Translations
   "status_confirmed": "បានបញ្ជាក់",
@@ -228,4 +231,16 @@ final Map<String, String> km = {
   "please_wait": "សូមរង់ចាំ...",
   "cancel": "បោះបង់",
   "confirm": "បញ្ជាក់",
+
+  // Payment error/retry dialog
+  "try_again": "ព្យាយាមម្តងទៀត",
+  "payment_not_completed": "ការទូទាត់មិនបានបញ្ចប់",
+  "payment_failed_message":
+      "ការទូទាត់របស់អ្នកមិនអាចបញ្ចប់បានទេ។ សូមព្យាយាមម្តងទៀត ឬបោះបង់ការកក់។",
+  "payment_pending": "ការទូទាត់កំពុងដំណើរការ",
+  "payment_pending_message":
+      "ការទូទាត់របស់អ្នកកំពុងដំណើរការ។ អ្នកអាចព្យាយាមម្តងទៀត ឬបោះបង់ការកក់។",
+  "payment_error_message":
+      "យើងមិនអាចផ្ទៀងផ្ទាត់ស្ថានភាពការទូទាត់របស់អ្នកបានទេ។ សូមព្យាយាមម្តងទៀត ឬបោះបង់ការកក់។",
+  "cancel_booking": "បោះបង់ការកក់",
 };

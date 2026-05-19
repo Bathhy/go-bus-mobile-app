@@ -24,13 +24,15 @@ class SignupBody {
   final String fullName;
   final String userName;
   final bool isEmployee;
+  final String phone;
 
   SignupBody({
     required this.email,
     required this.password,
     required this.fullName,
     required this.userName,
-    required this.isEmployee,
+    required this.phone,
+    this.isEmployee = false,
   });
 
   factory SignupBody.fromJson(Map<String, dynamic> json) =>

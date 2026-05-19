@@ -3,10 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/di/app_di.dart';
 import 'package:go_bus_express/resources/app_images.dart';
-import 'package:go_bus_express/view/widget/x_dialog.dart';
 import 'package:go_bus_express/view_models/controller/payment/kh_qr/kh_qr_controller.dart';
 import 'package:khqr_sdk/khqr_sdk.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 import 'package:shared_package/design_system/x_widget/x_app_bar.dart';
@@ -23,8 +21,11 @@ class KHQRPaymentView extends StatefulWidget {
 class _KHQRPaymentViewState extends State<KHQRPaymentView> {
   final controller = getIt<KhQrController>();
   Worker? _stateWorker;
-  // Worker? _expiryWorker;
+  Worker? _errorWorker;
   static const platform = MethodChannel('com.gobus.express/security');
+
+  // Prevents two dialogs from stacking (cancel dialog + error dialog)
+  bool _isDialogShowing = false;
 
   @override
   void initState() {
@@ -39,19 +40,16 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
       }
     });
 
-    // Handle expiry in initState to show dialog only once
-    // _expiryWorker = ever(controller.obs, (state) {
-    //   if (state.isExpired) {
-    //     WidgetsBinding.instance.addPostFrameCallback((_) {
-    //       if (mounted) {
-    //         XDialog.showTimeoutDialog(
-    //           context,
-    //           () => controller.cancelBooking(),
-    //         );
-    //       }
-    //     });
-    //   }
-    // });
+    _errorWorker = ever(controller.paymentError, (error) {
+      if (error != null && mounted) {
+        controller.paymentError.value = null;
+        // Dismiss any open dialog (e.g. cancel dialog) before showing error
+        if (_isDialogShowing) {
+          Navigator.of(context, rootNavigator: true).pop();
+        }
+        _showPaymentErrorDialog(error);
+      }
+    });
   }
 
   Future<void> _disableScreenshots() async {
@@ -74,11 +72,15 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
   void dispose() {
     _enableScreenshots();
     _stateWorker?.dispose();
-    // _expiryWorker?.dispose();
+    _errorWorker?.dispose();
     super.dispose();
   }
 
+  // MARK: - Cancel Payment Dialog
+
   void _showCancelPaymentDialog() {
+    if (_isDialogShowing) return;
+    _isDialogShowing = true;
     showDialog(
       context: context,
       barrierDismissible: true,
@@ -90,7 +92,6 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Icon Container
               Container(
                 width: 80,
                 height: 80,
@@ -105,11 +106,9 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
                 ),
               ),
               const SizedBox(height: 24),
-
-              // Title
               Text(
                 'Cancel Payment?'.tr,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
@@ -117,8 +116,6 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 12),
-
-              // Message
               Text(
                 'Are you sure you want to leave?\nYour booking will be cancelled.'
                     .tr,
@@ -130,16 +127,13 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
-
               Row(
                 children: [
                   Expanded(
                     child: SizedBox(
                       height: 50,
                       child: OutlinedButton(
-                        onPressed: () {
-                          Get.back();
-                        },
+                        onPressed: () => Get.back(),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.grey.shade700,
                           backgroundColor: Colors.white,
@@ -162,8 +156,6 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
                     ),
                   ),
                   const SizedBox(width: 12),
-
-                  // Cancel Booking Button
                   Expanded(
                     child: SizedBox(
                       height: 50,
@@ -196,7 +188,142 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
           ),
         ),
       ),
-    );
+    ).then((_) => _isDialogShowing = false);
+  }
+
+  // MARK: - Payment Error Dialog
+
+  void _showPaymentErrorDialog(String errorType) {
+    _isDialogShowing = true;
+    final isPending = errorType == 'pending';
+
+    final IconData icon = isPending ? Icons.hourglass_top_rounded : Icons.error_outline_rounded;
+    final Color iconBgColor = isPending ? Colors.blue.shade50 : Colors.red.shade50;
+    final Color iconColor = isPending ? Colors.blue.shade400 : Colors.red.shade400;
+
+    final String title = isPending
+        ? 'payment_pending'.tr
+        : 'payment_not_completed'.tr;
+
+    final String message = switch (errorType) {
+      'pending' => 'payment_pending_message'.tr,
+      'error'   => 'payment_error_message'.tr,
+      _         => 'payment_failed_message'.tr,
+    };
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Icon
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: iconBgColor,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, size: 48, color: iconColor),
+              ),
+              const SizedBox(height: 24),
+
+              // Title
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+
+              // Message
+              Text(
+                message,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey.shade600,
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+
+              // Buttons
+              Column(
+                children: [
+                  // Try Again (primary)
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Get.back();
+                        controller.retryPayment();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF4CAF50),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'try_again'.tr,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Cancel Booking (secondary)
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Get.back();
+                        controller.cancelBooking();
+                      },
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.red.shade600,
+                        side: BorderSide(
+                          color: Colors.red.shade300,
+                          width: 1.5,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        'cancel_booking'.tr,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    ).then((_) => _isDialogShowing = false);
   }
 
   @override
@@ -210,47 +337,6 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
           child: XAppBar(
             title: 'Payment'.tr,
             onBackPressed: () => _showCancelPaymentDialog(),
-            // Timer UI commented out - Backend handles timing
-            // actions: [
-            //   Container(
-            //     padding: EdgeInsets.symmetric(
-            //       vertical: XPadding.medium,
-            //       horizontal: XPadding.small,
-            //     ),
-            //     decoration: BoxDecoration(
-            //       borderRadius: BorderRadius.all(
-            //         Radius.circular(XPadding.medium),
-            //       ),
-            //       color: controller.isLowTime()
-            //           ? Colors.red.shade100
-            //           : Colors.orange.shade100,
-            //     ),
-            //     child: Row(
-            //       mainAxisAlignment: MainAxisAlignment.center,
-            //       children: [
-            //         Icon(
-            //           Icons.timer_outlined,
-            //           color: controller.isLowTime()
-            //               ? Colors.red
-            //               : Colors.orange,
-            //           size: 20,
-            //         ),
-            //         SizedBox(width: XPadding.small),
-            //         Text(
-            //           controller.formatTime(),
-            //           style: TextStyle(
-            //             fontSize: 16,
-            //             fontWeight: FontWeight.w600,
-            //             color: controller.isLowTime()
-            //                 ? Colors.red.shade900
-            //                 : Colors.orange.shade900,
-            //           ),
-            //         ),
-            //       ],
-            //     ),
-            //   ),
-            //   SizedBox(width: XPadding.extralarge),
-            // ],
           ),
         ),
         body: Obx(() {
@@ -282,46 +368,11 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
                         ? KhqrCurrency.usd
                         : KhqrCurrency.khr,
                   ),
-                // Container(
-                //   padding: EdgeInsets.all(XPadding.large),
-                //   decoration: BoxDecoration(
-                //     color: Colors.white,
-                //     borderRadius: BorderRadius.circular(16),
-                //     boxShadow: [
-                //       BoxShadow(
-                //         color: Colors.black.withOpacity(0.1),
-                //         blurRadius: 10,
-                //         offset: Offset(0, 4),
-                //       ),
-                //     ],
-                //   ),
-                //   child: Column(
-                //     mainAxisSize: MainAxisSize.min,
-                //     children: [
-                //       QrImageView(
-                //         data: state.qrData,
-                //         version: QrVersions.auto,
-                //         size: 280.0,
-                //         errorCorrectionLevel: QrErrorCorrectLevel.L,
-                //         backgroundColor: Colors.white,
-                //       ),
-                //       SizedBox(height: XPadding.medium),
-                //       Text(
-                //         state.receiverName,
-                //         style: TextStyle(
-                //           fontSize: 16,
-                //           fontWeight: FontWeight.w600,
-                //           color: Colors.black87,
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
 
                 // Instructions
                 Text(
                   'Scan to pay with any banking'.tr,
-                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                  style: const TextStyle(fontSize: 16, color: Colors.black54),
                 ),
 
                 // SubTotal
@@ -330,7 +381,7 @@ class _KHQRPaymentViewState extends State<KHQRPaymentView> {
                     children: [
                       TextSpan(
                         text: 'SubTotal: '.tr,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,

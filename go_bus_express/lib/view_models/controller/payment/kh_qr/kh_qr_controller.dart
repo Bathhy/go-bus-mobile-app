@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/services/local_notification_service.dart';
 import 'package:go_bus_express/core/storage/local_repository.dart';
+import 'package:go_bus_express/models/body/payment_body.dart';
 import 'package:go_bus_express/models/body/verify_payment_body.dart';
+import 'package:go_bus_express/models/payment/generate_qr_model.dart';
 import 'package:go_bus_express/models/payment/verify_payment_model.dart';
 import 'package:go_bus_express/repository/booking_repository.dart';
 import 'package:go_bus_express/repository/hive_manager_repository.dart';
@@ -18,9 +20,9 @@ class KhQrController extends BaseController<KhQrState> {
   final BookingRepository _bookingRepo;
   final LocalRepository _localRepository;
   final HiveManagerRepository _hiveManager;
-  // Timer? _countdownTimer;
 
-  // static const int _paymentTimeoutSeconds = 180; // Payment timeout duration
+  // Triggers the error dialog in the view; null = no error
+  final Rx<String?> paymentError = Rx<String?>(null);
 
   KhQrController(this._bookingRepo, this._localRepository, this._hiveManager)
     : super(KhQrState());
@@ -30,17 +32,12 @@ class KhQrController extends BaseController<KhQrState> {
     super.onInit();
     _initializeFromArguments();
     _getLocalMd5();
-    // _calculateRemainingTime();
-    // _startCountdownTimer();
     _verifyPayment();
   }
 
   void _initializeFromArguments() {
     final args = Get.arguments as Map<String, dynamic>?;
-
-    if (args == null) {
-      return;
-    }
+    if (args == null) return;
 
     final qrData = args['qrData'] as String? ?? '';
     final amount = (args['amount'] as num?)?.toDouble() ?? 0.0;
@@ -48,7 +45,7 @@ class KhQrController extends BaseController<KhQrState> {
     final bookingId = args['bookingId'] as int? ?? 0;
     final createdAt = args['createdAt'] as DateTime?;
 
-    log("This is QR Data $qrData");
+    log('QR Data: $qrData');
     updateState(
       (state) => state.copyWith(
         qrData: qrData,
@@ -60,49 +57,14 @@ class KhQrController extends BaseController<KhQrState> {
     );
   }
 
-  // void _calculateRemainingTime() {
-  //   if (state.createdAt == null) {
-  //     // New payment, use configured timeout
-  //     log(
-  //       '🆕 New payment session - starting with $_paymentTimeoutSeconds seconds',
-  //     );
-  //     updateState(
-  //       (state) => state.copyWith(remainingSeconds: _paymentTimeoutSeconds),
-  //     );
-  //     return;
-  //   }
-
-  //   // Calculate elapsed time since payment was created
-  //   final now = DateTime.now();
-  //   final elapsed = now.difference(state.createdAt!);
-  //   final elapsedSeconds = elapsed.inSeconds;
-
-  //   // Calculate remaining time using configured timeout
-  //   final remaining = _paymentTimeoutSeconds - elapsedSeconds;
-
-  //   if (remaining <= 0) {
-  //     // Payment already expired
-  //     updateState(
-  //       (state) => state.copyWith(remainingSeconds: 0, isExpired: true),
-  //     );
-  //   } else {
-  //     // Update with actual remaining time
-  //     updateState((state) => state.copyWith(remainingSeconds: remaining));
-  //   }
-  // }
-
-  // MARK: API Call - Verify Payment
+  // MARK: - Verify Payment (POST /checking-transaction)
 
   void _verifyPayment() async {
-    // Don't verify if already paid or expired
-    if (state.isPaid || state.isExpired) {
-      return;
-    }
+    if (state.isPaid || state.isExpired) return;
 
-    log('🔄 Calling verify payment API - waiting for backend response...');
+    log('🔄 Calling verify payment API...');
 
     final body = VerifyPaymentBody(md5: state.md5);
-
     final result = await _bookingRepo.verifyMd5(
       body: body,
       bookingId: state.bookingId.toString(),
@@ -110,31 +72,97 @@ class KhQrController extends BaseController<KhQrState> {
 
     switch (result) {
       case Success<BaseResponse<VerifyPaymentModel>>():
-        {
-          final successCode = result.data.status;
-          print("Log Status Code >>>>> ${successCode}");
-          if (successCode == 200) {
-            // Mark as paid immediately
-            updateState((state) => state.copyWith(isPaid: true));
+        final statusCode = result.data.status;
+        log('✅ Verify response status: $statusCode');
 
-            // Clear pending payment from Hive && Clear Md5
-            await _hiveManager.clearPendingPayment();
-            _clearLocalMd5();
-
-            // Show success notification
-            _showPaymentSuccessNotification();
-
-            // Navigate to success page
-            _handlePaymentSuccess();
-          } else {
-            log('⚠️ Payment not completed yet');
-          }
+        if (statusCode == 200) {
+          await _onPaymentSuccess();
+        } else {
+          // Backend returned non-200 body: FAILED or EXPIRED
+          log('⚠️ Payment not completed – status: $statusCode');
+          paymentError.value = 'failed';
         }
+
       case Error<BaseResponse<VerifyPaymentModel>>():
-        {
-          _showError(result.error.displayMessage);
-        }
+        log('❌ Verify error: ${result.error.displayMessage}');
+        // Wait briefly then fall back to GET booking payment status
+        await Future.delayed(const Duration(seconds: 2));
+        await _fallbackCheckPaymentStatus();
     }
+  }
+
+  // MARK: - Fallback (GET /payments/booking/{bookingId})
+
+  Future<void> _fallbackCheckPaymentStatus() async {
+    log('🔄 Fallback: GET /payments/booking/${state.bookingId}');
+
+    final result = await _bookingRepo.getPaymentByBookingId(
+      bookingId: state.bookingId,
+    );
+
+    switch (result) {
+      case Success<BaseResponse<Payment>>():
+        final status = (result.data.data?.status ?? '').toUpperCase();
+        log('📊 Fallback payment status: $status');
+
+        switch (status) {
+          case 'SUCCESS':
+          case 'PAID':
+          case 'COMPLETED':
+            await _onPaymentSuccess();
+
+          case 'PENDING':
+          case 'PROCESSING':
+            paymentError.value = 'pending';
+
+          default:
+            // FAILED, EXPIRED, TIMEOUT, or unknown
+            paymentError.value = 'failed';
+        }
+
+      case Error<BaseResponse<Payment>>():
+        log('❌ Fallback check failed: ${result.error.displayMessage}');
+        paymentError.value = 'error';
+    }
+  }
+
+  // MARK: - Retry (re-generate QR + start new verify cycle)
+
+  Future<void> retryPayment() async {
+    paymentError.value = null;
+    updateState((s) => s.copyWith(isLoading: true, qrData: ''));
+
+    final body = PaymentBody(
+      bookingId: state.bookingId,
+      currency: state.currency,
+    );
+
+    final result = await _bookingRepo.generateQr(body: body);
+
+    switch (result) {
+      case Success<BaseResponse<GenerateQrModel>>():
+        final qr = result.data.data?.data?.qr ?? '';
+        final md5 = result.data.data?.data?.md5 ?? '';
+
+        await _localRepository.saveMD5(md5);
+
+        updateState((s) => s.copyWith(isLoading: false, qrData: qr, md5: md5));
+        _verifyPayment();
+
+      case Error<BaseResponse<GenerateQrModel>>():
+        updateState((s) => s.copyWith(isLoading: false));
+        _showError(result.error.displayMessage);
+    }
+  }
+
+  // MARK: - Payment Success
+
+  Future<void> _onPaymentSuccess() async {
+    updateState((s) => s.copyWith(isPaid: true));
+    await _hiveManager.clearPendingPayment();
+    _clearLocalMd5();
+    _showPaymentSuccessNotification();
+    _handlePaymentSuccess();
   }
 
   void _handlePaymentSuccess() {
@@ -150,30 +178,8 @@ class KhQrController extends BaseController<KhQrState> {
     );
   }
 
-  // MARK: Timers (Commented out - Backend handles timing now)
+  // MARK: - Cancel Booking
 
-  // void _startCountdownTimer() {
-  //   _countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
-  //     if (state.remainingSeconds > 0 && !state.isPaid) {
-  //       updateState(
-  //         (state) =>
-  //             state.copyWith(remainingSeconds: state.remainingSeconds - 1),
-  //       );
-  //     } else {
-  //       _stopCountdownTimer();
-  //       if (!state.isPaid) {
-  //         updateState((state) => state.copyWith(isExpired: true));
-  //       }
-  //     }
-  //   });
-  // }
-
-  // void _stopCountdownTimer() {
-  //   _countdownTimer?.cancel();
-  //   _countdownTimer = null;
-  // }
-
-  // MARK: API Cancel Booking
   void cancelBooking() async {
     if (state.bookingId == 0) return;
 
@@ -183,33 +189,22 @@ class KhQrController extends BaseController<KhQrState> {
 
     switch (result) {
       case Success<void>():
-        {
-          updateState((state) => state.copyWith(isLoading: false));
-          _clearLocalMd5();
-          await _hiveManager.clearPendingPayment();
-          Get.offAllNamed(AppRoutes.mainNavigation);
-        }
+        updateState((state) => state.copyWith(isLoading: false));
+        _clearLocalMd5();
+        await _hiveManager.clearPendingPayment();
+        Get.offAllNamed(AppRoutes.mainNavigation);
+
       case Error<void>():
-        {
-          updateState((state) => state.copyWith(isLoading: false));
-          _showError(
-            'Failed to cancel booking: ${result.error.displayMessage}',
-          );
-        }
+        updateState((state) => state.copyWith(isLoading: false));
+        _showError(
+          'Failed to cancel booking: ${result.error.displayMessage}',
+        );
     }
   }
 
-  // String formatTime() {
-  //   final seconds = state.remainingSeconds;
-  //   int minutes = seconds ~/ 60;
-  //   int secs = seconds % 60;
-  //   return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
-  // }
-
-  // bool isLowTime() => state.remainingSeconds <= 30;
+  // MARK: - Helpers
 
   void _showError(String message) {
-    // Use WidgetsBinding to ensure we're in the right context
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Get.context != null) {
         ScaffoldMessenger.of(Get.context!).clearSnackBars();
@@ -235,17 +230,10 @@ class KhQrController extends BaseController<KhQrState> {
     });
   }
 
-  // MARK - Get Local MD5
   void _getLocalMd5() async {
     final md5 = _localRepository.getMD5();
     updateState((state) => state.copyWith(md5: md5));
   }
 
   void _clearLocalMd5() async => await _localRepository.removeMD5();
-
-  @override
-  void onClose() {
-    // _stopCountdownTimer();
-    super.onClose();
-  }
 }

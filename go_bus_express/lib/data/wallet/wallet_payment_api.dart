@@ -11,6 +11,7 @@ abstract class WalletPaymentApi {
 
   @POST('/payments/{id}/wallet')
   Future<BaseResponse<void>> payWithWallet({
+    @Header('X-Wallet-Session') required String sessionToken,
     @Path('id') required int id,
   });
 }

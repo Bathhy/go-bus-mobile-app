@@ -148,7 +148,9 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
               }),
               optionbutton: 1,
               bgColor: canProceed ? goBusPrimary : Colors.grey,
-              onTap: canProceed ? () => controller.createBooking() : null,
+              onTap: canProceed
+                  ? () => controller.createBooking(paymentMethod: selected)
+                  : null,
             ),
           ),
         );

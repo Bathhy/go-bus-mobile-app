@@ -18,6 +18,7 @@ class _SignUpViewState extends State<SignUpView> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   bool showPassword = false;
@@ -28,6 +29,7 @@ class _SignUpViewState extends State<SignUpView> {
     usernameController.dispose();
     emailController.dispose();
     passwordController.dispose();
+    phoneController.dispose();
     super.dispose();
   }
 
@@ -62,12 +64,25 @@ class _SignUpViewState extends State<SignUpView> {
     return null;
   }
 
+  String? _validatePhone(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Phone number is required';
+    }
+    final digits = value.replaceAll(RegExp(r'\D'), '');
+    if (digits.length < 8 || digits.length > 11) {
+      return 'Enter a valid phone number';
+    }
+    return null;
+  }
+
   void _handleSignUp() {
     if (_formKey.currentState?.validate() ?? false) {
+      final phone = '+855${phoneController.text.replaceAll(RegExp(r'\D'), '')}';
       authController.signup(
         emailController.text,
         passwordController.text,
         usernameController.text,
+        phone,
       );
     }
   }
@@ -146,6 +161,64 @@ class _SignUpViewState extends State<SignUpView> {
                       contentPadding: EdgeInsets.all(XPadding.large),
                       errorStyle: TextStyle(height: 0.8),
                     ),
+                  ),
+                ),
+                SizedBox(height: XPadding.large),
+
+                // PHONE
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: XPadding.medium,
+                          vertical: XPadding.large,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(color: Colors.grey.shade300),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '🇰🇭',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                            SizedBox(width: 6),
+                            Text(
+                              '+855',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey.shade700,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: TextFormField(
+                          controller: phoneController,
+                          validator: _validatePhone,
+                          keyboardType: TextInputType.phone,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          decoration: InputDecoration(
+                            hintText: 'Phone number',
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.all(XPadding.large),
+                            errorStyle: TextStyle(height: 0.8),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(height: XPadding.large),

@@ -170,6 +170,9 @@ final Map<String, String> en = {
   "top_up": "Top Up",
   "available_balance_custom": "Available balance: \$@balance",
   "insufficient_balance_custom": "Insufficient (\$@balance available)",
+  "wallet_pin": "Wallet PIN",
+  "enter_pin_to_pay": "Enter your PIN to complete payment",
+  "session_expired_enter_pin": "Your session expired. Enter your PIN to continue.",
   
   // Booking Status Translations
   "status_confirmed": "Confirmed",
@@ -228,4 +231,16 @@ final Map<String, String> en = {
   "please_wait": "Please wait...",
   "cancel": "Cancel",
   "confirm": "Confirm",
+
+  // Payment error/retry dialog
+  "try_again": "Try Again",
+  "payment_not_completed": "Payment Not Completed",
+  "payment_failed_message":
+      "Your payment could not be completed. Please try again or cancel your booking.",
+  "payment_pending": "Payment Processing",
+  "payment_pending_message":
+      "Your payment is still being processed. You can try again or cancel your booking.",
+  "payment_error_message":
+      "We couldn't verify your payment status. Please try again or cancel your booking.",
+  "cancel_booking": "Cancel Booking",
 };

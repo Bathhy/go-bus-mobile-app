@@ -116,7 +116,7 @@ class AuthController extends BaseController<AuthState> {
   }
 
   /* -------------------- SIGN UP -------------------- */
-  Future<void> signup(String email, String password, String username) async {
+  Future<void> signup(String email, String password, String username, String phone) async {
     // if (email.isEmpty || password.isEmpty || username.isEmpty) {
     //   _showError('Please fill in all fields');
     //   return;
@@ -139,8 +139,8 @@ class AuthController extends BaseController<AuthState> {
         email: email,
         password: password,
         fullName: username,
-        isEmployee: false,
-        userName: username
+        userName: username,
+        phone: phone,
       );
 
       final result = await _repository.signup(body: body);

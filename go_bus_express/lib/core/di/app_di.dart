@@ -12,6 +12,7 @@ import 'package:go_bus_express/data/payment/payment_api.dart';
 import 'package:go_bus_express/data/refund/refund_api.dart';
 import 'package:go_bus_express/data/ticket/ticket_api.dart';
 import 'package:go_bus_express/data/wallet/wallet_api.dart';
+import 'package:go_bus_express/data/wallet/wallet_payment_api.dart';
 import 'package:go_bus_express/repository/auth_repository.dart';
 import 'package:go_bus_express/repository/booking_repository.dart';
 import 'package:go_bus_express/repository/hive_manager_repository.dart';
@@ -74,12 +75,15 @@ Future<void> setupDependencyInjection() async {
     () => RouteRepositoryImpl(getIt<GoBusApi>()),
   );
   getIt.registerLazySingleton<BookingRepository>(
-    () => BookingRepositoryImpl(getIt(), getIt()),
+    () => BookingRepositoryImpl(getIt(), getIt(), getIt<WalletPaymentApi>()),
   );
   getIt.registerLazySingleton<TicketRepository>(
     () => TicketRepositoryImpl(getIt<TicketApi>()),
   );
   getIt.registerLazySingleton<WalletApi>(() => WalletApi(getIt<Dio>()));
+  getIt.registerLazySingleton<WalletPaymentApi>(
+    () => WalletPaymentApi(getIt<Dio>()),
+  );
   getIt.registerLazySingleton<WalletRepository>(
     () => WalletRepositoryImpl(getIt<WalletApi>()),
   );

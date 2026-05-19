@@ -1,5 +1,6 @@
 import 'package:go_bus_express/data/booking/booking_api.dart';
 import 'package:go_bus_express/data/payment/payment_api.dart';
+import 'package:go_bus_express/data/wallet/wallet_payment_api.dart';
 import 'package:go_bus_express/models/body/booking_body.dart';
 import 'package:go_bus_express/models/body/payment_body.dart';
 import 'package:go_bus_express/models/body/verify_payment_body.dart';
@@ -22,13 +23,23 @@ abstract class BookingRepository {
   });
 
   Future<XResult<void>> cancelBooking({required int bookingId});
+
+  Future<XResult<BaseResponse<Payment>>> getPaymentByBookingId({
+    required int bookingId,
+  });
+
+  Future<XResult<void>> payWithWallet({
+    required int bookingId,
+    required String sessionToken,
+  });
 }
 
 class BookingRepositoryImpl implements BookingRepository {
   final BookingApi _bookingApi;
   final PaymentBakongApi _paymentApi;
+  final WalletPaymentApi _walletPaymentApi;
 
-  BookingRepositoryImpl(this._bookingApi, this._paymentApi);
+  BookingRepositoryImpl(this._bookingApi, this._paymentApi, this._walletPaymentApi);
 
   @override
   Future<XResult<BookingModel?>> createBooking({required BookingBody body}) {
@@ -79,6 +90,29 @@ class BookingRepositoryImpl implements BookingRepository {
     return xResultHandler(() async {
       final res = await _bookingApi.cancelBooking(id: bookingId);
       return res.data;
+    });
+  }
+
+  @override
+  Future<XResult<BaseResponse<Payment>>> getPaymentByBookingId({
+    required int bookingId,
+  }) {
+    return xResultHandler(() async {
+      final res = await _paymentApi.getPaymentByBookingId(bookingId: bookingId);
+      return res;
+    });
+  }
+
+  @override
+  Future<XResult<void>> payWithWallet({
+    required int bookingId,
+    required String sessionToken,
+  }) {
+    return xResultHandler(() async {
+      await _walletPaymentApi.payWithWallet(
+        sessionToken: sessionToken,
+        id: bookingId,
+      );
     });
   }
 }

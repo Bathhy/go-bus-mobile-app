@@ -394,6 +394,9 @@ class _MyTicketViewState extends State<MyTicketView>
       );
       if (!mounted) return;
       Navigator.of(context).pop(); // dismiss loading dialog
+      if (success) {
+        await _ticketController.filterTickets(isUpcoming: true);
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -568,7 +571,8 @@ class _MyTicketViewState extends State<MyTicketView>
                       ),
                     ),
                   ),
-                  if (isUpcoming && _canRequestRefund(booking?.bookingStatus)) ...[
+                  if (isUpcoming &&
+                      _canRequestRefund(booking?.bookingStatus)) ...[
                     const SizedBox(width: 8),
                     Expanded(
                       child: OutlinedButton.icon(
@@ -579,9 +583,15 @@ class _MyTicketViewState extends State<MyTicketView>
                             _showRefundConfirmDialog(bid, amount);
                           }
                         },
-                        icon: const Icon(
-                          Icons.assignment_return_outlined,
-                          size: 16,
+                        // icon: const Icon(
+                        //   Icons.assignment_return_outlined,
+                        //   size: 16,
+                        // ),
+                        icon: AppSvgImage(
+                          path: AppImages.icRefund,
+                          height: 16,
+                          width: 16,
+                          color: Colors.red,
                         ),
                         label: Text('request_refund'.tr),
                         style: OutlinedButton.styleFrom(
@@ -595,7 +605,8 @@ class _MyTicketViewState extends State<MyTicketView>
                       ),
                     ),
                   ],
-                  if (isUpcoming && !_canRequestRefund(booking?.bookingStatus)) ...[
+                  if (isUpcoming &&
+                      !_canRequestRefund(booking?.bookingStatus)) ...[
                     const SizedBox(width: 8),
                     Expanded(
                       child: Container(
