@@ -154,9 +154,17 @@ class AuthController extends BaseController<AuthState> {
               await _localRepository.saveRefreshToken(authData.refreshToken!);
             }
           }
-          Get.back();
           log("Signup success >>> ${result.data?.token}");
           _showSuccess('Account created successfully');
+          // Use Navigator.pop instead of Get.back() to avoid GetX's
+          // internal closeCurrentSnackbar() call, which crashes when a
+          // SnackbarController._controller has not been initialized yet.
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            final ctx = Get.context;
+            if (ctx != null && Navigator.canPop(ctx)) {
+              Navigator.of(ctx).pop();
+            }
+          });
           break;
 
         case Error<AuthModel?>():

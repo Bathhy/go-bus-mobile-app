@@ -77,6 +77,8 @@ dependencies:
   stomp_dart_client: ^3.0.1
   web_socket_channel: ^3.0.1
 
+  audioplayers: ^6.1.0
+
   shimmer: ^3.0.0
 
   #Connectivity
@@ -111,6 +113,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
+    - assets/sounds/
     - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see

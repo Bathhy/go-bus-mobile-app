@@ -269,12 +269,7 @@ class SelectSeatController extends BaseController<SelectSeatState> {
       if (event.seatId != null) ids.remove(event.seatId);
       updateState((s) => s.copyWith(selectedSeats: seats, selectedSeatIds: ids));
       
-      Get.snackbar(
-        'Seat Taken',
-        'Seat $seatNum was selected by another user',
-        snackPosition: SnackPosition.TOP,
-        duration: const Duration(seconds: 3),
-      );
+      _showInfo('Seat Taken', 'Seat $seatNum was selected by another user');
     }
   }
 
@@ -333,12 +328,8 @@ class SelectSeatController extends BaseController<SelectSeatState> {
       if (event.seatId != null) ids.remove(event.seatId);
       updateState((s) => s.copyWith(selectedSeats: seats, selectedSeatIds: ids));
 
-      Get.snackbar(
-        'Seat Expired',
-        'Seat $seatNum selection has expired.',
-        snackPosition: SnackPosition.TOP,
-        duration: const Duration(seconds: 4),
-      );
+      _showInfo('Seat Expired', 'Seat $seatNum selection has expired.',
+          duration: const Duration(seconds: 4));
     }
   }
 
@@ -579,6 +570,37 @@ class SelectSeatController extends BaseController<SelectSeatState> {
     print('🔄 [MANUAL] Requesting state sync for schedule ${state.scheduleId}');
     _requestStateSync();
     // Snackbar removed - causes issues in dialog context
+  }
+
+  // MARK - Snackbar (ScaffoldMessenger – avoids GetX SnackbarController bug)
+
+  /// Shows an informational snackbar using [ScaffoldMessenger] so that
+  /// GetX's internal [SnackbarController] / [AnimationController] lifecycle
+  /// is never involved.  Calling [Get.snackbar] from a controller creates a
+  /// queued [SnackbarController] whose `late AnimationController _controller`
+  /// is only set once the widget mounts; if navigation happens before that
+  /// mount, accessing `_controller` throws [LateInitializationError].
+  void _showInfo(String title, String message, {Duration duration = const Duration(seconds: 3)}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final ctx = Get.context;
+      if (ctx == null) return;
+      ScaffoldMessenger.of(ctx).clearSnackBars();
+      ScaffoldMessenger.of(ctx).showSnackBar(
+        SnackBar(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              Text(message, style: const TextStyle(color: Colors.white)),
+            ],
+          ),
+          backgroundColor: Colors.orange.shade700,
+          duration: duration,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    });
   }
 
   // MARK - Helpers (legacy API compatibility)

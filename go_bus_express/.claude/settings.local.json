@@ -18,7 +18,12 @@
       "Bash(grep -r \"shimmer\" pubspec.yaml)",
       "Read(//c/Users/MSI63/Videos/Captures/OneDrive/Pictures/XML/Go Bus Final  System/**)",
       "Read(//c/Users/MSI63/Videos/Captures/OneDrive/Pictures/XML/**)",
-      "Bash(echo \"EXIT:$?\")"
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(xargs grep -l \"wallet\\\\|WalletPayment\\\\|payWithWallet\")",
+      "Bash(xargs grep -l \"checking.transaction\\\\|checkTransaction\\\\|pollPayment\\\\|payment.*status\")",
+      "Bash(xargs grep -l \"KhQr\\\\|khqr\\\\|PaymentSuccess\\\\|ChoosePayment\")",
+      "Bash(xargs grep -l \"wallet\\\\|WalletPayment\")",
+      "Bash(xargs grep -l \"khqr\\\\|KhQr\\\\|verifyMd5\\\\|checking\")"
     ]
   }
 }

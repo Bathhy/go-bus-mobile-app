@@ -158,12 +158,12 @@ class LayoutData {
   });
 
   factory LayoutData.fromJson(Map<String, dynamic> json) {
-    // Handle array format from API: [{"row": 1, "seats": ["A1", "A2"]}, ...]
-    if (json.containsKey('seats') && json['seats'] is List) {
-      return _$LayoutDataFromJson(json);
-    }
-    
-    // Handle direct array format (legacy)
+    // Always use the null-safe custom parser so that null seat entries in a
+    // row (e.g. the last row having fewer seats than the column count) are
+    // handled gracefully.  The generated _$LayoutDataFromJson casts every
+    // element as Map<String, dynamic>, which throws
+    //   "type 'Null' is not a subtype of type 'Map<String, dynamic>'"
+    // whenever the backend emits a null placeholder in a row.
     return LayoutData(
       rows: json['rows'] as int?,
       columns: json['columns'] as int?,
@@ -174,12 +174,14 @@ class LayoutData {
           ? (json['seats'] as List)
               .map((row) => (row as List)
                   .map((seat) {
-                    // Handle null seats in the layout
+                    // Handle null seat placeholders in the layout grid.
                     if (seat == null) {
                       return SeatPosition(seatNumber: null, isAvailable: false);
                     }
                     return SeatPosition.fromJson(
-                        seat is Map ? Map<String, dynamic>.from(seat) : {'seatNumber': seat});
+                        seat is Map
+                            ? Map<String, dynamic>.from(seat)
+                            : {'seatNumber': seat.toString()});
                   })
                   .toList())
               .toList()

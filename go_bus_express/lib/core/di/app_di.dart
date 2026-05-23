@@ -50,7 +50,7 @@ Future<void> setupDependencyInjection() async {
   await hiveManager.init();
   getIt.registerLazySingleton<HiveManagerRepository>(() => hiveManager);
 
-  // Network - Main API Service
+  // Network - Main API Service (30s timeout — all standard endpoints)
   final dioService = DioService(getIt<LocalRepository>());
   final dio = dioService.dio;
   getIt.registerLazySingleton(() => dio);
@@ -59,9 +59,13 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<BookingApi>(() => BookingApi(getIt<Dio>()));
   getIt.registerLazySingleton<TicketApi>(() => TicketApi(getIt<Dio>()));
 
-  // Network - Payment API Service
+  // Network - Payment API Service (6-minute timeout)
+  // Both PaymentBakongApi and WalletPaymentApi use server-side polling:
+  // the backend holds the HTTP connection open while it waits for the
+  // payment provider (up to ~5 min).  They must NOT share the main Dio.
+  final paymentDio = PaymentDioService(getIt<LocalRepository>()).dio;
   getIt.registerLazySingleton<PaymentBakongApi>(
-    () => PaymentBakongApi(getIt<Dio>())
+    () => PaymentBakongApi(paymentDio),
   );
 
   // Repositories
@@ -82,7 +86,7 @@ Future<void> setupDependencyInjection() async {
   );
   getIt.registerLazySingleton<WalletApi>(() => WalletApi(getIt<Dio>()));
   getIt.registerLazySingleton<WalletPaymentApi>(
-    () => WalletPaymentApi(getIt<Dio>()),
+    () => WalletPaymentApi(getIt<Dio>()), // responds quickly — standard 30s timeout
   );
   getIt.registerLazySingleton<WalletRepository>(
     () => WalletRepositoryImpl(getIt<WalletApi>()),

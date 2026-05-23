@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:go_bus_express/core/services/payment_sound_service.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/services/local_notification_service.dart';
 import 'package:go_bus_express/core/storage/local_repository.dart';
@@ -158,6 +159,10 @@ class KhQrController extends BaseController<KhQrState> {
   // MARK: - Payment Success
 
   Future<void> _onPaymentSuccess() async {
+    // Play "ting" + haptic the instant we know payment succeeded —
+    // before navigation so the user feels the confirmation immediately.
+    PaymentSoundService.playSuccess();
+
     updateState((s) => s.copyWith(isPaid: true));
     await _hiveManager.clearPendingPayment();
     _clearLocalMd5();

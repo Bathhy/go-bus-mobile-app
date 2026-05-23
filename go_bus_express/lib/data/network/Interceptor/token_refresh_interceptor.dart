@@ -161,16 +161,23 @@ class TokenRefreshInterceptor extends QueuedInterceptor {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (Get.currentRoute != AppRoutes.signIn) {
           Get.offAllNamed(AppRoutes.signIn);
-          
-          // Show a snackbar to inform user
-          Get.snackbar(
-            'Session Expired',
-            'Your session has expired. Please login again.',
-            snackPosition: SnackPosition.TOP,
-            duration: const Duration(seconds: 3),
-            backgroundColor: Get.theme.colorScheme.error.withOpacity(0.1),
-            colorText: Get.theme.colorScheme.error,
-          );
+
+          // Show session-expired notice via ScaffoldMessenger to avoid the
+          // GetX SnackbarController LateInitializationError (its internal
+          // AnimationController is only set once the widget mounts; calling
+          // Get.snackbar before that point crashes the app).
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            final ctx = Get.context;
+            if (ctx == null) return;
+            ScaffoldMessenger.of(ctx).showSnackBar(
+              SnackBar(
+                content: const Text('Your session has expired. Please login again.'),
+                backgroundColor: Get.theme.colorScheme.error,
+                duration: const Duration(seconds: 3),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          });
         }
         
         // Reset flag after navigation

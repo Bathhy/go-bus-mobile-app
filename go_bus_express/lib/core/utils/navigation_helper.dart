@@ -1,31 +1,22 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-/// Safe navigation helper to prevent GetX snackbar controller errors
+/// Safe navigation helper that bypasses GetX's snackbar queue entirely.
+///
+/// Never call [Get.back] / [Get.closeAllSnackbars] / [Get.closeCurrentSnackbar]
+/// here — all three internally access [SnackbarController._controller] which is
+/// a `late AnimationController` only initialised once the snackbar widget mounts.
+/// Calling them while a [Get.snackbar] job is queued but not yet mounted throws
+/// a [LateInitializationError].  Using [Navigator.pop] directly bypasses that
+/// queue completely.
 class NavigationHelper {
-  /// Safely navigate back, handling snackbar controller initialization issues
-  static void safeBack({
-    dynamic result,
-    bool closeOverlays = false,
-    bool canPop = true,
-    int? id,
-  }) {
-    try {
-      // Close any open snackbars first
-      if (Get.isSnackbarOpen == true) {
-        Get.closeAllSnackbars();
-      }
-      
-      // Navigate back with closeOverlays set to false to avoid snackbar controller issues
-      Get.back(
-        result: result,
-        closeOverlays: closeOverlays,
-        canPop: canPop,
-        id: id,
-      );
-    } catch (e) {
-      // Fallback: if Get.back() fails, the error is already handled
-      // The navigation will still work because Get.back() completes before throwing
-      // the snackbar controller error
+  /// Pop the current route using plain [Navigator.pop], which does not touch
+  /// GetX's internal snackbar queue.
+  static void safeBack({dynamic result}) {
+    final ctx = Get.context;
+    if (ctx == null) return;
+    if (Navigator.canPop(ctx)) {
+      Navigator.of(ctx).pop(result);
     }
   }
 }
