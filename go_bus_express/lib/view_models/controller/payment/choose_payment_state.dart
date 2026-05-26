@@ -14,6 +14,7 @@ class ChoosePaymentState extends BaseUiState {
   final String note;
   final int scheduleId;
   final double? walletBalance;
+  final String walletDescription;
 
   ChoosePaymentState({
     super.isLoading = false,
@@ -28,6 +29,7 @@ class ChoosePaymentState extends BaseUiState {
     this.note = '',
     this.scheduleId = 0,
     this.walletBalance,
+    this.walletDescription = '',
   });
 
   int get quantity => selectedSeats.length;
@@ -60,6 +62,7 @@ class ChoosePaymentState extends BaseUiState {
     String? note,
     int? scheduleId,
     double? walletBalance,
+    String? walletDescription,
   }) {
     return ChoosePaymentState(
       isLoading: isLoading ?? this.isLoading,
@@ -74,6 +77,7 @@ class ChoosePaymentState extends BaseUiState {
       note: note ?? this.note,
       scheduleId: scheduleId ?? this.scheduleId,
       walletBalance: walletBalance ?? this.walletBalance,
+      walletDescription: walletDescription ?? this.walletDescription,
     );
   }
 }

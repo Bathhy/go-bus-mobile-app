@@ -32,10 +32,12 @@ class WalletController extends BaseController<WalletState> {
 
     if (_localRepository.isWalletSessionValid()) {
       final cachedToken = _localRepository.getWalletSessionToken()!;
-      // Ensure in-memory state has the token so WalletView can refresh balance
+      final cachedHash = _localRepository.getWalletHash();
+      // Ensure in-memory state has the token + hash so WalletView and
+      // top-up KHQR generation work correctly without a fresh PIN login.
       if (state.wallet?.walletSessionToken == null) {
         updateState((s) => s.copyWith(
-          wallet: WalletModel(walletSessionToken: cachedToken),
+          wallet: WalletModel(walletSessionToken: cachedToken, hash: cachedHash),
         ));
       }
       Get.toNamed(AppRoutes.wallet);
@@ -89,11 +91,15 @@ class WalletController extends BaseController<WalletState> {
     switch (result) {
       case Success<WalletModel?>():
         final sessionToken = result.data?.walletSessionToken;
+        final walletHash = result.data?.hash;
         updateState((s) => s.copyWith(wallet: result.data, clearError: true));
         if (sessionToken != null) {
           await _localRepository.saveWalletSession(sessionToken);
         }
-        await _fetchWalletMe(sessionToken);
+        if (walletHash != null) {
+          await _localRepository.saveWalletHash(walletHash);
+        }
+        await _fetchWalletMe(sessionToken, includeTransactions: true);
         Get.offNamedUntil(
           AppRoutes.wallet,
           ModalRoute.withName(AppRoutes.mainNavigation),
@@ -110,8 +116,12 @@ class WalletController extends BaseController<WalletState> {
   // ─── Wallet data ───────────────────────────────────────────────────────────
 
   /// Called from WalletView on entry — always refreshes balance from API.
-  Future<void> fetchWalletMe() async {
-    await _fetchWalletMe(state.wallet?.walletSessionToken);
+  /// Set [includeTransactions] to true to also fetch transaction history.
+  Future<void> fetchWalletMe({bool includeTransactions = false}) async {
+    await _fetchWalletMe(
+      state.wallet?.walletSessionToken,
+      includeTransactions: includeTransactions,
+    );
   }
 
   Future<void> fetchTransactions({bool reset = false}) async {
@@ -136,11 +146,15 @@ class WalletController extends BaseController<WalletState> {
         final page_ = result.data;
         final newItems = page_?.content ?? [];
         final existing = reset ? <WalletTransactionModel>[] : state.transactions;
+        final nextPage = page + 1;
+        // API uses 1-based pages; totalPages tells us how many pages exist.
+        // e.g. page=1, totalPages=3 → nextPage=2, 2<=3 → hasMore=true
+        final totalPages = page_?.totalPages ?? 1;
         updateState((s) => s.copyWith(
           isTransactionLoading: false,
           transactions: [...existing, ...newItems],
-          currentPage: (page_?.number ?? page) + 1,
-          hasMorePages: !(page_?.last ?? true),
+          currentPage: nextPage,
+          hasMorePages: nextPage <= totalPages,
         ));
       case Error<WalletTransactionPage?>():
         log('❌ Wallet transactions error: ${result.error.displayMessage}');
@@ -151,7 +165,10 @@ class WalletController extends BaseController<WalletState> {
     }
   }
 
-  Future<void> _fetchWalletMe(String? token) async {
+  Future<void> _fetchWalletMe(
+    String? token, {
+    bool includeTransactions = false,
+  }) async {
     if (token == null) {
       updateState((s) => s.copyWith(isLoading: false));
       return;
@@ -164,12 +181,18 @@ class WalletController extends BaseController<WalletState> {
       case Success<WalletModel?>():
         final refreshed = result.data;
         if (refreshed != null) {
-          // /wallets/me returns walletSessionToken as null — preserve the login token
+          // /wallets/me returns walletSessionToken and hash as null —
+          // preserve both from the original login response.
           updateState((s) => s.copyWith(
             isLoading: false,
-            wallet: refreshed.copyWith(walletSessionToken: token),
+            wallet: refreshed.copyWith(
+              walletSessionToken: token,
+              hash: refreshed.hash ?? s.wallet?.hash,
+            ),
           ));
-          await fetchTransactions(reset: true);
+          if (includeTransactions) {
+            await fetchTransactions(reset: true);
+          }
         } else {
           updateState((s) => s.copyWith(isLoading: false));
         }
@@ -197,6 +220,7 @@ class WalletController extends BaseController<WalletState> {
       case Success<WalletModel?>():
         await _markWalletExistsInCache();
         final sessionToken = result.data?.walletSessionToken;
+        final walletHash = result.data?.hash;
         updateState((s) => s.copyWith(
           wallet: result.data,
           clearTempPin: true,
@@ -205,7 +229,10 @@ class WalletController extends BaseController<WalletState> {
         if (sessionToken != null) {
           await _localRepository.saveWalletSession(sessionToken);
         }
-        await _fetchWalletMe(sessionToken);
+        if (walletHash != null) {
+          await _localRepository.saveWalletHash(walletHash);
+        }
+        await _fetchWalletMe(sessionToken, includeTransactions: true);
         Get.offNamedUntil(
           AppRoutes.wallet,
           ModalRoute.withName(AppRoutes.mainNavigation),

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/http.dart';
 import 'package:go_bus_express/core/network/parse_error_logger.dart';
+import 'package:go_bus_express/models/body/wallet_pay_body.dart';
 import 'package:shared_package/network/base_response.dart';
 
 part 'wallet_payment_api.g.dart';
@@ -13,5 +14,6 @@ abstract class WalletPaymentApi {
   Future<BaseResponse<void>> payWithWallet({
     @Header('X-Wallet-Session') required String sessionToken,
     @Path('id') required int id,
+    @Body() required WalletPayBody body,
   });
 }

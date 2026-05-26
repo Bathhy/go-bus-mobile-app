@@ -14,7 +14,7 @@ import 'network_constant.dart';
 /// [DioExceptionType.receiveTimeout] before the payment completes.
 ///
 /// Only [PaymentBakongApi] should be wired to this service.
-/// All other APIs (including [WalletPaymentApi]) use the standard [DioService].
+/// All other APIs (including [WalletPaymentApi]) use the standard [DioService],lkmi  .
 class PaymentDioService {
   late Dio _dio;
   final LocalRepository _localRepository;

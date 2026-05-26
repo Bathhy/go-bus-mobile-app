@@ -120,7 +120,7 @@ class _WalletApi implements WalletApi {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/wallets/me/info',
+            '/wallets/my-balance',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -141,7 +141,7 @@ class _WalletApi implements WalletApi {
   }
 
   @override
-  Future<BaseResponse<WalletTransactionPage>> getTransactions(
+  Future<WalletTransactionPage> getTransactions(
     String sessionToken, {
     int page = 1,
     int size = 15,
@@ -151,7 +151,7 @@ class _WalletApi implements WalletApi {
     final _headers = <String, dynamic>{r'X-Wallet-Session': sessionToken};
     _headers.removeWhere((k, v) => v == null);
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<BaseResponse<WalletTransactionPage>>(
+    final _options = _setStreamType<WalletTransactionPage>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -162,12 +162,9 @@ class _WalletApi implements WalletApi {
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late BaseResponse<WalletTransactionPage> _value;
+    late WalletTransactionPage _value;
     try {
-      _value = BaseResponse<WalletTransactionPage>.fromJson(
-        _result.data!,
-        (json) => WalletTransactionPage.fromJson(json as Map<String, dynamic>),
-      );
+      _value = WalletTransactionPage.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -178,19 +175,19 @@ class _WalletApi implements WalletApi {
   @override
   Future<BaseResponse<WalletTopUpKhqrModel>> generateTopUpKhqr(
     String sessionToken,
-    Map<String, dynamic> body,
+    WalletTopUpKhqrBody body,
   ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{r'X-Wallet-Session': sessionToken};
     _headers.removeWhere((k, v) => v == null);
     final _data = <String, dynamic>{};
-    _data.addAll(body);
+    _data.addAll(body.toJson());
     final _options = _setStreamType<BaseResponse<WalletTopUpKhqrModel>>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/wallets/top-up/bakong/generateKHQR',
+            '/topups/bakong/generate-khqr',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -202,41 +199,6 @@ class _WalletApi implements WalletApi {
       _value = BaseResponse<WalletTopUpKhqrModel>.fromJson(
         _result.data!,
         (json) => WalletTopUpKhqrModel.fromJson(json as Map<String, dynamic>),
-      );
-    } on Object catch (e, s) {
-      errorLogger?.logError(e, s, _options);
-      rethrow;
-    }
-    return _value;
-  }
-
-  @override
-  Future<BaseResponse<VerifyPaymentModel>> checkTopUpTransaction(
-    String sessionToken,
-    VerifyPaymentBody body,
-  ) async {
-    final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
-    final _headers = <String, dynamic>{r'X-Wallet-Session': sessionToken};
-    _headers.removeWhere((k, v) => v == null);
-    final _data = <String, dynamic>{};
-    _data.addAll(body.toJson());
-    final _options = _setStreamType<BaseResponse<VerifyPaymentModel>>(
-      Options(method: 'POST', headers: _headers, extra: _extra)
-          .compose(
-            _dio.options,
-            '/wallets/top-up/bakong/checkingTransaction',
-            queryParameters: queryParameters,
-            data: _data,
-          )
-          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
-    );
-    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late BaseResponse<VerifyPaymentModel> _value;
-    try {
-      _value = BaseResponse<VerifyPaymentModel>.fromJson(
-        _result.data!,
-        (json) => VerifyPaymentModel.fromJson(json as Map<String, dynamic>),
       );
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);

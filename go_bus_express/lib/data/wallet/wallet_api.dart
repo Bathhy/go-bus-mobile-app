@@ -1,8 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/http.dart';
 import 'package:go_bus_express/core/network/parse_error_logger.dart';
-import 'package:go_bus_express/models/body/verify_payment_body.dart';
-import 'package:go_bus_express/models/payment/verify_payment_model.dart';
+import 'package:go_bus_express/models/body/wallet_topup_khqr_body.dart';
 import 'package:go_bus_express/models/wallet/wallet_model.dart';
 import 'package:go_bus_express/models/wallet/wallet_pin_body.dart';
 import 'package:go_bus_express/models/wallet/wallet_topup_khqr_model.dart';
@@ -26,25 +25,19 @@ abstract class WalletApi {
     @Header('X-Wallet-Session') String sessionToken,
   );
 
-  @GET('/wallets/me/info')
+  @GET('/wallets/my-balance')
   Future<BaseResponse<WalletModel>> getWalletInfo();
 
   @GET('/wallets/me/transactions')
-  Future<BaseResponse<WalletTransactionPage>> getTransactions(
+  Future<WalletTransactionPage> getTransactions(
     @Header('X-Wallet-Session') String sessionToken, {
     @Query('page') int page = 1,
     @Query('size') int size = 15,
   });
 
-  @POST('/wallets/top-up/bakong/generateKHQR')
+  @POST('/topups/bakong/generate-khqr')
   Future<BaseResponse<WalletTopUpKhqrModel>> generateTopUpKhqr(
     @Header('X-Wallet-Session') String sessionToken,
-    @Body() Map<String, dynamic> body,
-  );
-
-  @POST('/wallets/top-up/bakong/checkingTransaction')
-  Future<BaseResponse<VerifyPaymentModel>> checkTopUpTransaction(
-    @Header('X-Wallet-Session') String sessionToken,
-    @Body() VerifyPaymentBody body,
+    @Body() WalletTopUpKhqrBody body,
   );
 }

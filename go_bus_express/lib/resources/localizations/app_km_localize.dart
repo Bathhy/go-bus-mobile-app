@@ -173,6 +173,9 @@ final Map<String, String> km = {
   "wallet_pin": "លេខសម្ងាត់កាបូប",
   "enter_pin_to_pay": "បញ្ចូលលេខសម្ងាត់ដើម្បីបញ្ចប់ការទូទាត់",
   "session_expired_enter_pin": "សម័យប្រើប្រាស់បានផុតកំណត់។ បញ្ចូលលេខសម្ងាត់ដើម្បីបន្ត។",
+  "wallet_pin_required_hint": "ត្រូវការ PIN — អ្នកនឹងត្រូវបញ្ចូលនៅពេលចុច Pay",
+  "wallet_description_label": "បរិយាយ",
+  "wallet_description_hint": "ឧ. ការទូទាត់សំបុត្រឡានក្រុង",
   
   // Booking Status Translations
   "status_confirmed": "បានបញ្ជាក់",
@@ -232,6 +235,24 @@ final Map<String, String> km = {
   "cancel": "បោះបង់",
   "confirm": "បញ្ជាក់",
 
+  // Cancel Top-Up Dialog
+  "cancel_topup_title": "បោះបង់ការបញ្ចូលប្រាក់?",
+  "cancel_topup_message":
+      "ការទូទាត់របស់អ្នកនៅកំពុងដំណើរការ។\nបើអ្នកត្រឡប់ក្រោយឥឡូវ ការបញ្ចូលប្រាក់អាចនឹងមិនបញ្ចប់ទេ។",
+  "keep_waiting": "រង់ចាំបន្ត",
+  "cancel_topup": "បោះបង់ការបញ្ចូលប្រាក់",
+
+  // Top-Up Wallet Screen
+  "top_up_wallet": "បញ្ចូលប្រាក់ក្នុងកាបូប",
+  "enter_amount": "បញ្ចូលចំនួន",
+  "total_balance": "សមតុល្យសរុប",
+  "please_enter_valid_amount": "សូមបញ្ចូលចំនួនទឹកប្រាក់ត្រឹមត្រូវ",
+
+  // Top-Up Success Screen
+  "topup_success_title": "🎉 បញ្ចូលប្រាក់បានជោគជ័យ!",
+  "topup_success_message":
+      "ប្រាក់ត្រូវបានបញ្ចូលចូលកាបូបរបស់អ្នកដោយជោគជ័យ។\nសមតុល្យរបស់អ្នករួចរាល់សម្រាប់ប្រើ។",
+
   // Payment error/retry dialog
   "try_again": "ព្យាយាមម្តងទៀត",
   "payment_not_completed": "ការទូទាត់មិនបានបញ្ចប់",
@@ -243,4 +264,31 @@ final Map<String, String> km = {
   "payment_error_message":
       "យើងមិនអាចផ្ទៀងផ្ទាត់ស្ថានភាពការទូទាត់របស់អ្នកបានទេ។ សូមព្យាយាមម្តងទៀត ឬបោះបង់ការកក់។",
   "cancel_booking": "បោះបង់ការកក់",
+
+  // Wallet Transaction List
+  "All transactions loaded": "ប្រតិបត្តិការទាំងអស់ត្រូវបានផ្ទុក",
+
+  // Wallet Screen
+  'My Wallet': 'កាបូបរបស់ខ្ញុំ',
+  'Available Balance': 'សមតុល្យដែលមាន',
+  'Top Up': 'បញ្ចូលលុយ',
+  'Recent Transactions': 'ប្រតិបត្តិការថ្មីៗ',
+  'No Transactions Yet': 'មិនទាន់មានប្រតិបត្តិការទេ',
+  'Your transaction history will appear here':
+      'ប្រវត្តិប្រតិបត្តិការរបស់អ្នកនឹងបង្ហាញនៅទីនេះ',
+  'Failed to load transactions': 'បរាជ័យក្នុងការផ្ទុកប្រតិបត្តិការ',
+  'Retry': 'ព្យាយាមម្តងទៀត',
+
+  // Transaction Type Labels
+  'Payment': 'ការទូទាត់',
+  'Refund': 'សងប្រាក់វិញ',
+  'Withdrawal': 'ដកប្រាក់',
+  'Bonus': 'ប្រាក់រង្វាន់',
+  'Transaction': 'ប្រតិបត្តិការ',
+
+  // Transaction Status Labels
+  'Completed': 'បានបញ្ចប់',
+  'Pending': 'កំពុងរង់ចាំ',
+  'Failed': 'បរាជ័យ',
+  'Cancelled': 'បានលុបចោល',
 };

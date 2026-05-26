@@ -173,6 +173,9 @@ final Map<String, String> en = {
   "wallet_pin": "Wallet PIN",
   "enter_pin_to_pay": "Enter your PIN to complete payment",
   "session_expired_enter_pin": "Your session expired. Enter your PIN to continue.",
+  "wallet_pin_required_hint": "PIN required — you'll be prompted when you tap Pay",
+  "wallet_description_label": "Description",
+  "wallet_description_hint": "e.g. Bus ticket payment",
   
   // Booking Status Translations
   "status_confirmed": "Confirmed",
@@ -232,6 +235,24 @@ final Map<String, String> en = {
   "cancel": "Cancel",
   "confirm": "Confirm",
 
+  // Cancel Top-Up Dialog
+  "cancel_topup_title": "Cancel Top-Up?",
+  "cancel_topup_message":
+      "Your payment is still being processed.\nIf you go back now, the top-up may not complete.",
+  "keep_waiting": "Keep Waiting",
+  "cancel_topup": "Cancel Top-Up",
+
+  // Top-Up Wallet Screen
+  "top_up_wallet": "Top Up Wallet",
+  "enter_amount": "Enter Amount",
+  "total_balance": "TOTAL BALANCE",
+  "please_enter_valid_amount": "Please enter a valid amount",
+
+  // Top-Up Success Screen
+  "topup_success_title": "🎉 Top Up Successful!",
+  "topup_success_message":
+      "Your wallet has been topped up successfully.\nYour balance is ready to use.",
+
   // Payment error/retry dialog
   "try_again": "Try Again",
   "payment_not_completed": "Payment Not Completed",
@@ -243,4 +264,30 @@ final Map<String, String> en = {
   "payment_error_message":
       "We couldn't verify your payment status. Please try again or cancel your booking.",
   "cancel_booking": "Cancel Booking",
+
+  // Wallet Transaction List
+  "All transactions loaded": "All transactions loaded",
+
+  // Wallet Screen
+  'My Wallet': 'My Wallet',
+  'Available Balance': 'Available Balance',
+  'Top Up': 'Top Up',
+  'Recent Transactions': 'Recent Transactions',
+  'No Transactions Yet': 'No Transactions Yet',
+  'Your transaction history will appear here':
+      'Your transaction history will appear here',
+  'Failed to load transactions': 'Failed to load transactions',
+  'Retry': 'Retry',
+
+  // Transaction Type Labels
+  'Refund': 'Refund',
+  'Withdrawal': 'Withdrawal',
+  'Bonus': 'Bonus',
+  'Transaction': 'Transaction',
+
+  // Transaction Status Labels
+  'Completed': 'Completed',
+  'Pending': 'Pending',
+  'Failed': 'Failed',
+  'Cancelled': 'Cancelled',
 };

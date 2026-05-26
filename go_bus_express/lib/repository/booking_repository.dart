@@ -4,6 +4,7 @@ import 'package:go_bus_express/data/wallet/wallet_payment_api.dart';
 import 'package:go_bus_express/models/body/booking_body.dart';
 import 'package:go_bus_express/models/body/payment_body.dart';
 import 'package:go_bus_express/models/body/verify_payment_body.dart';
+import 'package:go_bus_express/models/body/wallet_pay_body.dart';
 import 'package:go_bus_express/models/booking/booking_model.dart';
 import 'package:go_bus_express/models/payment/generate_qr_model.dart';
 import 'package:go_bus_express/models/payment/verify_payment_model.dart';
@@ -31,6 +32,7 @@ abstract class BookingRepository {
   Future<XResult<void>> payWithWallet({
     required int bookingId,
     required String sessionToken,
+    String? description,
   });
 }
 
@@ -107,11 +109,13 @@ class BookingRepositoryImpl implements BookingRepository {
   Future<XResult<void>> payWithWallet({
     required int bookingId,
     required String sessionToken,
+    String? description,
   }) {
     return xResultHandler(() async {
       await _walletPaymentApi.payWithWallet(
         sessionToken: sessionToken,
         id: bookingId,
+        body: WalletPayBody(description: description),
       );
     });
   }

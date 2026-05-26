@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/resources/app_images.dart';
@@ -6,7 +8,6 @@ import 'package:go_bus_express/view_models/controller/payment/choose_payment_con
 import 'package:shared_package/config/themes.dart';
 import 'package:shared_package/design_system/constant/ts_padding.dart';
 import 'package:shared_package/design_system/x_widget/AppImage.dart';
-import 'package:shared_package/design_system/x_widget/ButtonComponent.dart';
 import 'package:shared_package/design_system/x_widget/TextComponent.dart';
 import 'package:shared_package/design_system/x_widget/x_app_bar.dart';
 
@@ -20,11 +21,16 @@ class ChoosePaymentView extends StatefulWidget {
   State<ChoosePaymentView> createState() => _ChoosePaymentViewState();
 }
 
-class _ChoosePaymentViewState extends State<ChoosePaymentView> {
+class _ChoosePaymentViewState extends State<ChoosePaymentView>
+    with SingleTickerProviderStateMixin {
   final ChoosePaymentController controller = getIt<ChoosePaymentController>();
   Worker? _stateWorker;
 
   final RxString _selectedPayment = 'KHQR'.obs;
+
+  // ── Shimmer animation ──────────────────────────────────────────────────────
+  late final AnimationController _shimmerController;
+  late final Animation<double> _shimmerAnim;
 
   @override
   void initState() {
@@ -36,13 +42,25 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
         XAppLoadingDialog.hideAppDialog();
       }
     });
+
+    _shimmerController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    )..repeat();
+
+    _shimmerAnim = Tween<double>(begin: -1.0, end: 2.0).animate(
+      CurvedAnimation(parent: _shimmerController, curve: Curves.easeInOut),
+    );
   }
 
   @override
   void dispose() {
     _stateWorker?.dispose();
+    _shimmerController.dispose();
     super.dispose();
   }
+
+  // ── Build ──────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -126,7 +144,13 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
         final walletBlocked =
             selected == 'Wallet' &&
             (state.walletBalance ?? 0.0) < state.totalPrice;
-        final canProceed = controller.canProceedToPayment() && !walletBlocked;
+        // Description is required when paying by Wallet
+        final walletDescriptionMissing =
+            selected == 'Wallet' && state.walletDescription.trim().isEmpty;
+        final canProceed =
+            controller.canProceedToPayment() &&
+            !walletBlocked &&
+            !walletDescriptionMissing;
 
         return Container(
           padding: EdgeInsets.all(XPadding.extralarge),
@@ -136,25 +160,139 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
                 blurRadius: 10,
-                offset: Offset(0, -2),
+                offset: const Offset(0, -2),
               ),
             ],
           ),
           child: SafeArea(
-            child: XButton(
-              height: 52,
+            child: _buildPayButton(
               label: 'Pay'.trParams({
                 'amount': state.totalPrice.toStringAsFixed(2),
               }),
-              optionbutton: 1,
-              bgColor: canProceed ? goBusPrimary : Colors.grey,
-              onTap: canProceed
+              canProceed: canProceed,
+              onPressed: canProceed
                   ? () => controller.createBooking(paymentMethod: selected)
                   : null,
             ),
           ),
         );
       }),
+    );
+  }
+
+  // ── Pay button with shimmer sweep ──────────────────────────────────────────
+
+  Widget _buildPayButton({
+    required String label,
+    required bool canProceed,
+    required VoidCallback? onPressed,
+  }) {
+    return AnimatedBuilder(
+      animation: _shimmerController,
+      builder: (context, _) {
+        // Pulsing glow — sine wave oscillation
+        final glowOpacity = canProceed
+            ? 0.22 + 0.10 * math.sin(_shimmerController.value * 2 * math.pi)
+            : 0.0;
+
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+          width: double.infinity,
+          height: 52,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: canProceed
+                ? [
+                    BoxShadow(
+                      color: goBusPrimary.withOpacity(glowOpacity),
+                      blurRadius: 20,
+                      spreadRadius: 1,
+                      offset: const Offset(0, 6),
+                    ),
+                  ]
+                : [],
+          ),
+          child: Stack(
+            children: [
+              // ── Base button ────────────────────────────────────────
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    backgroundColor:
+                        canProceed ? goBusPrimary : Colors.grey,
+                    disabledBackgroundColor: Colors.grey,
+                    foregroundColor: Colors.white,
+                    disabledForegroundColor: Colors.white70,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  onPressed: onPressed,
+                  child: Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+
+              // ── Shimmer sweep overlay (enabled only) ────────────────
+              if (canProceed)
+                Positioned.fill(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: IgnorePointer(child: _buildShimmerSweep()),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  /// Translucent white gradient strip that slides left → right.
+  Widget _buildShimmerSweep() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final totalWidth = constraints.maxWidth;
+        final stripWidth = totalWidth * 0.44;
+
+        // _shimmerAnim.value: -1.0 → 2.0  →  map to pixel offset
+        final progress = (_shimmerAnim.value + 1.0) / 3.0; // 0.0 → 1.0
+        final left = progress * (totalWidth + stripWidth) - stripWidth;
+
+        return Stack(
+          children: [
+            Positioned(
+              left: left,
+              top: 0,
+              bottom: 0,
+              width: stripWidth,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      Colors.white.withOpacity(0.0),
+                      Colors.white.withOpacity(0.30),
+                      Colors.white.withOpacity(0.0),
+                    ],
+                    stops: const [0.0, 0.5, 1.0],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -394,6 +532,96 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView> {
                 ],
               ),
             ),
+
+            // ── Description input (visible when Wallet is selected) ────────
+            if (isSelected) ...[
+              SizedBox(height: XPadding.medium),
+              TextField(
+                onChanged: controller.updateWalletDescription,
+                maxLength: 100,
+                decoration: InputDecoration(
+                  hintText: 'wallet_description_hint'.tr,
+                  hintStyle: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey.shade400,
+                  ),
+                  // Label with red asterisk to signal required
+                  label: RichText(
+                    text: TextSpan(
+                      text: 'wallet_description_label'.tr,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade600,
+                      ),
+                      children: const [
+                        TextSpan(
+                          text: ' *',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  prefixIcon: Icon(
+                    Icons.edit_note_rounded,
+                    size: 20,
+                    color: Colors.grey.shade400,
+                  ),
+                  counterText: '',
+                  isDense: true,
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: XPadding.large,
+                    vertical: XPadding.medium,
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey.shade50,
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: Colors.grey.shade200),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: goBusPrimary, width: 1.5),
+                  ),
+                ),
+              ),
+            ],
+
+            // ── PIN required hint (shown when wallet session has expired) ──
+            if (!controller.walletSessionValid) ...[
+              SizedBox(height: XPadding.small),
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: XPadding.large,
+                  vertical: XPadding.medium,
+                ),
+                decoration: BoxDecoration(
+                  color: goBusPrimary.withOpacity(0.06),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: goBusPrimary.withOpacity(0.2),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.lock_outline_rounded,
+                      size: 14,
+                      color: goBusPrimary,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: XTextSmall(
+                        label: 'wallet_pin_required_hint'.tr,
+                        colortext: goBusPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ],
         ),
       ),

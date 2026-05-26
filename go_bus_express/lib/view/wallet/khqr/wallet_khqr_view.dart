@@ -22,6 +22,9 @@ class _WalletKhQrViewState extends State<WalletKhQrView> {
   Worker? _stateWorker;
   static const _platform = MethodChannel('com.gobus.express/security');
 
+  // Prevents two dialogs stacking on top of each other
+  bool _isDialogShowing = false;
+
   @override
   void initState() {
     super.initState();
@@ -59,6 +62,133 @@ class _WalletKhQrViewState extends State<WalletKhQrView> {
     super.dispose();
   }
 
+  // ── Cancel Dialog ──────────────────────────────────────────────────────────
+
+  void _showCancelDialog() {
+    if (_isDialogShowing) return;
+    _isDialogShowing = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Icon
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.warning_amber_rounded,
+                  size: 48,
+                  color: Colors.orange.shade400,
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Title
+              Text(
+                'cancel_topup_title'.tr,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+
+              // Message
+              Text(
+                'cancel_topup_message'.tr,
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Colors.grey.shade600,
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+
+              // Buttons
+              Row(
+                children: [
+                  // Keep Waiting (primary)
+                  Expanded(
+                    child: SizedBox(
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () => Get.back(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: goBusPrimary,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'keep_waiting'.tr,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+
+                  // Cancel Top-Up (destructive)
+                  Expanded(
+                    child: SizedBox(
+                      height: 50,
+                      child: OutlinedButton(
+                        onPressed: () {
+                          Get.back(); // close dialog first
+                          controller.cancelTopUp();
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.red.shade600,
+                          side: BorderSide(
+                            color: Colors.red.shade300,
+                            width: 1.5,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'cancel_topup'.tr,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    ).then((_) => _isDialogShowing = false);
+  }
+
+  // ── Build ──────────────────────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -69,7 +199,7 @@ class _WalletKhQrViewState extends State<WalletKhQrView> {
           preferredSize: const Size.fromHeight(kToolbarHeight),
           child: XAppBar(
             title: 'Top Up'.tr,
-            onBackPressed: () => Get.back(),
+            onBackPressed: () => _showCancelDialog(),
           ),
         ),
         body: Obx(() {

@@ -105,8 +105,24 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
     return state.agreedToTerms && state.selectedSeats.isNotEmpty;
   }
 
+  /// True when the user already has an active wallet session (no PIN needed).
+  bool get walletSessionValid => _localRepository.isWalletSessionValid();
+
+  void updateWalletDescription(String value) {
+    updateState((s) => s.copyWith(walletDescription: value));
+  }
+
   void createBooking({required String paymentMethod}) async {
     try {
+      // ── Step 1: Wallet PIN gate — BEFORE booking is created ────────────────
+      // This prevents orphaned bookings when the user cancels the PIN dialog.
+      String? walletSessionToken;
+      if (paymentMethod == 'Wallet') {
+        walletSessionToken = await _ensureWalletSession();
+        if (walletSessionToken == null) return; // user cancelled PIN
+      }
+
+      // ── Step 2: Create booking ─────────────────────────────────────────────
       final body = BookingBody(
         scheduleId: state.scheduleId,
         seatIds: state.selectedSeatIds,
@@ -128,7 +144,14 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
           }
 
           if (paymentMethod == 'Wallet') {
-            await _payWithWallet(bookingId);
+            // Session is already validated — go straight to payment.
+            await _doWalletPay(
+              bookingId,
+              walletSessionToken!,
+              description: state.walletDescription.trim().isEmpty
+                  ? null
+                  : state.walletDescription.trim(),
+            );
           } else {
             await _generateQr(bookingId);
           }
@@ -145,30 +168,31 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
     }
   }
 
-  // ── Wallet payment ──────────────────────────────────────────────────────────
+  // ── Wallet session helpers ──────────────────────────────────────────────────
 
-  Future<void> _payWithWallet(int bookingId) async {
-    String? sessionToken = _getValidSessionToken();
-
-    if (sessionToken == null) {
-      // Pause loading so the PIN dialog appears cleanly over the page
-      updateState((s) => s.copyWith(isLoading: false));
-      sessionToken = await _showPinDialog();
-      if (sessionToken == null) return; // user cancelled
-      updateState((s) => s.copyWith(isLoading: true));
+  /// Returns a valid session token without user interaction if the session is
+  /// still warm; otherwise shows the PIN dialog and returns whatever that
+  /// resolves to (null if the user cancels).
+  Future<String?> _ensureWalletSession() async {
+    final existing = _getValidSessionToken();
+    if (existing != null) {
+      log('✅ Wallet session still valid — skipping PIN');
+      return existing;
     }
-
-    await _doWalletPay(bookingId, sessionToken);
+    log('🔐 Wallet session invalid — prompting PIN before booking');
+    return _showPinDialog();
   }
 
   Future<void> _doWalletPay(
     int bookingId,
     String sessionToken, {
     bool isRetry = false,
+    String? description,
   }) async {
     final result = await _bookingRepository.payWithWallet(
       bookingId: bookingId,
       sessionToken: sessionToken,
+      description: description,
     );
 
     switch (result) {
@@ -190,7 +214,12 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
           );
           if (newToken != null) {
             updateState((s) => s.copyWith(isLoading: true));
-            await _doWalletPay(bookingId, newToken, isRetry: true);
+            await _doWalletPay(
+              bookingId,
+              newToken,
+              isRetry: true,
+              description: description,
+            );
           }
         } else {
           updateState((s) => s.copyWith(isLoading: false));

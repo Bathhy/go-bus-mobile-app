@@ -12,12 +12,12 @@ import 'package:go_bus_express/view/ticket/khqr_payment/khqr_payment_view.dart';
 import 'package:go_bus_express/view/ticket/payment_success/payment_success_view.dart';
 import 'package:go_bus_express/view/ticket/select_route/select_route_view.dart';
 import 'package:go_bus_express/view/ticket/select_seat/select_seat_view.dart';
-import 'package:go_bus_express/view/wallet/payment_wallet_selection.dart';
 import 'package:go_bus_express/view/wallet/pin/confirm_pin_view.dart';
 import 'package:go_bus_express/view/wallet/pin/create_pin_view.dart';
 import 'package:go_bus_express/view/wallet/pin/enter_pin_view.dart';
 import 'package:go_bus_express/view/wallet/wallet_view.dart';
 import 'package:go_bus_express/view/wallet/khqr/wallet_khqr_view.dart';
+import 'package:go_bus_express/view/wallet/khqr/top_up_success_view.dart';
 import 'package:go_bus_express/view/refund/my_refund_view.dart';
 import 'package:go_bus_express/view/refund/refund_detail_view.dart';
 import 'package:go_bus_express/view/wallet/top_up_wallet_view.dart';
@@ -42,9 +42,9 @@ class AppRoutes {
   static const String walletConfirmPin = "/wallet/confirm-pin";
   static const String walletEnterPin = "/wallet/enter-pin";
   static const String topUpWallet = "/top-up-wallet";
-  static const String paymentWalletSelection = "/payment-wallet-selection";
   static const String withdrawWallet = "/withdraw-wallet";
   static const String walletTopUpKhqr = "/wallet/top-up/khqr";
+  static const String walletTopUpSuccess = "/wallet/top-up/success";
   static const String myRefund = "/my-refund";
   static const String refundDetail = "/refund-detail";
 
@@ -96,12 +96,13 @@ class AppRoutes {
     GetPage(name: walletConfirmPin, page: () => const ConfirmPinView()),
     GetPage(name: walletEnterPin, page: () => const EnterPinView()),
     GetPage(name: topUpWallet, page: () => const TopUpWalletView()),
-    GetPage(
-      name: paymentWalletSelection,
-      page: () => const PaymentWalletSelectionView(),
-    ),
     GetPage(name: withdrawWallet, page: () => const WithdrawWalletView()),
     GetPage(name: walletTopUpKhqr, page: () => const WalletKhQrView()),
+    GetPage(
+      transition: Transition.rightToLeftWithFade,
+      name: walletTopUpSuccess,
+      page: () => const TopUpSuccessView(),
+    ),
     GetPage(name: myRefund, page: () => const MyRefundView()),
     GetPage(name: refundDetail, page: () => const RefundDetailView()),
   ];

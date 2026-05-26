@@ -105,6 +105,16 @@ class LocalRepository with BaseSharePreference {
   Future<void> clearWalletSession() async {
     await removeValue(PreferencesKey.walletSessionToken);
     await removeValue(PreferencesKey.walletSessionExpiresAt);
+    await removeValue(PreferencesKey.walletHash);
+  }
+
+  // Wallet hash (needed to generate top-up KHQR; returned by /wallets/login)
+  Future<void> saveWalletHash(String hash) async {
+    await storeValue(PreferencesKey.walletHash, hash);
+  }
+
+  String? getWalletHash() {
+    return readString(PreferencesKey.walletHash);
   }
 
   // MARK : Payment Method

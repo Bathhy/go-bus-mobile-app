@@ -18,6 +18,7 @@ WalletModel _$WalletModelFromJson(Map<String, dynamic> json) => WalletModel(
   createdAt: json['createdAt'] as String?,
   updatedAt: json['updatedAt'] as String?,
   walletSessionToken: json['walletSessionToken'] as String?,
+  hash: json['hash'] as String?,
 );
 
 Map<String, dynamic> _$WalletModelToJson(WalletModel instance) =>
@@ -33,4 +34,5 @@ Map<String, dynamic> _$WalletModelToJson(WalletModel instance) =>
       'createdAt': instance.createdAt,
       'updatedAt': instance.updatedAt,
       'walletSessionToken': instance.walletSessionToken,
+      'hash': instance.hash,
     };

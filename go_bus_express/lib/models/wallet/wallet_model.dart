@@ -15,6 +15,7 @@ class WalletModel {
   final String? createdAt;
   final String? updatedAt;
   final String? walletSessionToken;
+  final String? hash;
 
   const WalletModel({
     this.id,
@@ -28,6 +29,7 @@ class WalletModel {
     this.createdAt,
     this.updatedAt,
     this.walletSessionToken,
+    this.hash,
   });
 
   factory WalletModel.fromJson(Map<String, dynamic> json) =>
@@ -47,6 +49,7 @@ class WalletModel {
     String? createdAt,
     String? updatedAt,
     String? walletSessionToken,
+    String? hash,
   }) {
     return WalletModel(
       id: id ?? this.id,
@@ -60,6 +63,7 @@ class WalletModel {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       walletSessionToken: walletSessionToken ?? this.walletSessionToken,
+      hash: hash ?? this.hash,
     );
   }
 }

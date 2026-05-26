@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/di/app_di.dart';
@@ -16,6 +17,12 @@ import 'package:shared_package/network/x_result.dart';
 
 class WalletKhQrController extends BaseController<WalletKhQrState> {
   final WalletRepository _walletRepo;
+
+  /// Attached to the long-poll [checkTopUpTransaction] request.
+  /// Calling [cancelTopUp] cancels the token → Dio drops the connection
+  /// immediately instead of holding it open for up to 5 minutes.
+  final CancelToken _cancelToken = CancelToken();
+  bool _isCancelled = false;
 
   WalletKhQrController(this._walletRepo) : super(const WalletKhQrState());
 
@@ -44,12 +51,13 @@ class WalletKhQrController extends BaseController<WalletKhQrState> {
     final result = await _walletRepo.generateTopUpKhqr(
       sessionToken: token,
       amount: state.amount,
+      hash: _walletHash,
     );
 
     switch (result) {
       case Success<WalletTopUpKhqrModel?>():
-        final qr = result.data?.data?.qr ?? '';
-        final md5 = result.data?.data?.md5 ?? '';
+        final qr = result.data?.qr ?? '';
+        final md5 = result.data?.md5 ?? '';
         updateState((s) => s.copyWith(qrData: qr, md5: md5, isGenerating: false));
         if (qr.isNotEmpty && md5.isNotEmpty) {
           _checkTopUpTransaction(token);
@@ -65,24 +73,35 @@ class WalletKhQrController extends BaseController<WalletKhQrState> {
 
     final result = await _walletRepo.checkTopUpTransaction(
       sessionToken: token,
-      md5: state.md5,
+      hash: state.md5,
+      cancelToken: _cancelToken,
     );
+
+    // User pressed back and confirmed cancel — ignore the result entirely
+    if (_isCancelled) return;
 
     switch (result) {
       case Success<BaseResponse<VerifyPaymentModel>>():
-        if (result.data.status == 200) {
+        if (result.data.status == 201) {
           updateState((s) => s.copyWith(isPaid: true));
           await _refreshWalletBalance();
-          Get.offNamedUntil(
-            AppRoutes.wallet,
-            ModalRoute.withName(AppRoutes.mainNavigation),
-          );
+          Get.offNamed(AppRoutes.walletTopUpSuccess);
         } else {
           log('⚠️ Top-up not completed yet');
         }
       case Error<BaseResponse<VerifyPaymentModel>>():
         _showError(result.error.displayMessage);
     }
+  }
+
+  /// Called when the user confirms the cancel dialog.
+  /// Kills the in-flight Dio connection immediately and navigates back.
+  void cancelTopUp() {
+    _isCancelled = true;
+    if (!_cancelToken.isCancelled) {
+      _cancelToken.cancel('User cancelled top-up');
+    }
+    Get.back();
   }
 
   Future<void> _refreshWalletBalance() async {
@@ -95,6 +114,9 @@ class WalletKhQrController extends BaseController<WalletKhQrState> {
 
   String get _sessionToken =>
       getIt<WalletController>().state.wallet?.walletSessionToken ?? '';
+
+  String get _walletHash =>
+      getIt<WalletController>().state.wallet?.hash ?? '';
 
   void _showError(String message) {
     WidgetsBinding.instance.addPostFrameCallback((_) {

@@ -89,7 +89,10 @@ Future<void> setupDependencyInjection() async {
     () => WalletPaymentApi(getIt<Dio>()), // responds quickly — standard 30s timeout
   );
   getIt.registerLazySingleton<WalletRepository>(
-    () => WalletRepositoryImpl(getIt<WalletApi>()),
+    // paymentDio (6-min timeout) is passed so checkTopUpTransaction can
+    // attach a CancelToken — Retrofit doesn't support CancelToken, so
+    // that one call uses raw Dio directly in the repository.
+    () => WalletRepositoryImpl(getIt<WalletApi>(), paymentDio),
   );
   getIt.registerLazySingleton<RefundApi>(() => RefundApi(getIt<Dio>()));
   getIt.registerLazySingleton<RefundRepository>(
