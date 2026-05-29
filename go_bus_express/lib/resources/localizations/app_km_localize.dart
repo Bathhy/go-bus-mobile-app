@@ -174,9 +174,6 @@ final Map<String, String> km = {
   "enter_pin_to_pay": "បញ្ចូលលេខសម្ងាត់ដើម្បីបញ្ចប់ការទូទាត់",
   "session_expired_enter_pin": "សម័យប្រើប្រាស់បានផុតកំណត់។ បញ្ចូលលេខសម្ងាត់ដើម្បីបន្ត។",
   "wallet_pin_required_hint": "ត្រូវការ PIN — អ្នកនឹងត្រូវបញ្ចូលនៅពេលចុច Pay",
-  "wallet_description_label": "បរិយាយ",
-  "wallet_description_hint": "ឧ. ការទូទាត់សំបុត្រឡានក្រុង",
-  
   // Booking Status Translations
   "status_confirmed": "បានបញ្ជាក់",
   "status_pending": "កំពុងរង់ចាំ",

@@ -144,13 +144,9 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView>
         final walletBlocked =
             selected == 'Wallet' &&
             (state.walletBalance ?? 0.0) < state.totalPrice;
-        // Description is required when paying by Wallet
-        final walletDescriptionMissing =
-            selected == 'Wallet' && state.walletDescription.trim().isEmpty;
         final canProceed =
             controller.canProceedToPayment() &&
-            !walletBlocked &&
-            !walletDescriptionMissing;
+            !walletBlocked;
 
         return Container(
           padding: EdgeInsets.all(XPadding.extralarge),
@@ -533,61 +529,6 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView>
               ),
             ),
 
-            // ── Description input (visible when Wallet is selected) ────────
-            if (isSelected) ...[
-              SizedBox(height: XPadding.medium),
-              TextField(
-                onChanged: controller.updateWalletDescription,
-                maxLength: 100,
-                decoration: InputDecoration(
-                  hintText: 'wallet_description_hint'.tr,
-                  hintStyle: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey.shade400,
-                  ),
-                  // Label with red asterisk to signal required
-                  label: RichText(
-                    text: TextSpan(
-                      text: 'wallet_description_label'.tr,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade600,
-                      ),
-                      children: const [
-                        TextSpan(
-                          text: ' *',
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  prefixIcon: Icon(
-                    Icons.edit_note_rounded,
-                    size: 20,
-                    color: Colors.grey.shade400,
-                  ),
-                  counterText: '',
-                  isDense: true,
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: XPadding.large,
-                    vertical: XPadding.medium,
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey.shade50,
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey.shade200),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: goBusPrimary, width: 1.5),
-                  ),
-                ),
-              ),
-            ],
 
             // ── PIN required hint (shown when wallet session has expired) ──
             if (!controller.walletSessionValid) ...[

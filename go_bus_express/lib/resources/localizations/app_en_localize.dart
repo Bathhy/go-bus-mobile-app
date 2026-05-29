@@ -174,9 +174,6 @@ final Map<String, String> en = {
   "enter_pin_to_pay": "Enter your PIN to complete payment",
   "session_expired_enter_pin": "Your session expired. Enter your PIN to continue.",
   "wallet_pin_required_hint": "PIN required — you'll be prompted when you tap Pay",
-  "wallet_description_label": "Description",
-  "wallet_description_hint": "e.g. Bus ticket payment",
-  
   // Booking Status Translations
   "status_confirmed": "Confirmed",
   "status_pending": "Pending",

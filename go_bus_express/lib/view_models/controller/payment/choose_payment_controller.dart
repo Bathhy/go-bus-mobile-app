@@ -108,10 +108,6 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
   /// True when the user already has an active wallet session (no PIN needed).
   bool get walletSessionValid => _localRepository.isWalletSessionValid();
 
-  void updateWalletDescription(String value) {
-    updateState((s) => s.copyWith(walletDescription: value));
-  }
-
   void createBooking({required String paymentMethod}) async {
     try {
       // ── Step 1: Wallet PIN gate — BEFORE booking is created ────────────────
@@ -148,9 +144,7 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
             await _doWalletPay(
               bookingId,
               walletSessionToken!,
-              description: state.walletDescription.trim().isEmpty
-                  ? null
-                  : state.walletDescription.trim(),
+              description: 'Pay With Wallet',
             );
           } else {
             await _generateQr(bookingId);
