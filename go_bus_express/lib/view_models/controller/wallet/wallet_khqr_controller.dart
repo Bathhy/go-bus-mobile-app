@@ -84,7 +84,7 @@ class WalletKhQrController extends BaseController<WalletKhQrState> {
       case Success<BaseResponse<VerifyPaymentModel>>():
         if (result.data.status == 201) {
           updateState((s) => s.copyWith(isPaid: true));
-          await _refreshWalletBalance();
+          await _refreshWallet();
           Get.offNamed(AppRoutes.walletTopUpSuccess);
         } else {
           log('⚠️ Top-up not completed yet');
@@ -104,11 +104,11 @@ class WalletKhQrController extends BaseController<WalletKhQrState> {
     Get.back();
   }
 
-  Future<void> _refreshWalletBalance() async {
+  Future<void> _refreshWallet() async {
     try {
-      await getIt<WalletController>().fetchWalletMe();
+      await getIt<WalletController>().fetchWalletMe(includeTransactions: true);
     } catch (e) {
-      log('⚠️ Could not refresh wallet balance: $e');
+      log('⚠️ Could not refresh wallet: $e');
     }
   }
 

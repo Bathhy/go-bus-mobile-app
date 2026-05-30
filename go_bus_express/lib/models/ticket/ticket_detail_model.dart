@@ -130,7 +130,7 @@ class Payment {
     String? transactionId;
     String? status;
     DateTime? paidAt;
-    int? walletTransactionId;
+    String? walletTransactionId;
 
     Payment({
         this.id,

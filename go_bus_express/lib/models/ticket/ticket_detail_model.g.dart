@@ -142,7 +142,7 @@ Payment _$PaymentFromJson(Map<String, dynamic> json) => Payment(
   paidAt: json['paidAt'] == null
       ? null
       : DateTime.parse(json['paidAt'] as String),
-  walletTransactionId: (json['walletTransactionId'] as num?)?.toInt(),
+  walletTransactionId: json['walletTransactionId'] as String?,
 );
 
 Map<String, dynamic> _$PaymentToJson(Payment instance) => <String, dynamic>{

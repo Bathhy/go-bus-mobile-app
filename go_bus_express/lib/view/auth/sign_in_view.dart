@@ -15,8 +15,10 @@ class SignInView extends StatefulWidget {
 
 class _SignInViewState extends State<SignInView> {
   // final TextEditingController emailController = TextEditingController(text: "panha@gmail.com");
-  final TextEditingController emailController = TextEditingController(text: "natsu@gmail.com");
-  final TextEditingController passwordController = TextEditingController(text: "Sambath1302@");
+  // final TextEditingController emailController = TextEditingController(text: "natsu@gmail.com");
+  // final TextEditingController passwordController = TextEditingController(text: "Sambath1302@");
+    final TextEditingController emailController = TextEditingController(text: "");
+  final TextEditingController passwordController = TextEditingController(text: "");
   //   final TextEditingController emailController = TextEditingController(text: "thongVathana@gmail.col\\       m");
   // final TextEditingController passwordController = TextEditingController(text: "Vathana@123");
   final AuthController authController = getIt<AuthController>();
