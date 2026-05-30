@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_bus_express/core/di/app_di.dart';
+import 'package:go_bus_express/models/refund/refund_request.dart';
 import 'package:go_bus_express/models/ticket/ticket_model.dart';
 import 'package:go_bus_express/resources/app_images.dart';
 import 'package:go_bus_express/resources/routes/app_routes.dart';
@@ -282,115 +283,236 @@ class _MyTicketViewState extends State<MyTicketView>
     );
   }
 
-  Future<void> _showRefundConfirmDialog(int bookingId, double amount) async {
-    final amountStr = amount.toStringAsFixed(2);
-    final message = 'confirm_refund_message'.tr.replaceAll(
-      '@amount',
-      amountStr,
-    );
+  Future<void> _showRefundRequestDialog(int bookingId) async {
+    final reasonController = TextEditingController();
+    RefundMethod selectedMethod = RefundMethod.manual;
 
-    final confirmed = await showDialog<bool>(
+    final result = await showDialog<({String reason, RefundMethod method})>(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        elevation: 8,
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AppSvgImage(
-                path: AppImages.icRefund,
-                height: 50,
-                width: 50,
-                color: Colors.orange.shade600,
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'confirm_refund_title'.tr,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 20,
-                  color: Colors.black87,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                message,
-                style: const TextStyle(
-                  fontSize: 15,
-                  color: Colors.black54,
-                  height: 1.5,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.of(ctx).pop(false),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.grey.shade700,
-                        side: BorderSide(
-                          color: Colors.grey.shade300,
-                          width: 1.5,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) {
+          Widget methodOption(RefundMethod method, String label, IconData icon) {
+            final isSelected = selectedMethod == method;
+            return Expanded(
+              child: GestureDetector(
+                onTap: () => setDialogState(() => selectedMethod = method),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? Colors.orange.shade50
+                        : Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isSelected
+                          ? Colors.orange.shade600
+                          : Colors.grey.shade300,
+                      width: isSelected ? 1.5 : 1,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(
+                        icon,
+                        size: 24,
+                        color: isSelected
+                            ? Colors.orange.shade700
+                            : Colors.grey.shade600,
                       ),
-                      child: Text(
-                        'cancel'.tr,
-                        style: const TextStyle(
-                          fontSize: 15,
+                      const SizedBox(height: 6),
+                      Text(
+                        label,
+                        style: TextStyle(
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
+                          color: isSelected
+                              ? Colors.orange.shade700
+                              : Colors.grey.shade700,
                         ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+
+          return Dialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            elevation: 8,
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: AppSvgImage(
+                      path: AppImages.icRefund,
+                      height: 50,
+                      width: 50,
+                      color: Colors.orange.shade600,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Center(
+                    child: Text(
+                      'confirm_refund_title'.tr,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 20,
+                        color: Colors.black87,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'refund_reason'.tr,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: reasonController,
+                    maxLines: 3,
+                    minLines: 2,
+                    textInputAction: TextInputAction.newline,
+                    decoration: InputDecoration(
+                      hintText: 'refund_reason_hint'.tr,
+                      hintStyle: TextStyle(
+                        color: Colors.grey.shade400,
+                        fontSize: 14,
+                      ),
+                      contentPadding: const EdgeInsets.all(12),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Colors.orange.shade600),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.of(ctx).pop(true),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange.shade600,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      child: Text(
-                        'confirm'.tr,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'refund_method'.tr,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
                     ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      methodOption(
+                        RefundMethod.manual,
+                        'refund_method_manual'.tr,
+                        Icons.account_balance_outlined,
+                      ),
+                      const SizedBox(width: 12),
+                      methodOption(
+                        RefundMethod.wallet,
+                        'refund_method_wallet'.tr,
+                        Icons.account_balance_wallet_outlined,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.of(ctx).pop(),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.grey.shade700,
+                            side: BorderSide(
+                              color: Colors.grey.shade300,
+                              width: 1.5,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          child: Text(
+                            'cancel'.tr,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            final reason = reasonController.text.trim();
+                            if (reason.isEmpty) {
+                              ScaffoldMessenger.of(ctx).showSnackBar(
+                                SnackBar(
+                                  content: Text('refund_reason_required'.tr),
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                              return;
+                            }
+                            Navigator.of(ctx).pop(
+                              (reason: reason, method: selectedMethod),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange.shade600,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          child: Text(
+                            'submit'.tr,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
 
-    if (confirmed == true && mounted) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => reasonController.dispose());
+
+    if (result != null && mounted) {
       _showRefundLoadingDialog();
       final success = await _ticketController.requestRefund(
         bookingId: bookingId,
-        amount: amount,
+        reason: result.reason,
+        method: result.method.key,
       );
       if (!mounted) return;
       Navigator.of(context).pop(); // dismiss loading dialog
@@ -571,70 +693,12 @@ class _MyTicketViewState extends State<MyTicketView>
                       ),
                     ),
                   ),
-                  if (isUpcoming &&
-                      _canRequestRefund(booking?.bookingStatus)) ...[
+                  if (isUpcoming) ...[
                     const SizedBox(width: 8),
                     Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          final bid = booking?.id;
-                          final amount = booking?.totalAmount ?? 0.0;
-                          if (bid != null) {
-                            _showRefundConfirmDialog(bid, amount);
-                          }
-                        },
-                        // icon: const Icon(
-                        //   Icons.assignment_return_outlined,
-                        //   size: 16,
-                        // ),
-                        icon: AppSvgImage(
-                          path: AppImages.icRefund,
-                          height: 16,
-                          width: 16,
-                          color: Colors.red,
-                        ),
-                        label: Text('request_refund'.tr),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.red,
-                          side: const BorderSide(color: Colors.red),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                  ],
-                  if (isUpcoming &&
-                      !_canRequestRefund(booking?.bookingStatus)) ...[
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(
-                          color: Colors.orange.shade50,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.orange.shade200),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.hourglass_top_rounded,
-                              size: 16,
-                              color: Colors.orange.shade700,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              'refund_requested'.tr,
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.orange.shade700,
-                              ),
-                            ),
-                          ],
-                        ),
+                      child: _buildRefundSection(
+                        booking?.refundStatus,
+                        booking?.id,
                       ),
                     ),
                   ],
@@ -647,14 +711,104 @@ class _MyTicketViewState extends State<MyTicketView>
     );
   }
 
-  bool _canRequestRefund(String? bookingStatus) {
-    const nonRefundableStatuses = {
-      'REFUND_REQUESTED',
-      'REFUNDED',
-      'CANCELLED',
-      'REJECTED',
-    };
-    return !nonRefundableStatuses.contains(bookingStatus);
+  Widget _buildRefundSection(String? refundStatus, int? bookingId) {
+    // null → user hasn't requested a refund yet → show the button
+    if (refundStatus == null) {
+      return OutlinedButton.icon(
+        onPressed: () {
+          if (bookingId != null) _showRefundRequestDialog(bookingId);
+        },
+        icon: AppSvgImage(
+          path: AppImages.icRefund,
+          height: 16,
+          width: 16,
+          color: Colors.red,
+        ),
+        label: Text('request_refund'.tr),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.red,
+          side: const BorderSide(color: Colors.red),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+        ),
+      );
+    }
+
+    final config = _refundStatusConfig(refundStatus);
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+        color: config.bgColor,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: config.borderColor),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(config.icon, size: 16, color: config.textColor),
+          const SizedBox(width: 6),
+          Text(
+            config.label.tr,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: config.textColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  ({
+    Color bgColor,
+    Color borderColor,
+    Color textColor,
+    IconData icon,
+    String label,
+  }) _refundStatusConfig(String refundStatus) {
+    switch (refundStatus) {
+      case 'PENDING':
+        return (
+          bgColor: Colors.orange.shade50,
+          borderColor: Colors.orange.shade200,
+          textColor: Colors.orange.shade700,
+          icon: Icons.hourglass_top_rounded,
+          label: 'refund_pending',
+        );
+      case 'APPROVED':
+        return (
+          bgColor: Colors.blue.shade50,
+          borderColor: Colors.blue.shade200,
+          textColor: Colors.blue.shade700,
+          icon: Icons.check_circle_outline_rounded,
+          label: 'refund_approved',
+        );
+      case 'COMPLETED':
+        return (
+          bgColor: Colors.green.shade50,
+          borderColor: Colors.green.shade200,
+          textColor: Colors.green.shade700,
+          icon: Icons.task_alt_rounded,
+          label: 'refund_completed',
+        );
+      case 'REJECTED':
+        return (
+          bgColor: Colors.red.shade50,
+          borderColor: Colors.red.shade200,
+          textColor: Colors.red.shade700,
+          icon: Icons.cancel_outlined,
+          label: 'refund_rejected',
+        );
+      default:
+        return (
+          bgColor: Colors.grey.shade50,
+          borderColor: Colors.grey.shade200,
+          textColor: Colors.grey.shade700,
+          icon: Icons.info_outline,
+          label: refundStatus,
+        );
+    }
   }
 
   String _getRouteText(TicketItem ticket) {

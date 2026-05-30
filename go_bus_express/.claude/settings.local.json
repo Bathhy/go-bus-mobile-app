@@ -23,7 +23,8 @@
       "Bash(xargs grep -l \"checking.transaction\\\\|checkTransaction\\\\|pollPayment\\\\|payment.*status\")",
       "Bash(xargs grep -l \"KhQr\\\\|khqr\\\\|PaymentSuccess\\\\|ChoosePayment\")",
       "Bash(xargs grep -l \"wallet\\\\|WalletPayment\")",
-      "Bash(xargs grep -l \"khqr\\\\|KhQr\\\\|verifyMd5\\\\|checking\")"
+      "Bash(xargs grep -l \"khqr\\\\|KhQr\\\\|verifyMd5\\\\|checking\")",
+      "PowerShell(flutter analyze *)"
     ]
   }
 }

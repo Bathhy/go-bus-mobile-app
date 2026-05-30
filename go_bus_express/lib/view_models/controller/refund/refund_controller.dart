@@ -55,9 +55,17 @@ class RefundController extends BaseController<RefundState> {
     await fetchRefunds(status: status);
   }
 
-  Future<bool> requestRefund({required int bookingId, required double amount}) async {
+  Future<bool> requestRefund({
+    required int bookingId,
+    required String reason,
+    required String method,
+  }) async {
     try {
-      final result = await _repository.requestRefund(bookingId: bookingId, amount: amount);
+      final result = await _repository.requestRefund(
+        bookingId: bookingId,
+        reason: reason,
+        method: method,
+      );
       switch (result) {
         case Success<RefundModel?>():
           log('✅ Refund requested for booking $bookingId');

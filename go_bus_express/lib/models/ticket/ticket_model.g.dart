@@ -40,6 +40,7 @@ BookingDetail _$BookingDetailFromJson(Map<String, dynamic> json) =>
     BookingDetail(
       id: (json['id'] as num?)?.toInt(),
       bookingStatus: json['bookingStatus'] as String?,
+      refundStatus: json['refundStatus'] as String?,
       paymentStatus: json['paymentStatus'] as String?,
       paymentMethod: json['paymentMethod'] as String?,
       totalAmount: (json['totalAmount'] as num?)?.toDouble(),
@@ -68,6 +69,7 @@ Map<String, dynamic> _$BookingDetailToJson(BookingDetail instance) =>
     <String, dynamic>{
       'id': instance.id,
       'bookingStatus': instance.bookingStatus,
+      'refundStatus': instance.refundStatus,
       'paymentStatus': instance.paymentStatus,
       'paymentMethod': instance.paymentMethod,
       'totalAmount': instance.totalAmount,

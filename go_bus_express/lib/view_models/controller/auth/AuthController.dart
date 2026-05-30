@@ -169,7 +169,7 @@ class AuthController extends BaseController<AuthState> {
 
         case Error<AuthModel?>():
           log("Signup error >>> ${result.error}");
-          _showError(result.error.toString());
+          _showError(result.error.displayMessage);
           break;
       }
     } finally {

@@ -529,11 +529,21 @@ class _HomePageState extends State<HomePage>
                     : balance != null
                         ? '\$${balance.toStringAsFixed(2)}'
                         : '--';
-                return _buildStatItem(
-                  icon: Icons.account_balance_wallet_outlined,
-                  label: 'Wallet'.tr,
-                  value: valueText,
-                  color: const Color(0xFF2196F3),
+                return GestureDetector(
+                  onTap: () {
+                    final isWalletExist =
+                        homeController.state.profileModel?.isWalletExist ??
+                            false;
+                    _walletController.navigateToWallet(
+                      isWalletExist: isWalletExist,
+                    );
+                  },
+                  child: _buildStatItem(
+                    icon: Icons.account_balance_wallet_outlined,
+                    label: 'Wallet'.tr,
+                    value: valueText,
+                    color: const Color(0xFF2196F3),
+                  ),
                 );
               }),
             ),

@@ -33,6 +33,7 @@ class TicketItem {
 class BookingDetail {
   int? id;
   String? bookingStatus;
+  String? refundStatus;
   String? paymentStatus;
   String? paymentMethod;
   double? totalAmount;
@@ -47,6 +48,7 @@ class BookingDetail {
   BookingDetail({
     this.id,
     this.bookingStatus,
+    this.refundStatus,
     this.paymentStatus,
     this.paymentMethod,
     this.totalAmount,

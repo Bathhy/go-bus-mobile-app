@@ -143,7 +143,8 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView>
         final selected = _selectedPayment.value;
         final walletBlocked =
             selected == 'Wallet' &&
-            (state.walletBalance ?? 0.0) < state.totalPrice;
+            ((state.walletBalance ?? 0.0) * 100).round() <
+                (state.totalPrice * 100).round();
         final canProceed =
             controller.canProceedToPayment() &&
             !walletBlocked;
@@ -420,7 +421,7 @@ class _ChoosePaymentViewState extends State<ChoosePaymentView>
   ) {
     final isSelected = selected == 'Wallet';
     final balance = walletBalance ?? 0.0;
-    final hasSufficient = balance >= totalPrice;
+    final hasSufficient = (balance * 100).round() >= (totalPrice * 100).round();
 
     return GestureDetector(
       onTap: () => _selectedPayment.value = 'Wallet',

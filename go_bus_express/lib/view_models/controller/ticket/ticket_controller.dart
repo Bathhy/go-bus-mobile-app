@@ -67,11 +67,19 @@ class TicketController extends BaseController<TicketState> {
     return state.tickets;
   }
 
-  Future<bool> requestRefund({required int bookingId, required double amount}) async {
-    log('💸 Requesting refund for booking $bookingId, amount=$amount');
+  Future<bool> requestRefund({
+    required int bookingId,
+    required String reason,
+    required String method,
+  }) async {
+    log('💸 Requesting refund for booking $bookingId, reason=$reason, method=$method');
     updateState((s) => s.copyWith(isRefunding: true, clearRefundError: true, refundSuccess: false));
     try {
-      final result = await _refundRepository.requestRefund(bookingId: bookingId, amount: amount);
+      final result = await _refundRepository.requestRefund(
+        bookingId: bookingId,
+        reason: reason,
+        method: method,
+      );
       switch (result) {
         case Success<RefundModel?>():
           log('✅ Refund requested for booking $bookingId');

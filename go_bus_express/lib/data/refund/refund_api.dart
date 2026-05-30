@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/http.dart';
 import 'package:go_bus_express/models/refund/refund_model.dart';
+import 'package:go_bus_express/models/refund/refund_request.dart';
 import 'package:shared_package/network/base_response.dart';
 import 'package:go_bus_express/core/network/parse_error_logger.dart';
 
@@ -25,6 +26,6 @@ abstract class RefundApi {
   @POST('/refunds/request/{bookingId}')
   Future<BaseResponse<RefundModel>> requestRefund({
     @Path('bookingId') required int bookingId,
-    @Body() required Map<String, dynamic> body,
+    @Body() required RefundRequest body,
   });
 }
