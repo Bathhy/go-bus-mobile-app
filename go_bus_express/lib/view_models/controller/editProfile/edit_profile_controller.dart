@@ -8,6 +8,7 @@ import 'package:go_bus_express/repository/profile_repository.dart';
 import 'package:go_bus_express/view/edit_profile/model/edit_profile_model.dart';
 import 'package:go_bus_express/view_models/controller/base/base_controller.dart';
 import 'package:go_bus_express/view_models/controller/editProfile/edit_profile_state.dart';
+import 'package:go_bus_express/view_models/controller/home/home_controller.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_package/network/x_result.dart';
 
@@ -97,114 +98,107 @@ class EditProfileController extends BaseController<EditProfileState> {
   }
 
   void updateProfile(String email, String fullName, String phoneNumber) async {
-    // Set loading
     updateState((state) => state.copyWith(isLoading: true));
 
     try {
       final File? image = state.selectedImage;
       final body = UpdateProfileBody(email, fullName, phoneNumber);
-      final result = await _repository.updateProfile(body, image);
 
-      switch (result) {
-        case Success<ProfileModel?>():
-          if (result.data != null) {
-            final profileJson = jsonEncode(result.data!.toJson());
-            await _localRepository.saveProfile(profileJson);
+      // Run both calls in parallel when image is selected
+      final results = await Future.wait([
+        _repository.updateProfile(body),
+        if (image != null) _repository.uploadProfileImage(image),
+      ]);
 
-            // Stop loading before showing success message
-            updateState((state) => state.copyWith(isLoading: false));
+      final profileResult = results[0];
+      final imageResult = image != null ? results[1] : null;
 
-            // Show success message
-            if (Get.context != null) {
-              ScaffoldMessenger.of(Get.context!).showSnackBar(
-                SnackBar(
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Success'.tr,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      Text('Profile updated successfully'.tr),
-                    ],
+      // Check for errors
+      if (profileResult is Error<ProfileModel?>) {
+        updateState((state) => state.copyWith(isLoading: false));
+        log('Profile error: ${profileResult.error.displayMessage}');
+        _showError(profileResult.error.displayMessage ?? 'Failed to update profile');
+        return;
+      }
+
+      if (imageResult is Error<ProfileModel?>) {
+        updateState((state) => state.copyWith(isLoading: false));
+        log('Image upload error: ${imageResult.error.displayMessage}');
+        _showError(imageResult.error.displayMessage ?? 'Failed to upload image');
+        return;
+      }
+
+      // Use image result if available, otherwise use profile result
+      final updatedProfile = (imageResult as Success<ProfileModel?>?)?.data
+          ?? (profileResult as Success<ProfileModel?>).data;
+
+      if (updatedProfile != null) {
+        final profileJson = jsonEncode(updatedProfile.toJson());
+        await _localRepository.saveProfile(profileJson);
+
+        updateState((state) => state.copyWith(isLoading: false));
+
+        if (Get.context != null) {
+          ScaffoldMessenger.of(Get.context!).showSnackBar(
+            SnackBar(
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Success'.tr,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  backgroundColor: const Color(0xFF4CAF50),
-                  behavior: SnackBarBehavior.floating,
-                  margin: const EdgeInsets.all(16),
-                  duration: const Duration(seconds: 2),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              );
-            }
-
-            // Navigate back after a short delay
-            Future.delayed(const Duration(milliseconds: 500), () {
-              Get.back(result: true);
-            });
-          } else {
-            updateState((state) => state.copyWith(isLoading: false));
-          }
-        case Error<ProfileModel?>():
-          updateState((state) => state.copyWith(isLoading: false));
-          log('Profile error: ${result.error.displayMessage}');
-
-          // Show error message
-          if (Get.context != null) {
-            ScaffoldMessenger.of(Get.context!).showSnackBar(
-              SnackBar(
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Error'.tr,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(result.error.displayMessage ?? 'Failed to update profile'),
-                  ],
-                ),
-                backgroundColor: Colors.red.shade400,
-                behavior: SnackBarBehavior.floating,
-                margin: const EdgeInsets.all(16),
-                duration: const Duration(seconds: 3),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                  Text('Profile updated successfully'.tr),
+                ],
               ),
-            );
-          }
+              backgroundColor: const Color(0xFF4CAF50),
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.all(16),
+              duration: const Duration(seconds: 2),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          );
+        }
+
+        // Refresh home screen so profile image updates immediately
+        try {
+          await Get.find<HomeController>().fetchProfile();
+        } catch (_) {}
+
+        Future.delayed(const Duration(milliseconds: 500), () {
+          Get.back(result: true);
+        });
+      } else {
+        updateState((state) => state.copyWith(isLoading: false));
       }
     } catch (e) {
       updateState((state) => state.copyWith(isLoading: false));
       log('Profile update exception: $e');
-
-      if (Get.context != null) {
-        ScaffoldMessenger.of(Get.context!).showSnackBar(
-          SnackBar(
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Error'.tr,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text('An unexpected error occurred'.tr),
-              ],
-            ),
-            backgroundColor: Colors.red.shade400,
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(16),
-            duration: const Duration(seconds: 3),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        );
-      }
+      _showError('An unexpected error occurred');
     }
+  }
+
+  void _showError(String message) {
+    if (Get.context == null) return;
+    ScaffoldMessenger.of(Get.context!).showSnackBar(
+      SnackBar(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Error'.tr, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(message),
+          ],
+        ),
+        backgroundColor: Colors.red.shade400,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
   }
 }

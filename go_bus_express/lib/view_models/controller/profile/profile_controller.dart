@@ -32,7 +32,11 @@ class ProfileController extends BaseController<ProfileState> {
       try {
         final profileJson = jsonDecode(cachedProfile) as Map<String, dynamic>;
         final profile = ProfileModel.fromJson(profileJson);
-        updateState((state) => state.copyWith(profileModel: profile));
+        final imageUrl = _localRepository.getProfileImageUrl();
+        updateState((state) => state.copyWith(
+          profileModel: profile,
+          profileImageUrl: imageUrl,
+        ));
         log('Loaded cached profile: ${profile.fullName}');
       } catch (e) {
         log('Failed to load cached profile: $e');

@@ -14,6 +14,7 @@ enum PreferencesKey {
   walletSessionToken,
   walletSessionExpiresAt,
   walletHash,
+  profileImageUrl,
 }
 
 mixin class BaseSharePreference {

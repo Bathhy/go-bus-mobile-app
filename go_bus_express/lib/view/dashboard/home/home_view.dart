@@ -341,9 +341,7 @@ class _HomePageState extends State<HomePage>
                                   const SizedBox(width: 12),
                                   // Profile Picture
                                   Obx(() {
-                                    final imageUrl = getImageUrl(
-                                      homeController.state.profileModel?.image,
-                                    );
+                                    final imageUrl = homeController.state.profileImageUrl ?? '';
                                     return Container(
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
@@ -461,7 +459,7 @@ class _HomePageState extends State<HomePage>
           _buildIconButton(Icons.phone, () => homeController.callPhone()),
           const SizedBox(width: 12),
           Obx(() {
-            final imageUrl = getImageUrl(homeController.state.profileModel?.image);
+            final imageUrl = homeController.state.profileImageUrl ?? '';
             return CircleAvatar(
               radius: 17,
               backgroundColor: Colors.white,

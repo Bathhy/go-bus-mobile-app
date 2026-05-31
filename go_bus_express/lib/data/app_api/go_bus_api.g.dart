@@ -181,30 +181,16 @@ class _GoBusApi implements GoBusApi {
   }
 
   @override
-  Future<BaseResponse<ProfileModel>> updateProfile({
-    required String email,
-    required String fullName,
-    required String phone,
-    MultipartFile? image,
-  }) async {
+  Future<BaseResponse<ProfileModel>> updateProfile(
+    UpdateProfileBody body,
+  ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
-    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
-    final _data = FormData();
-    _data.fields.add(MapEntry('email', email));
-    _data.fields.add(MapEntry('fullName', fullName));
-    _data.fields.add(MapEntry('phone', phone));
-    if (image != null) {
-      _data.files.add(MapEntry('image', image));
-    }
+    final _data = <String, dynamic>{};
+    _data.addAll(body.toJson());
     final _options = _setStreamType<BaseResponse<ProfileModel>>(
-      Options(
-            method: 'PUT',
-            headers: _headers,
-            extra: _extra,
-            contentType: 'multipart/form-data',
-          )
+      Options(method: 'PUT', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
             '/users/current-user',
@@ -219,6 +205,74 @@ class _GoBusApi implements GoBusApi {
       _value = BaseResponse<ProfileModel>.fromJson(
         _result.data!,
         (json) => ProfileModel.fromJson(json as Map<String, dynamic>),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<BaseResponse<ProfileModel>> uploadProfileImage({
+    required MultipartFile file,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = FormData();
+    _data.files.add(MapEntry('file', file));
+    final _options = _setStreamType<BaseResponse<ProfileModel>>(
+      Options(
+            method: 'POST',
+            headers: _headers,
+            extra: _extra,
+            contentType: 'multipart/form-data',
+          )
+          .compose(
+            _dio.options,
+            '/profile/image',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late BaseResponse<ProfileModel> _value;
+    try {
+      _value = BaseResponse<ProfileModel>.fromJson(
+        _result.data!,
+        (json) => ProfileModel.fromJson(json as Map<String, dynamic>),
+      );
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<BaseResponse<ProfileImageUrlModel>> fetchProfileImageUrl() async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<BaseResponse<ProfileImageUrlModel>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/profile/image/url',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late BaseResponse<ProfileImageUrlModel> _value;
+    try {
+      _value = BaseResponse<ProfileImageUrlModel>.fromJson(
+        _result.data!,
+        (json) => ProfileImageUrlModel.fromJson(json as Map<String, dynamic>),
       );
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);

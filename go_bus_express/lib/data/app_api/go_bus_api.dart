@@ -6,7 +6,9 @@ import 'package:retrofit/http.dart';
 import 'package:go_bus_express/core/network/parse_error_logger.dart';
 import 'package:shared_package/network/base_response.dart';
 
+import '../../models/body/update_profile_body.dart';
 import '../../models/home/all_route_model.dart';
+import '../../models/profile/profile_image_url_model.dart';
 
 part 'go_bus_api.g.dart';
 
@@ -49,11 +51,16 @@ abstract class GoBusApi {
   Future<BaseResponse<List<AllRouteModel>>> fetchRoutes();
 
   @PUT('/users/current-user')
+  Future<BaseResponse<ProfileModel>> updateProfile(
+    @Body() UpdateProfileBody body,
+  );
+
+  @POST('/profile/image')
   @MultiPart()
-  Future<BaseResponse<ProfileModel>> updateProfile({
-    @Part(name: "email") required String email,
-    @Part(name: "fullName") required String fullName,
-    @Part(name: "phone") required String phone,
-    @Part(name: "image") MultipartFile? image,
+  Future<BaseResponse<ProfileModel>> uploadProfileImage({
+    @Part(name: "file") required MultipartFile file,
   });
+
+  @GET('/profile/image/url')
+  Future<BaseResponse<ProfileImageUrlModel>> fetchProfileImageUrl();
 }

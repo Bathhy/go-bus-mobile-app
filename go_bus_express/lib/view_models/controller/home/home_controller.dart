@@ -18,6 +18,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../models/home/all_route_model.dart';
 import '../../../models/payment/pending_payment_model.dart';
+import '../../../models/profile/profile_image_url_model.dart';
 import '../../../resources/routes/app_routes.dart';
 
 class HomeController extends BaseController<HomeState> {
@@ -44,6 +45,21 @@ class HomeController extends BaseController<HomeState> {
         if (result.data != null) {
           final profileJson = jsonEncode(result.data!.toJson());
           await _localRepository.saveProfile(profileJson);
+
+          // Fetch signed image URL only when profile has an image
+          if (result.data!.image != null) {
+            final imageResult = await _repository.fetchProfileImageUrl();
+            if (imageResult is Success<ProfileImageUrlModel?> &&
+                imageResult.data?.imageUrl != null) {
+              final url = imageResult.data!.imageUrl!;
+              await _localRepository.saveProfileImageUrl(url);
+              updateState((state) => state.copyWith(profileImageUrl: url));
+              log('✅ Profile image URL saved');
+            }
+          } else {
+            await _localRepository.removeProfileImageUrl();
+            updateState((state) => state.copyWith(profileImageUrl: ''));
+          }
         }
         // Pre-load wallet balance on home screen if session is still valid
         final isWalletExist = result.data?.isWalletExist ?? false;

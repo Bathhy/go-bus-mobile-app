@@ -6,6 +6,7 @@ import '../../../models/home/all_route_model.dart';
 
 class HomeState extends BaseUiState {
   final ProfileModel? profileModel;
+  final String? profileImageUrl;
   final List<AllRouteModel> routes;
   final bool isLoadingRoutes;
   final int? selectedRouteId;
@@ -18,6 +19,7 @@ class HomeState extends BaseUiState {
   HomeState({
     super.isLoading = false,
     this.profileModel = const ProfileModel(),
+    this.profileImageUrl,
     this.routes = const [],
     this.isLoadingRoutes = false,
     this.selectedRouteId,
@@ -31,6 +33,7 @@ class HomeState extends BaseUiState {
   HomeState copyWith({
     bool? isLoading,
     ProfileModel? profileModel,
+    String? profileImageUrl,
     List<AllRouteModel>? routes,
     bool? isLoadingRoutes,
     int? selectedRouteId,
@@ -43,6 +46,7 @@ class HomeState extends BaseUiState {
     return HomeState(
       isLoading: isLoading ?? this.isLoading,
       profileModel: profileModel ?? this.profileModel,
+      profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       routes: routes ?? this.routes,
       isLoadingRoutes: isLoadingRoutes ?? this.isLoadingRoutes,
       selectedRouteId: selectedRouteId ?? this.selectedRouteId,

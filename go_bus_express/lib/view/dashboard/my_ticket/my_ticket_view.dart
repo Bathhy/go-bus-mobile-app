@@ -522,7 +522,9 @@ class _MyTicketViewState extends State<MyTicketView>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            success ? 'refund_success'.tr : 'refund_failed'.tr,
+            success
+                ? 'refund_success'.tr
+                : (_ticketController.state.refundError ?? 'refund_failed'.tr),
             style: const TextStyle(color: Colors.white),
           ),
           backgroundColor: success ? Colors.green : Colors.red,

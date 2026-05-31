@@ -117,6 +117,19 @@ class LocalRepository with BaseSharePreference {
     return readString(PreferencesKey.walletHash);
   }
 
+  // Profile image URL
+  Future<void> saveProfileImageUrl(String url) async {
+    await storeValue(PreferencesKey.profileImageUrl, url);
+  }
+
+  String? getProfileImageUrl() {
+    return readString(PreferencesKey.profileImageUrl);
+  }
+
+  Future<void> removeProfileImageUrl() async {
+    await removeValue(PreferencesKey.profileImageUrl);
+  }
+
   // MARK : Payment Method
 
   Future<void> saveMD5(String md5) async {
