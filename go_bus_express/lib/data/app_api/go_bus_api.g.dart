@@ -207,7 +207,7 @@ class _GoBusApi implements GoBusApi {
           )
           .compose(
             _dio.options,
-            '/users',
+            '/users/current-user',
             queryParameters: queryParameters,
             data: _data,
           )

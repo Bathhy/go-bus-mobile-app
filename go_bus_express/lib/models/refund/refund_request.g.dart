@@ -13,7 +13,4 @@ RefundRequest _$RefundRequestFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$RefundRequestToJson(RefundRequest instance) =>
-    <String, dynamic>{
-      'reason': instance.reason,
-      'method': instance.method,
-    };
+    <String, dynamic>{'reason': instance.reason, 'method': instance.method};

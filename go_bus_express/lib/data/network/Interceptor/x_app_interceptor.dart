@@ -16,7 +16,10 @@ class XInterceptor extends Interceptor {
   ) async {
     final token = _localRepository.getToken();
 
-    options.headers['Content-Type'] = 'application/json';
+    // Only set JSON content-type for non-multipart requests
+    if (options.data is! FormData) {
+      options.headers['Content-Type'] = 'application/json';
+    }
     options.headers['X-Requested-With'] = 'XMLHttpRequest ';
     options.headers['accepts-version'] = '1.0.0';
     options.headers['Accept-Language'] = 'en';
@@ -29,7 +32,21 @@ class XInterceptor extends Interceptor {
     final method = options.method.toUpperCase();
     debug('$method  ${options.uri}');
     debug('Headers: ${options.headers}');
-    debug('Body: ${options.data}\n');
+
+    // Log FormData fields individually so keys/values are visible
+    if (options.data is FormData) {
+      final formData = options.data as FormData;
+      debug('Body (multipart fields):');
+      for (final field in formData.fields) {
+        debug('  ${field.key}: ${field.value}');
+      }
+      for (final file in formData.files) {
+        debug('  ${file.key}: [file] ${file.value.filename}');
+      }
+    } else {
+      debug('Body: ${options.data}');
+    }
+    debug('');
     super.onRequest(options, handler);
   }
 

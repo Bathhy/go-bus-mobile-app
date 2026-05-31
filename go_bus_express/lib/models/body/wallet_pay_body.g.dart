@@ -7,11 +7,7 @@ part of 'wallet_pay_body.dart';
 // **************************************************************************
 
 WalletPayBody _$WalletPayBodyFromJson(Map<String, dynamic> json) =>
-    WalletPayBody(
-      description: json['description'] as String?,
-    );
+    WalletPayBody(description: json['description'] as String?);
 
 Map<String, dynamic> _$WalletPayBodyToJson(WalletPayBody instance) =>
-    <String, dynamic>{
-      'description': instance.description,
-    };
+    <String, dynamic>{'description': instance.description};

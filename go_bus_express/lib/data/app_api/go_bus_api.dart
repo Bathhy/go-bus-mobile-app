@@ -48,7 +48,7 @@ abstract class GoBusApi {
   @GET('/routes')
   Future<BaseResponse<List<AllRouteModel>>> fetchRoutes();
 
-  @PUT('/users')
+  @PUT('/users/current-user')
   @MultiPart()
   Future<BaseResponse<ProfileModel>> updateProfile({
     @Part(name: "email") required String email,
