@@ -11,6 +11,15 @@ extension DateTimeExt on DateTime {
         '${day.toString().padLeft(2, '0')}';
   }
 
+  /// Format as LocalDateTime string (yyyy-MM-ddTHH:mm:ss)
+  /// Compatible with Java LocalDateTime / Spring @DateTimeFormat ISO
+  String toLocalDateTimeString() {
+    return '${toLocalDateString()}T'
+        '${hour.toString().padLeft(2, '0')}:'
+        '${minute.toString().padLeft(2, '0')}:'
+        '${second.toString().padLeft(2, '0')}';
+  }
+
   /// Format date as readable string (EEE, MMM d, yyyy)
   /// Example: Mon, Apr 28, 2026
   String toReadableDate() {

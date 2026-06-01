@@ -1,6 +1,8 @@
 import 'dart:developer';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_bus_express/core/utils/date_ext.dart';
 import 'package:go_bus_express/models/route/detail_route_model.dart';
 import 'package:go_bus_express/repository/route_repository.dart';
 import 'package:go_bus_express/view_models/controller/base/base_controller.dart';
@@ -56,15 +58,34 @@ class SelectRouteController extends BaseController<SelectRouteState> {
     );
   }
 
+  /// Builds the fromDateTime for the API:
+  /// - today → current time (so already-departed schedules are excluded)
+  /// - future date → midnight of that date (show all schedules for the day)
+  String _buildFromDateTime(String departureDateStr) {
+    final now = DateTime.now();
+    final departureDay = DateTime.tryParse(departureDateStr);
+    if (departureDay == null) return departureDateStr;
+
+    final isToday = departureDay.year == now.year &&
+        departureDay.month == now.month &&
+        departureDay.day == now.day;
+
+    return isToday
+        ? now.toLocalDateTimeString()
+        : DateTime(departureDay.year, departureDay.month, departureDay.day)
+            .toLocalDateTimeString();
+  }
+
   Future<void> fetchRouteByID({
     required int routeId,
     required String departureDate,
     required String returnDate,
   }) async {
+    final fromDateTime = _buildFromDateTime(departureDate);
     print('🔍 DEBUG: routeId = $routeId');
-    print('🔍 DEBUG: departureDate = $departureDate');
+    print('🔍 DEBUG: fromDateTime = $fromDateTime');
 
-    final result = await _repository.fetchBusBySchedule(routeId, departureDate);
+    final result = await _repository.fetchBusBySchedule(routeId, fromDateTime);
 
     log('🔍 DEBUG: API call completed');
 
@@ -86,6 +107,36 @@ class SelectRouteController extends BaseController<SelectRouteState> {
       case Error<RouteListResponseModel?>():
         updateState((state) => state.copyWith(isLoading: false));
         log("❌ Error loading schedules: ${result.error.displayMessage}");
+        _showError(result.error.displayMessage);
     }
+  }
+
+  void _showError(String message) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.context != null) {
+        ScaffoldMessenger.of(Get.context!).clearSnackBars();
+        ScaffoldMessenger.of(Get.context!).showSnackBar(
+          SnackBar(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Error',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(message, style: const TextStyle(color: Colors.white)),
+              ],
+            ),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    });
   }
 }
