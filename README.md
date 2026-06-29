@@ -3,11 +3,6 @@
 **Faster, smarter bus travel.** A Flutter mobile app for booking intercity bus tickets in Cambodia — search routes, pick a seat, pay with KHQR/Bakong or wallet, and get a digital e-ticket with real-time trip updates.
 
 ## Screenshots
-
-<p align="center">
-  <img src="go_bus_express/flutter_01.png" width="200" alt="Home screen with route search" />
-</p>
-
 **Home & account**
 
 <p align="center">
