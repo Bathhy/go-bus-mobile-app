@@ -69,7 +69,7 @@ class WalletKhQrController extends BaseController<WalletKhQrState> {
   }
 
   void _checkTopUpTransaction(String token) async {
-    log('🔄 Waiting for top-up payment confirmation...');
+    log('Waiting for top-up payment confirmation...');
 
     final result = await _walletRepo.checkTopUpTransaction(
       sessionToken: token,
@@ -87,7 +87,7 @@ class WalletKhQrController extends BaseController<WalletKhQrState> {
           await _refreshWallet();
           Get.offNamed(AppRoutes.walletTopUpSuccess);
         } else {
-          log('⚠️ Top-up not completed yet');
+          log('Top-up not completed yet');
         }
       case Error<BaseResponse<VerifyPaymentModel>>():
         _showError(result.error.displayMessage);
@@ -108,7 +108,7 @@ class WalletKhQrController extends BaseController<WalletKhQrState> {
     try {
       await getIt<WalletController>().fetchWalletMe(includeTransactions: true);
     } catch (e) {
-      log('⚠️ Could not refresh wallet: $e');
+      log('Could not refresh wallet: $e');
     }
   }
 

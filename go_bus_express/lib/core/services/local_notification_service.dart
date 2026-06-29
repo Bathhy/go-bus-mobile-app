@@ -43,7 +43,7 @@ class LocalNotificationService {
     }
 
     _isInitialized = true;
-    if (kDebugMode) print('✅ Local Notifications initialized');
+    if (kDebugMode) print('Local Notifications initialized');
   }
 
   Future<void> showPaymentSuccessNotification({
@@ -86,7 +86,7 @@ class LocalNotificationService {
     );
 
     if (kDebugMode) {
-      print('✅ Payment success notification shown for booking #$bookingId');
+      print('Payment success notification shown for booking #$bookingId');
     }
   }
 

@@ -8,7 +8,7 @@ class WebSocketDiagnostic {
     final startTime = DateTime.now();
     
     try {
-      dev.log('🔍 [WS Diagnostic] Testing connection to: $url');
+      dev.log('[WS Diagnostic] Testing connection to: $url');
       
       final uri = Uri.parse(url);
       final channel = WebSocketChannel.connect(uri);
@@ -21,7 +21,7 @@ class WebSocketDiagnostic {
       );
       
       final duration = DateTime.now().difference(startTime);
-      dev.log('✅ [WS Diagnostic] Connected in ${duration.inMilliseconds}ms');
+      dev.log('[WS Diagnostic] Connected in ${duration.inMilliseconds}ms');
       
       await channel.sink.close();
       
@@ -32,7 +32,7 @@ class WebSocketDiagnostic {
       );
     } catch (e) {
       final duration = DateTime.now().difference(startTime);
-      dev.log('❌ [WS Diagnostic] Failed: $e');
+      dev.log('[WS Diagnostic] Failed: $e');
       
       return DiagnosticResult(
         success: false,
@@ -45,7 +45,7 @@ class WebSocketDiagnostic {
   
   static void printConnectionInfo(String url) {
     dev.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    dev.log('🔍 WebSocket Connection Info');
+    dev.log('WebSocket Connection Info');
     dev.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     dev.log('URL: $url');
     
@@ -56,7 +56,7 @@ class WebSocketDiagnostic {
       dev.log('Port: ${uri.port}');
       dev.log('Path: ${uri.path}');
     } catch (e) {
-      dev.log('❌ Invalid URL format: $e');
+      dev.log('Invalid URL format: $e');
     }
     
     dev.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');

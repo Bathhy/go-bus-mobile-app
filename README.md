@@ -5,53 +5,53 @@
 ## Screenshots
 
 <p align="center">
-  <img src="flutter_01.png" width="200" alt="Home screen with route search" />
-  <img src="flutter_02.png" width="200" alt="Home screen, signed-in user view" />
-  <img src="assets/images/gobus_poster2.jpg" width="220" alt="GoBus Express promo" />
+  <img src="go_bus_express/flutter_01.png" width="200" alt="Home screen with route search" />
+  <img src="go_bus_express/flutter_02.png" width="200" alt="Home screen, signed-in user view" />
+  <img src="go_bus_express/assets/images/gobus_poster2.jpg" width="220" alt="GoBus Express promo" />
 </p>
 
 **Home & account**
 
 <p align="center">
-  <img src="screenshots/home.png" width="200" alt="Home screen" />
-  <img src="screenshots/profile.png" width="200" alt="Profile screen" />
-  <img src="screenshots/ticket_empty.png" width="200" alt="Ticket list, no upcoming trips" />
+  <img src="go_bus_express/screenshots/home.png" width="200" alt="Home screen" />
+  <img src="go_bus_express/screenshots/profile.png" width="200" alt="Profile screen" />
+  <img src="go_bus_express/screenshots/ticket_empty.png" width="200" alt="Ticket list, no upcoming trips" />
 </p>
 
 **Booking flow**
 
 <p align="center">
-  <img src="screenshots/select_route.png" width="200" alt="Select route" />
-  <img src="screenshots/select_time.png" width="200" alt="Select departure time and bus" />
-  <img src="screenshots/choose_payment.png" width="200" alt="Choose payment method" />
+  <img src="go_bus_express/screenshots/select_route.png" width="200" alt="Select route" />
+  <img src="go_bus_express/screenshots/select_time.png" width="200" alt="Select departure time and bus" />
+  <img src="go_bus_express/screenshots/choose_payment.png" width="200" alt="Choose payment method" />
 </p>
 
 **Payments & wallet**
 
 <p align="center">
-  <img src="screenshots/payment_khqr.png" width="200" alt="KHQR payment screen" />
-  <img src="screenshots/wallet_pin.png" width="200" alt="Wallet PIN entry" />
-  <img src="screenshots/wallet_pin_confirm.png" width="200" alt="Wallet PIN confirmation" />
+  <img src="go_bus_express/screenshots/payment_khqr.png" width="200" alt="KHQR payment screen" />
+  <img src="go_bus_express/screenshots/wallet_pin.png" width="200" alt="Wallet PIN entry" />
+  <img src="go_bus_express/screenshots/wallet_pin_confirm.png" width="200" alt="Wallet PIN confirmation" />
 </p>
 
 <p align="center">
-  <img src="screenshots/my_wallet.png" width="200" alt="Wallet balance & transactions" />
-  <img src="screenshots/topup_wallet.png" width="200" alt="Top up wallet" />
-  <img src="screenshots/topup_qr.png" width="200" alt="Top up via KHQR" />
+  <img src="go_bus_express/screenshots/my_wallet.png" width="200" alt="Wallet balance & transactions" />
+  <img src="go_bus_express/screenshots/topup_wallet.png" width="200" alt="Top up wallet" />
+  <img src="go_bus_express/screenshots/topup_qr.png" width="200" alt="Top up via KHQR" />
 </p>
 
 <p align="center">
-  <img src="screenshots/payment_success.png" width="200" alt="Payment successful" />
-  <img src="screenshots/topup_success.png" width="200" alt="Top up successful" />
-  <img src="screenshots/booking_success.png" width="200" alt="Booking payment successful" />
+  <img src="go_bus_express/screenshots/payment_success.png" width="200" alt="Payment successful" />
+  <img src="go_bus_express/screenshots/topup_success.png" width="200" alt="Top up successful" />
+  <img src="go_bus_express/screenshots/booking_success.png" width="200" alt="Booking payment successful" />
 </p>
 
 **Tickets & refunds**
 
 <p align="center">
-  <img src="screenshots/ticket_detail_qr.png" width="200" alt="Ticket detail with QR code" />
-  <img src="screenshots/ticket_detail_passenger.png" width="200" alt="Ticket detail, passenger & payment info" />
-  <img src="screenshots/refund_request.png" width="200" alt="Refund request dialog" />
+  <img src="go_bus_express/screenshots/ticket_detail_qr.png" width="200" alt="Ticket detail with QR code" />
+  <img src="go_bus_express/screenshots/ticket_detail_passenger.png" width="200" alt="Ticket detail, passenger & payment info" />
+  <img src="go_bus_express/screenshots/refund_request.png" width="200" alt="Refund request dialog" />
 </p>
 
 ## Features
@@ -61,11 +61,11 @@
 - 🎫 **Digital tickets** — view booking history and ticket/QR details, no paper needed
 - 💳 **Payments** — KHQR / Bakong QR payment, in-app wallet with top-up and withdrawal
 - 🔁 **Refunds** — request and track ticket refunds
-- 🔔 **Push & local notifications** — booking and payment status updates via Firebase Cloud Messaging
+- 🔔 **Push & local notifications** — booking and payment status updates via Local Notification
 - 📡 **Real-time updates** — STOMP/WebSocket connection for live payment and trip status
 - 🌐 **Offline awareness** — connectivity monitoring with graceful fallback messaging
 - 🌍 **Localization** — multi-language support (English / Khmer)
-- 👤 **Account management** — Google Sign-In, profile editing, PIN code security
+- 👤 **Account management** —  Profile editing, PIN code security
 
 ## Tech stack
 

@@ -54,7 +54,7 @@ class HomeController extends BaseController<HomeState> {
               final url = imageResult.data!.imageUrl!;
               await _localRepository.saveProfileImageUrl(url);
               updateState((state) => state.copyWith(profileImageUrl: url));
-              log('✅ Profile image URL saved');
+              log('Profile image URL saved');
             }
           } else {
             await _localRepository.removeProfileImageUrl();
@@ -67,7 +67,7 @@ class HomeController extends BaseController<HomeState> {
           try {
             await Get.find<WalletController>().fetchWalletMe();
           } catch (e) {
-            log('⚠️ Could not pre-load wallet balance: $e');
+            log('Could not pre-load wallet balance: $e');
           }
         }
       case Error<ProfileModel?>():
@@ -96,48 +96,48 @@ class HomeController extends BaseController<HomeState> {
             .map((json) => AllRouteModel.fromJson(json))
             .toList();
         updateState((state) => state.copyWith(routes: routes));
-        print('📦 Loaded ${routes.length} routes from cache');
+        print('Loaded ${routes.length} routes from cache');
       } catch (e) {
-        print('❌ Error loading cached routes: $e');
+        print('Error loading cached routes: $e');
       }
     } else {
-      print('📦 No cached routes found');
+      print('No cached routes found');
     }
   }
 
   Future<void> fetchRoutes({bool forceRefresh = false}) async {
-    print('🔄 [fetchRoutes] START - forceRefresh: $forceRefresh');
-    print('🔄 [fetchRoutes] Current state.routes.length: ${state.routes.length}');
+    print('[fetchRoutes] START - forceRefresh: $forceRefresh');
+    print('[fetchRoutes] Current state.routes.length: ${state.routes.length}');
     
     // If routes already exist and not forcing refresh, skip
     if (!forceRefresh && state.routes.isNotEmpty) {
-      print('✅ Routes already loaded - SKIPPING API call');
+      print('Routes already loaded - SKIPPING API call');
       return;
     }
 
-    print('🔄 Setting isLoadingRoutes = true');
+    print('Setting isLoadingRoutes = true');
     updateState((state) => state.copyWith(isLoadingRoutes: true));
     
-    print('🔄 Calling _routeRepository.fetchRoutes()...');
+    print('Calling _routeRepository.fetchRoutes()...');
     final result = await _routeRepository.fetchRoutes();
-    print('🔄 Repository returned result type: ${result.runtimeType}');
+    print('Repository returned result type: ${result.runtimeType}');
 
     switch (result) {
       case Success<List<AllRouteModel>>():
-        print('✅ SUCCESS - API returned ${result.data.length} routes');
-        print('✅ Routes data: ${result.data.map((r) => r.origin).toList()}');
+        print('SUCCESS - API returned ${result.data.length} routes');
+        print('Routes data: ${result.data.map((r) => r.origin).toList()}');
         
         updateState(
           (state) {
-            print('🔍 BEFORE copyWith - state.routes.length: ${state.routes.length}');
+            print('BEFORE copyWith - state.routes.length: ${state.routes.length}');
             final newState = state.copyWith(isLoadingRoutes: false, routes: result.data);
-            print('🔍 AFTER copyWith - newState.routes.length: ${newState.routes.length}');
+            print('AFTER copyWith - newState.routes.length: ${newState.routes.length}');
             return newState;
           },
         );
 
-        print('🔍 AFTER updateState - this.state.routes.length: ${state.routes.length}');
-        print('🔍 Routes in state: ${state.routes.map((r) => r.origin).toList()}');
+        print('AFTER updateState - this.state.routes.length: ${state.routes.length}');
+        print('Routes in state: ${state.routes.map((r) => r.origin).toList()}');
 
         // Save to cache
         final routesJson = jsonEncode(
@@ -145,13 +145,13 @@ class HomeController extends BaseController<HomeState> {
         );
         await _localRepository.saveRoutes(routesJson);
 
-        print('✅ Routes saved to cache successfully');
+        print('Routes saved to cache successfully');
       case Error<List<AllRouteModel>>():
-        print('❌ ERROR - Routes fetch failed: ${result.error}');
+        print('ERROR - Routes fetch failed: ${result.error}');
         updateState((state) => state.copyWith(isLoadingRoutes: false));
     }
     
-    print('🔄 [fetchRoutes] END');
+    print('[fetchRoutes] END');
   }
 
   void selectRoute(AllRouteModel route) {
@@ -166,7 +166,7 @@ class HomeController extends BaseController<HomeState> {
 
   Map<String, dynamic>? getSearchParams() {
     if (state.selectedRouteId == null || state.departureDate == null) {
-      log('❌ Missing required search parameters');
+      log('Missing required search parameters');
       return null;
     }
 
@@ -184,7 +184,7 @@ class HomeController extends BaseController<HomeState> {
       params['return_date'] = state.returnDate!.toLocalDateString();
     }
 
-    log('✅ Search params: $params');
+    log('Search params: $params');
     return params;
   }
 
@@ -237,11 +237,11 @@ class HomeController extends BaseController<HomeState> {
       case Success<void>():
         updateState((state) => state.copyWith(isLoading: false));
         await _hiveRepository.clearPendingPayment();
-        log('✅ Pending payment canceled');
+        log('Pending payment canceled');
         break;
       case Error<void>():
         updateState((state) => state.copyWith(isLoading: false));
-        log('❌ Failed to cancel pending payment');
+        log('Failed to cancel pending payment');
         break;
     }
   }
@@ -259,11 +259,11 @@ class HomeController extends BaseController<HomeState> {
         if (await canLaunchUrl(webUri)) {
           await launchUrl(webUri, mode: LaunchMode.externalApplication);
         } else {
-          log('❌ Could not launch Telegram');
+          log('Could not launch Telegram');
         }
       }
     } catch (e) {
-      log('❌ Error opening Telegram: $e');
+      log('Error opening Telegram: $e');
       // Only show snackbar if context is available
       if (Get.context != null) {
         ScaffoldMessenger.of(Get.context!).showSnackBar(
@@ -282,10 +282,10 @@ class HomeController extends BaseController<HomeState> {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri);
       } else {
-        log('❌ Could not make phone call');
+        log('Could not make phone call');
       }
     } catch (e) {
-      log('❌ Error launching phone call: $e');
+      log('Error launching phone call: $e');
       // Only show snackbar if context is available
       if (Get.context != null) {
         ScaffoldMessenger.of(Get.context!).showSnackBar(

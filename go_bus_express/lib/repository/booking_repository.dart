@@ -70,7 +70,7 @@ class BookingRepositoryImpl implements BookingRepository {
             );
         return res;
       } catch (e) {
-        print('❌ Error in generateQr repository: $e');
+        print('Error in generateQr repository: $e');
         rethrow;
       }
     });

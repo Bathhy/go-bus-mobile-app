@@ -34,7 +34,7 @@ class FirebaseServiceComet {
       await _setupMessageHandlers(context);
     } catch (e, st) {
       if (kDebugMode) {
-        debugPrint('🔥 FirebaseServiceComet.init error: $e\n$st');
+        debugPrint('FirebaseServiceComet.init error: $e\n$st');
       }
     }
   }
@@ -76,7 +76,7 @@ class FirebaseServiceComet {
         debugPrint('[FCM] Permissions: ${_settings.authorizationStatus}');
       }
     } catch (e) {
-      if (kDebugMode) debugPrint('⚠️ Error requesting permissions: $e');
+      if (kDebugMode) debugPrint('Error requesting permissions: $e');
       rethrow;
     }
   }
@@ -89,7 +89,7 @@ class FirebaseServiceComet {
       await _fm.deleteToken();
       if (kDebugMode) debugPrint('[FCM] Token deleted');
     } catch (e) {
-      if (kDebugMode) debugPrint('⚠️ deleteToken error: $e');
+      if (kDebugMode) debugPrint('deleteToken error: $e');
     }
   }
 
@@ -97,7 +97,7 @@ class FirebaseServiceComet {
     try {
       return await _fm.getToken();
     } catch (e) {
-      if (kDebugMode) debugPrint('⚠️ getCurrentToken error: $e');
+      if (kDebugMode) debugPrint('getCurrentToken error: $e');
       return null;
     }
   }
@@ -107,7 +107,7 @@ class FirebaseServiceComet {
       await _fm.subscribeToTopic(topic);
       if (kDebugMode) debugPrint('[FCM] Subscribed to topic: $topic');
     } catch (e) {
-      if (kDebugMode) debugPrint('⚠️ Subscribe to topic error: $e');
+      if (kDebugMode) debugPrint('Subscribe to topic error: $e');
     }
   }
 
@@ -116,7 +116,7 @@ class FirebaseServiceComet {
       await _fm.unsubscribeFromTopic(topic);
       if (kDebugMode) debugPrint('[FCM] Unsubscribed from topic: $topic');
     } catch (e) {
-      if (kDebugMode) debugPrint('⚠️ Unsubscribe from topic error: $e');
+      if (kDebugMode) debugPrint('Unsubscribe from topic error: $e');
     }
   }
 }

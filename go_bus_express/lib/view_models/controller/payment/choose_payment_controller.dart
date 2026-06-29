@@ -48,7 +48,7 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
         updateState((s) => s.copyWith(walletBalance: result.data?.balance ?? 0.0));
         break;
       case Error():
-        log('⚠️ Failed to fetch wallet balance: ${result.error.displayMessage}');
+        log('Failed to fetch wallet balance: ${result.error.displayMessage}');
         break;
     }
   }
@@ -57,7 +57,7 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
     final args = Get.arguments as Map<String, dynamic>?;
 
     if (args == null) {
-      log('❌ No arguments passed to ChoosePaymentController');
+      log('No arguments passed to ChoosePaymentController');
       return;
     }
 
@@ -124,14 +124,14 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
         seatIds: state.selectedSeatIds,
       );
       updateState((state) => state.copyWith(isLoading: true));
-      log('🔄 Creating booking with seat IDs: ${state.selectedSeatIds}');
+      log('Creating booking with seat IDs: ${state.selectedSeatIds}');
 
       final result = await _bookingRepository.createBooking(body: body);
 
       switch (result) {
         case Success<BookingModel?>():
           final bookingId = result.data?.id;
-          log('✅ Booking created, id=$bookingId');
+          log('Booking created, id=$bookingId');
 
           if (bookingId == null) {
             updateState((state) => state.copyWith(isLoading: false));
@@ -151,12 +151,12 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
           }
 
         case Error<BookingModel?>():
-          log('❌ Booking error ${result.error.statusCode}: ${result.error.displayMessage}');
+          log('Booking error ${result.error.statusCode}: ${result.error.displayMessage}');
           updateState((state) => state.copyWith(isLoading: false));
           _showError(result.error.displayMessage);
       }
     } catch (e, st) {
-      log('❌ Exception in createBooking: $e\n$st');
+      log('Exception in createBooking: $e\n$st');
       updateState((state) => state.copyWith(isLoading: false));
       _showError('Failed to create booking. Please try again.');
     }
@@ -170,10 +170,10 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
   Future<String?> _ensureWalletSession() async {
     final existing = _getValidSessionToken();
     if (existing != null) {
-      log('✅ Wallet session still valid — skipping PIN');
+      log('Wallet session still valid — skipping PIN');
       return existing;
     }
-    log('🔐 Wallet session invalid — prompting PIN before booking');
+    log('Wallet session invalid — prompting PIN before booking');
     return _showPinDialog();
   }
 
@@ -200,7 +200,7 @@ class ChoosePaymentController extends BaseController<ChoosePaymentState> {
       case Error():
         final isExpired = result.error.statusCode == 401;
         if (!isRetry && isExpired) {
-          log('⚠️ Wallet session expired — requesting PIN');
+          log('Wallet session expired — requesting PIN');
           await _localRepository.clearWalletSession();
           updateState((s) => s.copyWith(isLoading: false));
           final newToken = await _showPinDialog(

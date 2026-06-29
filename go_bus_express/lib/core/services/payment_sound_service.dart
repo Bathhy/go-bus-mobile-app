@@ -20,7 +20,7 @@ class PaymentSoundService {
       // Dispose after playback completes so we don't leak resources.
       player.onPlayerComplete.first.then((_) => player.dispose());
     } catch (e) {
-      if (kDebugMode) debugPrint('⚠️ PaymentSoundService.playSuccess error: $e');
+      if (kDebugMode) debugPrint('PaymentSoundService.playSuccess error: $e');
     }
   }
 }

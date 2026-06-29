@@ -63,7 +63,7 @@ class KhQrController extends BaseController<KhQrState> {
   void _verifyPayment() async {
     if (state.isPaid || state.isExpired) return;
 
-    log('🔄 Calling verify payment API...');
+    log('Calling verify payment API...');
 
     final body = VerifyPaymentBody(md5: state.md5);
     final result = await _bookingRepo.verifyMd5(
@@ -74,18 +74,18 @@ class KhQrController extends BaseController<KhQrState> {
     switch (result) {
       case Success<BaseResponse<VerifyPaymentModel>>():
         final statusCode = result.data.status;
-        log('✅ Verify response status: $statusCode');
+        log('Verify response status: $statusCode');
 
         if (statusCode == 200) {
           await _onPaymentSuccess();
         } else {
           // Backend returned non-200 body: FAILED or EXPIRED
-          log('⚠️ Payment not completed – status: $statusCode');
+          log('Payment not completed – status: $statusCode');
           paymentError.value = 'failed';
         }
 
       case Error<BaseResponse<VerifyPaymentModel>>():
-        log('❌ Verify error: ${result.error.displayMessage}');
+        log('Verify error: ${result.error.displayMessage}');
         // Wait briefly then fall back to GET booking payment status
         await Future.delayed(const Duration(seconds: 2));
         await _fallbackCheckPaymentStatus();
@@ -95,7 +95,7 @@ class KhQrController extends BaseController<KhQrState> {
   // MARK: - Fallback (GET /payments/booking/{bookingId})
 
   Future<void> _fallbackCheckPaymentStatus() async {
-    log('🔄 Fallback: GET /payments/booking/${state.bookingId}');
+    log('Fallback: GET /payments/booking/${state.bookingId}');
 
     final result = await _bookingRepo.getPaymentByBookingId(
       bookingId: state.bookingId,
@@ -104,7 +104,7 @@ class KhQrController extends BaseController<KhQrState> {
     switch (result) {
       case Success<BaseResponse<Payment>>():
         final status = (result.data.data?.status ?? '').toUpperCase();
-        log('📊 Fallback payment status: $status');
+        log('Fallback payment status: $status');
 
         switch (status) {
           case 'SUCCESS':
@@ -122,7 +122,7 @@ class KhQrController extends BaseController<KhQrState> {
         }
 
       case Error<BaseResponse<Payment>>():
-        log('❌ Fallback check failed: ${result.error.displayMessage}');
+        log('Fallback check failed: ${result.error.displayMessage}');
         paymentError.value = 'error';
     }
   }

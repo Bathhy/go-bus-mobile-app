@@ -34,7 +34,7 @@ class EditProfileController extends BaseController<EditProfileState> {
     final args = Get.arguments as Map<String, dynamic>?;
 
     if (args == null) {
-      log('❌ No arguments passed to ChoosePaymentController');
+      log('No arguments passed to ChoosePaymentController');
       return;
     }
 
@@ -68,7 +68,7 @@ class EditProfileController extends BaseController<EditProfileState> {
       );
 
       if (pickedFile != null) {
-        log('✅ Image picked from gallery: ${pickedFile.path}');
+        log('Image picked from gallery: ${pickedFile.path}');
         final File imageFile = File(pickedFile.path);
         updateState((state) => state.copyWith(selectedImage: imageFile));
       }

@@ -24,7 +24,7 @@ class SelectRouteController extends BaseController<SelectRouteState> {
     final args = Get.arguments as Map<String, dynamic>?;
 
     if (args == null) {
-      log('❌ No arguments passed to SelectRouteController');
+      log('No arguments passed to SelectRouteController');
       return;
     }
 
@@ -34,11 +34,11 @@ class SelectRouteController extends BaseController<SelectRouteState> {
     final destination = args['destination'] as String?;
 
     if (routeId == null || departureDate == null) {
-      log('❌ Missing required parameters');
+      log('Missing required parameters');
       return;
     }
 
-    /// 🔥 Update state immediately so UI can show data
+    ///  Update state immediately so UI can show data
     updateState(
       (state) => state.copyWith(
         routeId: routeId,
@@ -82,12 +82,12 @@ class SelectRouteController extends BaseController<SelectRouteState> {
     required String returnDate,
   }) async {
     final fromDateTime = _buildFromDateTime(departureDate);
-    print('🔍 DEBUG: routeId = $routeId');
-    print('🔍 DEBUG: fromDateTime = $fromDateTime');
+    print('DEBUG: routeId = $routeId');
+    print('DEBUG: fromDateTime = $fromDateTime');
 
     final result = await _repository.fetchBusBySchedule(routeId, fromDateTime);
 
-    log('🔍 DEBUG: API call completed');
+    log('DEBUG: API call completed');
 
     switch (result) {
       case Success<RouteListResponseModel?>():
@@ -106,7 +106,7 @@ class SelectRouteController extends BaseController<SelectRouteState> {
 
       case Error<RouteListResponseModel?>():
         updateState((state) => state.copyWith(isLoading: false));
-        log("❌ Error loading schedules: ${result.error.displayMessage}");
+        log("Error loading schedules: ${result.error.displayMessage}");
         _showError(result.error.displayMessage);
     }
   }

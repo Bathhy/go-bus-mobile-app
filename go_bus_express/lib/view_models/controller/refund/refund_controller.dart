@@ -13,7 +13,7 @@ class RefundController extends BaseController<RefundState> {
 
   @override
   void onInit() {
-    log('🚀 RefundController onInit');
+    log('RefundController onInit');
     fetchRefunds();
     super.onInit();
   }
@@ -25,7 +25,7 @@ class RefundController extends BaseController<RefundState> {
       switch (result) {
         case Success<RefundPage?>():
           final items = result.data?.content ?? [];
-          log('✅ Loaded ${items.length} refunds (status=$status)');
+          log('Loaded ${items.length} refunds (status=$status)');
           updateState((s) => s.copyWith(
                 refunds: items,
                 selectedStatus: status,
@@ -33,7 +33,7 @@ class RefundController extends BaseController<RefundState> {
               ));
           break;
         case Error<RefundPage?>():
-          log('❌ Error: ${result.error.displayMessage}');
+          log('Error: ${result.error.displayMessage}');
           updateState((s) => s.copyWith(
                 refunds: [],
                 isLoading: false,
@@ -42,7 +42,7 @@ class RefundController extends BaseController<RefundState> {
           break;
       }
     } catch (e) {
-      log('💥 Exception: $e');
+      log('Exception: $e');
       updateState((s) => s.copyWith(
             refunds: [],
             isLoading: false,
@@ -68,14 +68,14 @@ class RefundController extends BaseController<RefundState> {
       );
       switch (result) {
         case Success<RefundModel?>():
-          log('✅ Refund requested for booking $bookingId');
+          log('Refund requested for booking $bookingId');
           return true;
         case Error<RefundModel?>():
-          log('❌ Refund request failed: ${result.error.displayMessage}');
+          log('Refund request failed: ${result.error.displayMessage}');
           return false;
       }
     } catch (e) {
-      log('💥 Refund exception: $e');
+      log('Refund exception: $e');
       return false;
     }
   }
@@ -87,7 +87,7 @@ class RefundDetailController extends BaseController<RefundDetailState> {
   RefundDetailController(this._repository) : super(RefundDetailState());
 
   Future<void> fetchDetail({required int id}) async {
-    log('📡 Fetching refund detail id=$id');
+    log('Fetching refund detail id=$id');
     updateState((s) => s.copyWith(isLoading: true, clearError: true));
     try {
       final result = await _repository.getRefundDetail(id: id);

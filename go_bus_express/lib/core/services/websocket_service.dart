@@ -60,31 +60,31 @@ class WebSocketService {
     _updateStatus(ConnectionStatus.connecting);
 
     final wsUrl = _buildWsUrl(_baseUrl!, _token!);
-    print('🔌 [STOMP] Connecting to: ${wsUrl.replaceAll(_token!, '***')}');
+    print('[STOMP] Connecting to: ${wsUrl.replaceAll(_token!, '***')}');
 
     _client = StompClient(
       config: StompConfig(
         url: wsUrl,
         onConnect: _onStompConnect,
         onStompError: (frame) {
-          print('❌ [STOMP] Error: ${frame.body}');
+          print('[STOMP] Error: ${frame.body}');
           _updateStatus(ConnectionStatus.error);
           _scheduleReconnect();
         },
         onWebSocketError: (error) {
-          print('❌ [STOMP] WS error: $error');
+          print('[STOMP] WS error: $error');
           _updateStatus(ConnectionStatus.error);
           _scheduleReconnect();
         },
         onDisconnect: (frame) {
-          print('🔌 [STOMP] Disconnected');
+          print('[STOMP] Disconnected');
           if (!_disposed) {
             _updateStatus(ConnectionStatus.disconnected);
             _scheduleReconnect();
           }
         },
         onWebSocketDone: () {
-          print('🔌 [STOMP] WS closed');
+          print('[STOMP] WS closed');
           if (!_disposed) {
             _updateStatus(ConnectionStatus.disconnected);
             _scheduleReconnect();
@@ -100,27 +100,27 @@ class WebSocketService {
   }
 
   void _onStompConnect(StompFrame frame) {
-    print('✅ [STOMP] Connected successfully!');
-    print('✅ [STOMP] Frame headers: ${frame.headers}');
+    print('[STOMP] Connected successfully!');
+    print('[STOMP] Frame headers: ${frame.headers}');
     _retryCount = 0;
     _updateStatus(ConnectionStatus.connected);
 
-    print('📡 [STOMP] Subscribing to: $_subscribeTopic');
+    print('[STOMP] Subscribing to: $_subscribeTopic');
     _topicUnsubscribe = _client!.subscribe(
       destination: _subscribeTopic!,
       callback: (frame) {
         final body = frame.body;
-        print('📨 [STOMP] Message received on topic $_subscribeTopic');
-        print('📨 [STOMP] Frame headers: ${frame.headers}');
+        print('[STOMP] Message received on topic $_subscribeTopic');
+        print('[STOMP] Frame headers: ${frame.headers}');
         if (body != null && !_messageController.isClosed) {
-          print('📨 [STOMP] Body (${body.length} chars): $body');
+          print('[STOMP] Body (${body.length} chars): $body');
           _messageController.add(body);
         } else {
-          print('⚠️ [STOMP] Body is null or controller closed');
+          print('[STOMP] Body is null or controller closed');
         }
       },
     );
-    print('✅ [STOMP] Successfully subscribed to: $_subscribeTopic');
+    print('[STOMP] Successfully subscribed to: $_subscribeTopic');
   }
 
   /// Send a message to a STOMP destination.
@@ -129,22 +129,22 @@ class WebSocketService {
   /// [body]        — map that will be JSON-encoded
   void sendToDestination(String destination, Map<String, dynamic> body) {
     if (_currentStatus != ConnectionStatus.connected || _client == null) {
-      print('⚠️ [STOMP] Cannot send, not connected (queuing not supported for STOMP)');
+      print('[STOMP] Cannot send, not connected (queuing not supported for STOMP)');
       return;
     }
     try {
       final encoded = jsonEncode(body);
       _client!.send(destination: destination, body: encoded);
-      print('📤 [STOMP] Sent to $destination');
+      print('[STOMP] Sent to $destination');
     } catch (e) {
-      print('❌ [STOMP] Send failed: $e');
+      print('[STOMP] Send failed: $e');
     }
   }
 
   void _scheduleReconnect() {
     if (_disposed || _retryCount >= _maxRetries) {
       if (_retryCount >= _maxRetries) {
-        print('❌ [STOMP] Max retries ($_maxRetries) reached');
+        print('[STOMP] Max retries ($_maxRetries) reached');
         _updateStatus(ConnectionStatus.error);
       }
       return;
@@ -152,7 +152,7 @@ class WebSocketService {
 
     final delay = _backoffDelay(_retryCount);
     _retryCount++;
-    print('🔄 [STOMP] Retry $_retryCount/$_maxRetries in ${delay.inSeconds}s');
+    print('[STOMP] Retry $_retryCount/$_maxRetries in ${delay.inSeconds}s');
 
     _retryTimer?.cancel();
     _retryTimer = Timer(delay, () {

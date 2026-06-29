@@ -14,14 +14,14 @@ class TicketDetailController extends BaseController<TicketDetailState> {
 
   @override
   void onInit() {
-    log('🚀 TicketDetailController onInit called');
+    log('TicketDetailController onInit called');
     super.onInit();
   }
 
   // Method to initialize with route arguments
   void initializeWithArguments(Map<String, dynamic>? args) {
     if (args == null) {
-      log('⚠️ No arguments provided to TicketDetailController');
+      log('No arguments provided to TicketDetailController');
       return;
     }
 
@@ -29,7 +29,7 @@ class TicketDetailController extends BaseController<TicketDetailState> {
     final passengerName = args['passengerName'] as String?;
     final passengerEmail = args['email'] as String?;
 
-    log('📋 Initializing with arguments: ticketId=$ticketId, passengerName=$passengerName, email=$passengerEmail');
+    log('Initializing with arguments: ticketId=$ticketId, passengerName=$passengerName, email=$passengerEmail');
 
     updateState((state) => state.copyWith(
       ticketId: ticketId,
@@ -43,7 +43,7 @@ class TicketDetailController extends BaseController<TicketDetailState> {
 
   // Method to fetch ticket detail by ID
   Future<void> fetchTicketDetail({required int ticketId}) async {
-    log('📡 Fetching ticket detail with ID: $ticketId');
+    log('Fetching ticket detail with ID: $ticketId');
 
     // Set loading state and clear any previous errors
     updateState((state) => state.copyWith(isLoading: true, clearError: true));
@@ -55,23 +55,23 @@ class TicketDetailController extends BaseController<TicketDetailState> {
 
       switch (result) {
         case Success<TicketDetailModel?>():
-          log('✅ Ticket detail fetched successfully');
+          log('Ticket detail fetched successfully');
           final ticketDetail = result.data;
           if (ticketDetail != null) {
-            log('📊 Ticket detail loaded: ID ${ticketDetail.id}');
+            log('Ticket detail loaded: ID ${ticketDetail.id}');
             updateState(
               (state) =>
                   state.copyWith(ticketDetail: ticketDetail, isLoading: false),
             );
           } else {
-            log('⚠️ Received null ticket detail');
+            log('Received null ticket detail');
             updateState(
               (state) => state.copyWith(ticketDetail: null, isLoading: false),
             );
           }
           break;
         case Error<TicketDetailModel?>():
-          log('❌ Error fetching ticket detail: ${result.error.displayMessage}');
+          log('Error fetching ticket detail: ${result.error.displayMessage}');
           updateState(
             (state) => state.copyWith(
               isLoading: false,
@@ -81,7 +81,7 @@ class TicketDetailController extends BaseController<TicketDetailState> {
           break;
       }
     } catch (e) {
-      log('💥 Exception in fetchTicketDetail: $e');
+      log('Exception in fetchTicketDetail: $e');
       updateState(
         (state) => state.copyWith(
           isLoading: false,

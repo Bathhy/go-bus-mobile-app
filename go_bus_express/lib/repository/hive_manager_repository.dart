@@ -11,18 +11,18 @@ class HiveManagerRepository {
   Future<void> init() async {
     try {
       _box = await Hive.openBox<PendingPaymentModel>(_pendingPaymentBox);
-      log('✅ Hive PendingPayment box opened');
+      log('Hive PendingPayment box opened');
     } catch (e) {
-      log('❌ Error opening Hive box: $e');
+      log('Error opening Hive box: $e');
     }
   }
 
   Future<void> savePendingPayment(PendingPaymentModel payment) async {
     try {
       await _box?.put(_pendingPaymentKey, payment);
-      log('✅ Pending payment saved: BookingID ${payment.bookingId}');
+      log('Pending payment saved: BookingID ${payment.bookingId}');
     } catch (e) {
-      log('❌ Error saving pending payment: $e');
+      log('Error saving pending payment: $e');
     }
   }
 
@@ -30,11 +30,11 @@ class HiveManagerRepository {
     try {
       final payment = _box?.get(_pendingPaymentKey);
       if (payment != null) {
-        log('✅ Pending payment found: BookingID ${payment.bookingId}');
+        log('Pending payment found: BookingID ${payment.bookingId}');
       }
       return payment;
     } catch (e) {
-      log('❌ Error getting pending payment: $e');
+      log('Error getting pending payment: $e');
       return null;
     }
   }
@@ -42,9 +42,9 @@ class HiveManagerRepository {
   Future<void> clearPendingPayment() async {
     try {
       await _box?.delete(_pendingPaymentKey);
-      log('✅ Pending payment cleared');
+      log('Pending payment cleared');
     } catch (e) {
-      log('❌ Error clearing pending payment: $e');
+      log('Error clearing pending payment: $e');
     }
   }
 

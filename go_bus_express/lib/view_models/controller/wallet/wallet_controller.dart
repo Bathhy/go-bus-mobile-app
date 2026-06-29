@@ -73,7 +73,7 @@ class WalletController extends BaseController<WalletState> {
       case Success<WalletModel?>():
         await _loginAfterCreate(state.tempPin!);
       case Error<WalletModel?>():
-        log('❌ Create wallet error: ${createResult.error.displayMessage}');
+        log('Create wallet error: ${createResult.error.displayMessage}');
         updateState((s) => s.copyWith(
           isLoading: false,
           errorMessage: createResult.error.displayMessage,
@@ -105,7 +105,7 @@ class WalletController extends BaseController<WalletState> {
           ModalRoute.withName(AppRoutes.mainNavigation),
         );
       case Error<WalletModel?>():
-        log('❌ Wallet login error: ${result.error.displayMessage}');
+        log('Wallet login error: ${result.error.displayMessage}');
         updateState((s) => s.copyWith(
           isLoading: false,
           errorMessage: result.error.displayMessage,
@@ -157,7 +157,7 @@ class WalletController extends BaseController<WalletState> {
           hasMorePages: nextPage <= totalPages,
         ));
       case Error<WalletTransactionPage?>():
-        log('❌ Wallet transactions error: ${result.error.displayMessage}');
+        log('Wallet transactions error: ${result.error.displayMessage}');
         updateState((s) => s.copyWith(
           isTransactionLoading: false,
           transactionError: result.error.displayMessage,
@@ -197,7 +197,7 @@ class WalletController extends BaseController<WalletState> {
           updateState((s) => s.copyWith(isLoading: false));
         }
       case Error<WalletModel?>():
-        log('❌ Wallet me error: ${result.error.displayMessage}');
+        log('Wallet me error: ${result.error.displayMessage}');
         updateState((s) => s.copyWith(isLoading: false));
     }
   }
@@ -238,7 +238,7 @@ class WalletController extends BaseController<WalletState> {
           ModalRoute.withName(AppRoutes.mainNavigation),
         );
       case Error<WalletModel?>():
-        log('❌ Auto-login after create error: ${result.error.displayMessage}');
+        log('Auto-login after create error: ${result.error.displayMessage}');
         updateState((s) => s.copyWith(
           isLoading: false,
           errorMessage: result.error.displayMessage,
