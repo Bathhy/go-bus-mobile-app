@@ -6,8 +6,6 @@
 
 <p align="center">
   <img src="go_bus_express/flutter_01.png" width="200" alt="Home screen with route search" />
-  <img src="go_bus_express/flutter_02.png" width="200" alt="Home screen, signed-in user view" />
-  <img src="go_bus_express/assets/images/gobus_poster2.jpg" width="220" alt="GoBus Express promo" />
 </p>
 
 **Home & account**
